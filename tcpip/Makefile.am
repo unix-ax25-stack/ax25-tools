@@ -1,5 +1,5 @@
 
-etcfiles = rip98.conf ttylinkd.conf
+etcfiles = rip98d.conf ttylinkd.conf
 
 installconf:
 	$(mkinstalldirs) $(DESTDIR)$(AX25_SYSCONFDIR)
@@ -10,7 +10,7 @@ installconf:
 
 sbin_PROGRAMS = rip98d ttylinkd
 
-man_MANS = rip98.conf.5 rip98d.8 ttylinkd.conf.5 ttylinkd.8
+man_MANS = rip98d.conf.5 rip98d.8 ttylinkd.conf.5 ttylinkd.8
 
 docdir=${prefix}/doc/ax25-tools
 doc_DATA= ttylinkd.README ttylinkd.INSTALL

@@ -8,12 +8,14 @@
 #include "config.h"
 #include "user_io.h"
 
+#define BUFLEN	8192
+
 int compression		= 0;
 int paclen_in		= 256;
 int paclen_out		= 256;
 
 /* This is for select_loop() */
-static unsigned char buf[8192];
+static unsigned char buf[BUFLEN];
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -22,8 +24,8 @@ static unsigned char buf[8192];
 static int compression_error = 0;
 
 /* These are for the (de)compressor */
-static unsigned char input_buffer[8192];
-static unsigned char output_buffer[8192];
+static unsigned char input_buffer[BUFLEN];
+static unsigned char output_buffer[BUFLEN];
 
 static z_stream incoming_stream;
 static z_stream outgoing_stream;
@@ -62,7 +64,8 @@ static int flush_output(int fd, const void *buf, size_t count)
 	int cnt = count;
 
 	while (cnt > 0) {
-		write(fd, buf, min(paclen_out, cnt));
+		if (write(fd, buf, min(paclen_out, cnt)) < 0)
+			return -1;
 		buf += paclen_out;
 		cnt -= paclen_out;
 	}
@@ -99,7 +102,7 @@ int user_write(int fd, const void *buf, size_t count)
 	do {
 		/* Set up fixed-size output buffer. */
 		outgoing_stream.next_out = output_buffer;
-		outgoing_stream.avail_out = sizeof(output_buffer);
+		outgoing_stream.avail_out = BUFLEN;
 
 		/* Compress as much data into the buffer as possible. */
 		status = deflate(&outgoing_stream, Z_PARTIAL_FLUSH);
@@ -111,8 +114,8 @@ int user_write(int fd, const void *buf, size_t count)
 		}
 
 		/* Now send the compressed data */
-		flush_output(fd, output_buffer, sizeof(output_buffer) - outgoing_stream.avail_out);
-
+		if (flush_output(fd, output_buffer, BUFLEN - outgoing_stream.avail_out) < 0)
+			return -1;
 	} while (outgoing_stream.avail_out == 0);
 
 	return count;
@@ -158,8 +161,8 @@ int user_read(int fd, void *buf, size_t count)
 		incoming_stream.next_in = input_buffer;
 		incoming_stream.avail_in = 0;
 
-		if ((len = read(fd, input_buffer, sizeof(input_buffer))) < 0)
-			return -1;
+		if ((len = read(fd, input_buffer, BUFLEN)) <= 0)
+			return len;
 
 		incoming_stream.avail_in = len;
 	}
@@ -173,11 +176,11 @@ int select_loop(int s)
 	fd_set read_fd;
 	int n;
 
-	if (fcntl(s, F_SETFL, O_NONBLOCK) == -1) {
+	if (fcntl(s, F_SETFL, O_NONBLOCK) < 0) {
 		close(s);
 		return -1;
 	}
-	if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK) == -1) {
+	if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK) < 0) {
 		close(s);
 		return -1;
 	}
@@ -193,18 +196,18 @@ int select_loop(int s)
 		select(s + 1, &read_fd, NULL, NULL, NULL);
 
 		if (FD_ISSET(s, &read_fd)) {
-			while ((n = user_read(s, buf, 8192)) > 0)
+			while ((n = user_read(s, buf, BUFLEN)) > 0)
 				user_write(STDOUT_FILENO, buf, n);
-			if (n == 0 || errno != EAGAIN) {
+			if (n == 0 || (n < 0 && errno != EAGAIN)) {
 				close(s);
 				break;
 			}
 		}
 
 		if (FD_ISSET(STDIN_FILENO, &read_fd)) {
-			while ((n = user_read(STDIN_FILENO, buf, 8192)) > 0)
+			while ((n = user_read(STDIN_FILENO, buf, BUFLEN)) > 0)
 				user_write(s, buf, n);
-			if (n == 0 || errno != EAGAIN) {
+			if (n == 0 || (n < 0 && errno != EAGAIN)) {
 				close(s);
 				break;
 			}

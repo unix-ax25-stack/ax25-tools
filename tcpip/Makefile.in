@@ -61,7 +61,9 @@ AWK = @AWK@
 AX25IO_LIB = @AX25IO_LIB@
 AX25_LIB = @AX25_LIB@
 CC = @CC@
+CXX = @CXX@
 DMASCC = @DMASCC@
+FLTK_LIB = @FLTK_LIB@
 MAKEINFO = @MAKEINFO@
 NCURSES_LIB = @NCURSES_LIB@
 PACKAGE = @PACKAGE@
@@ -69,11 +71,11 @@ UTIL_LIB = @UTIL_LIB@
 VERSION = @VERSION@
 Z_LIB = @Z_LIB@
 
-etcfiles = rip98.conf ttylinkd.conf
+etcfiles = rip98d.conf ttylinkd.conf
 
 sbin_PROGRAMS = rip98d ttylinkd
 
-man_MANS = rip98.conf.5 rip98d.8 ttylinkd.conf.5 ttylinkd.8
+man_MANS = rip98d.conf.5 rip98d.8 ttylinkd.conf.5 ttylinkd.8
 
 docdir = ${prefix}/doc/ax25-tools
 doc_DATA = ttylinkd.README ttylinkd.INSTALL
@@ -100,6 +102,10 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I..
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
+X_CFLAGS = @X_CFLAGS@
+X_LIBS = @X_LIBS@
+X_EXTRA_LIBS = @X_EXTRA_LIBS@
+X_PRE_LIBS = @X_PRE_LIBS@
 rip98d_OBJECTS =  rip98d.o rip98r.o rip98t.o
 rip98d_DEPENDENCIES = 
 rip98d_LDFLAGS = 

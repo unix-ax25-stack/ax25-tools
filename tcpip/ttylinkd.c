@@ -1,6 +1,6 @@
 /*
  * ttylinkd:  A ttylink daemon using the ntalkd protocol.
- * Copyright (C) 1996,1197 Craig Small (csmall@gonzo.triode.net.au)
+ * Copyright (C) 1996,1197,2000 Craig Small (csmall@small.dropbear.id.au)
  *
  * This program is free software ; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
   *  04/03/97   cs  Added config file, no more defines.
   *  09/03/97   tjd Enhanced to allow specifying user@hostname.wherever.
   *                 rather than be confined to localhost.
+  *  04/01/00   cs  Minor stuff with email addresses
   */
 #include <ctype.h>
 #include <signal.h>

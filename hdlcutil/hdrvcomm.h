@@ -30,9 +30,13 @@
 #ifndef _HDRVCOMM_H
 #define _HDRVCOMM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ---------------------------------------------------------------------- */
 
-#define HDRVC_KERNEL 1 //why was undef here ???
+#define HDRVC_KERNEL 1
 
 /* ---------------------------------------------------------------------- */
 
@@ -106,4 +110,7 @@ extern int hdrvc_diag(struct sm_diag_data *diag);
 #endif /* HDRVC_KERNEL */
 
 /* ---------------------------------------------------------------------- */
+#ifdef __cplusplus
+	   }
+#endif
 #endif /* _HDRVCOMM_H */

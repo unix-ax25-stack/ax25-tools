@@ -3,7 +3,7 @@
 /*
  *	sethdlc.c  -- kernel HDLC radio modem driver setup utility.
  *
- *	Copyright (C) 1996  Thomas Sailer (sailer@ife.ee.ethz.ch)
+ *	Copyright (C) 1996,1997,2000  Thomas Sailer (sailer@ife.ee.ethz.ch)
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -25,9 +25,10 @@
  *
  *
  * History:
- *   0.1  16.10.96  Adapted from setbaycom.c and setsm.c
- *   0.2  20.11.96  New mode set/query code
- *   0.5  11.05.97  introduced hdrvcomm.h
+ *   0.1  16.10.1996  Adapted from setbaycom.c and setsm.c
+ *   0.2  20.11.1996  New mode set/query code
+ *   0.5  11.05.1997  introduced hdrvcomm.h
+ *   0.6  05.01.2000  glibc compile fixes
  */
 
 /*****************************************************************************/
@@ -41,12 +42,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-/*#include <linux/if.h>*/
 #include <net/if.h>
 #include "hdrvcomm.h"
-
-#include <linux/soundmodem.h>
-#include <linux/baycom.h>
 
 /* ---------------------------------------------------------------------- */
 

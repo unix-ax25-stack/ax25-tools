@@ -3,7 +3,7 @@
 /*
  *	smmixer.c  -- kernel soundcard radio modem driver mixer utility.
  *
- *	Copyright (C) 1996  Thomas Sailer (sailer@ife.ee.ethz.ch)
+ *	Copyright (C) 1996,1997,2000  Thomas Sailer (sailer@ife.ee.ethz.ch)
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -25,8 +25,9 @@
  *
  *
  * History:
- *   0.1  26.06.96  Started
- *   0.2  11.05.97  introduced hdrvcomm.h
+ *   0.1  26.06.1996  Started
+ *   0.2  11.05.1997  introduced hdrvcomm.h
+ *   0.3  05.01.2000  glibc compile fixes
  */
 
 /*****************************************************************************/
@@ -41,7 +42,6 @@
 #include <net/if.h>
 #include "hdrvcomm.h"
 
-#include <linux/soundmodem.h>
 /* ---------------------------------------------------------------------- */
 
 static char *progname;
@@ -56,9 +56,7 @@ static int do_mix_ioctl(int cmd, struct sm_mixer_data *mixdat)
 
 	par.cmd = cmd;
 	par.data.mix = *mixdat;
-#ifdef HDRVC_KERNEL
 	i = hdrvc_sm_ioctl(cmd, &par);
-#endif
 	*mixdat = par.data.mix;
 	return i;
 }

@@ -37,6 +37,7 @@ void nodes(int s, char *nodecall, char *op, char *ident, int quality, int count,
 {
 	struct nr_route_struct nr_node;
 	char *p, *q, *dev;
+	int i;
 
 	if (ax25_config_load_ports() == 0) {
 		fprintf(stderr, "nrparms: nodes: no AX.25 ports configured\n");
@@ -44,7 +45,7 @@ void nodes(int s, char *nodecall, char *op, char *ident, int quality, int count,
 	}
 
 	nr_node.type   = NETROM_NODE;
-	/*nr_node.ndigis = 0;*/
+	nr_node.ndigis = 0;
 
 	if (op[0] != '+' && op[0] != '-') {
 		fprintf(stderr, "nrparms: nodes: invalid operation %s\n", op);
@@ -95,7 +96,7 @@ void nodes(int s, char *nodecall, char *op, char *ident, int quality, int count,
 		close(s);
 		exit(1);
 	}
-	/*
+
 	for (i = 0; i < AX25_MAX_DIGIS && digis[i] != NULL; i++) {
 		if (ax25_aton_entry(digis[i], nr_node.digipeaters[i].ax25_call) != 0) {
 			fprintf(stderr, "nrparms: invalid callsign %s\n", digis[i]);
@@ -103,7 +104,7 @@ void nodes(int s, char *nodecall, char *op, char *ident, int quality, int count,
 			exit(1);
 		}
 		nr_node.ndigis++;
-	} */
+	}
 
 	if ((dev = ax25_config_get_dev(port)) == NULL) {
 		fprintf(stderr, "nrparms: nodes: invalid port name - %s\n", port);

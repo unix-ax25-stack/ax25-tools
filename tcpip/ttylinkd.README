@@ -28,7 +28,7 @@ BUGS / TO DO
 CREDITS
 =======
 This program and documentation Copyright (C) 1997 Craig Small VK2XLZ
-(csmall@gonzo.triode.net.au), (csmall@gonzo.vk2xlz.ampr.org).
+<csmall@small.dropbear.id.au>
 Please read the file ttylinkd.c for full notice.
 Thanks to Tomi Manninen OH2BNS for the AX.25 patches in 0.02
 Thanks to Tomi again for the short callsign fix in 0.03

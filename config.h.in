@@ -36,6 +36,9 @@
 /* Define to `int' if <sys/types.h> doesn't define.  */
 #undef uid_t
 
+/* Define if the X Window System is missing or not being used.  */
+#undef X_DISPLAY_MISSING
+
 /* Define if you have a proper netax25/ax25.h header file. */
 #undef HAVE_NETAX25_AX25_H 
 

@@ -3,7 +3,7 @@
 /*
  *	hdrvcomm.c  -- HDLC driver communications.
  *
- *	Copyright (C) 1996  Thomas Sailer (sailer@ife.ee.ethz.ch)
+ *	Copyright (C) 1996-1998  Thomas Sailer (sailer@ife.ee.ethz.ch)
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@
  *
  *
  * History:
- *   0.1  10.5.97  Started
+ *   0.1  10.05.97  Started
+ *   0.2  14.04.98  Tried to implement AF_PACKET
  */
 
 /*****************************************************************************/
@@ -36,33 +37,34 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
-#include <sys/socket.h>
+/*#include <sys/socket.h>*/
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <asm/byteorder.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
-#ifdef __GLIBC__
-#include <netinet/if_ether.h>
-#else
-#include <linux/if_ether.h>
-#endif
 #include <net/if.h>
 #include "hdrvcomm.h"
 #include "usersmdiag.h"
+#include <net/if_arp.h>
+#include <linux/if_ether.h>
+#include <linux/if_packet.h>
+#ifndef SOL_PACKET
+#define SOL_PACKET  263
+#endif
 
-#include <linux/hdlcdrv.h>
 /* ---------------------------------------------------------------------- */
 
 #ifdef HDRVC_KERNEL
 static int kernel_mode = 1;
 #endif /* HDRVC_KERNEL */
-static char *if_name = "bc0";
+static char *if_name = "bcsf0";
 static char *prg_name;
 static int fd = -1;
 static struct ifreq ifr_h;
 static int promisc = 0;
+static int afpacket = 1;
 static int msqid = -1;
 
 /* ---------------------------------------------------------------------- */
@@ -93,39 +95,62 @@ static void terminate_sig(int signal)
 int hdrvc_recvpacket(char *pkt, int maxlen)
 {
 	struct ifreq ifr_new;
-	struct sockaddr from;
+	struct sockaddr_ll from;
 	int from_len = sizeof(from);
 
 #ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		if (!promisc) {
-			struct sockaddr sa;
+			if (afpacket) {
+				struct sockaddr_ll sll;
+				struct packet_mreq mr;
+
+				memset(&sll, 0, sizeof(sll));
+				sll.sll_family = AF_PACKET;
+				sll.sll_ifindex = ifr_h.ifr_ifindex;
+				sll.sll_protocol = htons(ETH_P_AX25);
+				if (bind(fd, (struct sockaddr *)&sll, sizeof(sll)) < 0) {
+					fprintf(stderr, "%s: Error %s (%i) bind failed\n",
+						prg_name, strerror(errno), errno);
+					exit(-2);
+				}
+				memset(&mr, 0, sizeof(mr));
+				mr.mr_ifindex = sll.sll_ifindex;
+				mr.mr_type = PACKET_MR_PROMISC;
+				if (setsockopt(fd, SOL_PACKET, PACKET_ADD_MEMBERSHIP, (char *)&mr, sizeof(mr)) < 0) {
+					fprintf(stderr, "%s: Error %s (%i) setsockopt SOL_PACKET, PACKET_ADD_MEMBERSHIP failed\n",
+						prg_name, strerror(errno), errno);
+					exit(-2);
+				}
+			} else {
+				struct sockaddr sa;
 			
-			strcpy(sa.sa_data, if_name);
-			sa.sa_family = AF_INET;
-			if (bind(fd, &sa, sizeof(struct sockaddr)) < 0) {
-				fprintf(stderr, "%s: Error %s (%i) bind failed\n",
-					prg_name, strerror(errno), errno);
-				exit(-2);
-			}
-			ifr_new = ifr_h;
-			ifr_new.ifr_flags |= IFF_PROMISC;
-			if (ioctl(fd, SIOCSIFFLAGS, &ifr_new) < 0) {
-				perror("ioctl (SIOCSIFFLAGS)");
-				exit(1);
-			}
-			signal(SIGTERM, terminate_sig);
-			signal(SIGQUIT, terminate_sig);
-			if (atexit((void (*)(void))terminate)) {
-				perror("atexit");
-				terminate();
+				strcpy(sa.sa_data, if_name);
+				sa.sa_family = AF_INET;
+				if (bind(fd, &sa, sizeof(sa)) < 0) {
+					fprintf(stderr, "%s: Error %s (%i) bind failed\n",
+						prg_name, strerror(errno), errno);
+					exit(-2);
+				}
+				ifr_new = ifr_h;
+				ifr_new.ifr_flags |= IFF_PROMISC;
+				if (ioctl(fd, SIOCSIFFLAGS, &ifr_new) < 0) {
+					perror("ioctl (SIOCSIFFLAGS)");
+					exit(1);
+				}
+				signal(SIGTERM, terminate_sig);
+				signal(SIGQUIT, terminate_sig);
+				if (atexit((void (*)(void))terminate)) {
+					perror("atexit");
+					terminate();
+				}
 			}
 			promisc = 1;
 			fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
 		}
 		if (!pkt || maxlen < 2)
 			return 0;
-		return recvfrom(fd, pkt, maxlen, 0, &from, &from_len);
+		return recvfrom(fd, pkt, maxlen, 0, (struct sockaddr *)&from, &from_len);
 	}
 #endif /* HDRVC_KERNEL */
 	return -1;
@@ -185,34 +210,53 @@ void hdrvc_args(int *argc, char *argv[], char *def_if)
 
 void hdrvc_init(void)
 {
+	key_t k;
+	static struct ifreq ifr;
+
 #ifdef HDRVC_KERNEL
 	if (kernel_mode) {
-		if ((fd = socket(PF_INET, SOCK_PACKET, htons(ETH_P_AX25))) < 0) {
-			fprintf(stderr, "%s: Error %s (%i), cannot open %s\n", prg_name, 
-				strerror(errno), errno, if_name);
-			exit(-1);
-		}
 		strcpy(ifr_h.ifr_name, if_name);
-		if (ioctl(fd, SIOCGIFFLAGS, &ifr_h) < 0) {
-			fprintf(stderr, "%s: Error %s (%i), cannot ioctl %s\n", prg_name, 
+		/* first try to use AF_PACKET */
+		if ((fd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_AX25))) < 0
+		    || ioctl(fd, SIOCGIFINDEX, &ifr_h) < 0) {
+			if (fd >= 0)
+				close(fd);
+			afpacket = 0;
+			if ((fd = socket(PF_INET, SOCK_PACKET, htons(ETH_P_AX25))) < 0) {
+				fprintf(stderr, "%s: Error %s (%i), cannot open %s\n", prg_name, 
+					strerror(errno), errno, if_name);
+				exit(-1);
+			}
+			if (ioctl(fd, SIOCGIFFLAGS, &ifr_h) < 0) {
+				fprintf(stderr, "%s: Error %s (%i), cannot ioctl SIOCGIFFLAGS %s\n", prg_name, 
+					strerror(errno), errno, if_name);
+				exit(-1);
+			}
+		}
+		strcpy(ifr.ifr_name, if_name);
+		if (ioctl(fd, SIOCGIFHWADDR, &ifr) < 0 ) {
+			fprintf(stderr, "%s: Error %s (%i), cannot ioctl SIOCGIFHWADDR %s\n", prg_name, 
 				strerror(errno), errno, if_name);
 			exit(-1);
+                }
+		if (ifr.ifr_hwaddr.sa_family != ARPHRD_AX25) {
+			fprintf(stderr, "%s: Error, interface %s not AX25 (%i)\n", prg_name, 
+				if_name, ifr.ifr_hwaddr.sa_family);
+			exit(-1);
 		}
-	} else 
+		return;
+	}
 #endif /* HDRVC_KERNEL */
-	{
-		key_t k = ftok(if_name, USERSM_KEY_PROJ);
-		
-		if (k == (key_t)-1) {
-			fprintf(stderr, "%s: Error %s (%i), cannot ftok on %s\n", prg_name, 
-				strerror(errno), errno, if_name);
-			exit(-1);
-		}
-		if ((msqid = msgget(k, 0700)) < 0) {
-			fprintf(stderr, "%s: Error %s (%i), cannot msgget %d\n", prg_name, 
-				strerror(errno), errno, k);
-			exit(-1);
-		}
+	k = ftok(if_name, USERSM_KEY_PROJ);
+	if (k == (key_t)-1) {
+		fprintf(stderr, "%s: Error %s (%i), cannot ftok on %s\n", prg_name, 
+			strerror(errno), errno, if_name);
+		exit(-1);
+	}
+	if ((msqid = msgget(k, 0700)) < 0) {
+		fprintf(stderr, "%s: Error %s (%i), cannot msgget %d\n", prg_name, 
+			strerror(errno), errno, k);
+		exit(-1);
 	}
 }
 

@@ -16,7 +16,7 @@ In operation
 that each neighbour that also uses RIP98 must be listed. RIP98 is not a
 broadcast protocol and each neighbour is individually contacted. Any
 incoming RIP98 message is also validated against this list. The list of
-neighbours is held in /etc/ax25/rip98.conf, and each line is
+neighbours is held in /etc/ax25/rip98d.conf, and each line is
 either the name or the dotted decimal IP address of the neighbour.
 .LP
 The time interval between RIP98 transmissions is set to one hour by default
@@ -48,7 +48,7 @@ Display the version.
 .nf
 /proc/net/route
 .br
-/etc/ax25/rip98.conf
+/etc/ax25/rip98d.conf
 .fi
 .SH "SEE ALSO"
 .BR rip98.conf (5),
