@@ -37,10 +37,10 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
-/*#include <sys/socket.h>*/
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <asm/byteorder.h>
+#include <endian.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>

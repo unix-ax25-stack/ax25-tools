@@ -52,7 +52,7 @@
 #else
 #include <linux/if_ether.h>
 #endif
-#include <asm/byteorder.h>
+#include <endian.h>
 
 #include "yam.h"
 

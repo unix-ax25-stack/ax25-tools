@@ -30,6 +30,7 @@
 
 /*****************************************************************************/
 
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <stdio.h>
@@ -37,7 +38,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <asm/byteorder.h>
+#include <endian.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
