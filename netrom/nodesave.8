@@ -1,0 +1,31 @@
+.TH NODESAVE 8 "21 May 1996" Linux "Linux System Managers Manual"
+.SH NAME
+nodesave \- Saves NET/ROM routing information
+.SH SYNOPSIS
+.B nodesave [filename]
+.SH DESCRIPTION
+.LP
+.B Nodesave
+saves the contents of the /proc filesystem entries for the NET/ROM routing
+tables. The output of the program is in the form of a Bourne shell script
+that calls nrparms(8) to recreate the NET/ROM routing information. If no
+filename is given on the command line, the program writes the script to
+stdout.
+.LP
+Typically
+.B nodesave
+would be used when taking a system off-air so that the NET/ROM routing may
+be quickly restored when the system is brought back on-line.
+.SH FILES
+.nf
+/proc/net/nr_neigh
+.br
+/proc/net/nr_nodes
+.fi
+.SH "SEE ALSO"
+.BR netrom (4),
+.BR netromd (8),
+.BR nrparms (8).
+.LP
+.SH AUTHOR
+Tomi Manninen OH2BNS <tpmannin@cc.hut.fi>
