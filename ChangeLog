@@ -2,6 +2,7 @@ ax25-tools (0.0.9)
 	* Fix for mkiss pid problem 
 	* Removed inline statesment in hdrvcomm.c
 	* Added remaining missing sys/time.h
+	* Netromd now uses PF_SOCKET
 
  -- Craig Small <csmall@small.dropbear.id.au>  NO RELEASE YET
 

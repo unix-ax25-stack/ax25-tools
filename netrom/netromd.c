@@ -213,7 +213,7 @@ int main(int argc, char **argv)
 	ax25_aton_entry(nr_config_get_addr(NULL), (char *)&my_call);
 	ax25_aton_entry("NODES", (char *)&node_call);
 	
-	if ((s = socket(AF_INET, SOCK_PACKET, htons(ETH_P_AX25))) == -1) {
+	if ((s = socket(PF_PACKET, SOCK_PACKET, htons(ETH_P_AX25))) == -1) {
 		perror("netromd: socket");
 		return 1;
 	}
