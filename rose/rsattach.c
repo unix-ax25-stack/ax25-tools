@@ -8,6 +8,8 @@
 #include <ctype.h>
 #include <netdb.h>
 
+#include <config.h>
+
 #include <sys/ioctl.h>
 
 #include <sys/socket.h>
@@ -16,11 +18,24 @@
 #include <net/if_arp.h>
 /* #include <linux/sockios.h> */
 
-#include <netax25/ax25.h>
-#include <netrose/rose.h>
-#include <netax25/axlib.h>
 
-#include <config.h>
+#ifdef HAVE_NETAX25_AX25_H
+#include <netax25/ax25.h>
+#else
+#include <netax25/kernel_ax25.h>
+#endif
+#ifdef HAVE_NETROM_NETROM_H
+#include <netrom/netrom.h>
+#else
+#include <netax25/kernel_netrom.h>
+#endif
+#ifdef HAVE_NETROSE_ROSE_H
+#include <netrose/rose.h>
+#else 
+#include <netax25/kernel_rose.h>
+#endif
+
+#include <netax25/axlib.h>
 
 #include "../pathnames.h"
 

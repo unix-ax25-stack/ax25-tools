@@ -58,22 +58,30 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 AWK = @AWK@
+AX25IO_LIB = @AX25IO_LIB@
+AX25_LIB = @AX25_LIB@
 CC = @CC@
 MAKEINFO = @MAKEINFO@
 NCURSES_LIB = @NCURSES_LIB@
 PACKAGE = @PACKAGE@
+UTIL_LIB = @UTIL_LIB@
 VERSION = @VERSION@
+Z_LIB = @Z_LIB@
 
 etcfiles = rsports
 etcdir = $(sysconfdir)/ax25
 
 sbin_PROGRAMS = rsattach rsdwnlnk rsmemsiz rsparms rsuplnk 
 
+LDADD = $(AX25_LIB)
+
+rsmemsiz_LDADD = 
+
 sbin_SCRIPTS = rsusers.sh
 
 man_MANS = rose.4 rsports.5 rsattach.8 rsparms.8 rsdwnlnk.8 rsuplnk.8
 
-EXTRA_DIST = $(man_MANS) $(etcfiles)
+EXTRA_DIST = $(man_MANS) $(etcfiles) $(sbin_SCRIPTS)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
@@ -100,7 +108,6 @@ rsdwnlnk_DEPENDENCIES =
 rsdwnlnk_LDFLAGS = 
 rsmemsiz_SOURCES = rsmemsiz.c
 rsmemsiz_OBJECTS =  rsmemsiz.o
-rsmemsiz_LDADD = $(LDADD)
 rsmemsiz_DEPENDENCIES = 
 rsmemsiz_LDFLAGS = 
 rsparms_SOURCES = rsparms.c

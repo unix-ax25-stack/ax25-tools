@@ -5,6 +5,8 @@ sbin_PROGRAMS = setcrystal sethdlc smmixer smdiag
 
 man_MANS = sethdlc.8 smdiag.8 smmixer.8 baycom.9 hdlcdrv.9 soundmodem.9
 
+EXTRA_DIST = $(man_MANS)
+
 setcrystal_SOURCES = 	\
 	setcrystal.c
 

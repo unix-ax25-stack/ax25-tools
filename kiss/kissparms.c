@@ -3,15 +3,23 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <config.h>
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <net/if.h>
 #include <net/ethernet.h>
 
+#ifdef HAVE_NETAX25_AX25_H
 #include <netax25/ax25.h>
-#include <netax25/axconfig.h>
-
-#include <config.h>
+#else
+#include <netax25/kernel_ax25.h>
+#endif
+#ifdef HAVE_NETROSE_ROSE_H
+#include <netrose/rose.h>
+#else 
+#include <netax25/kernel_rose.h>
+#endif
 
 #define	PARAM_TXDELAY	1
 #define	PARAM_PERSIST	2

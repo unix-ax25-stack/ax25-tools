@@ -58,15 +58,21 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 AWK = @AWK@
+AX25IO_LIB = @AX25IO_LIB@
+AX25_LIB = @AX25_LIB@
 CC = @CC@
 MAKEINFO = @MAKEINFO@
 NCURSES_LIB = @NCURSES_LIB@
 PACKAGE = @PACKAGE@
+UTIL_LIB = @UTIL_LIB@
 VERSION = @VERSION@
+Z_LIB = @Z_LIB@
 
 sbin_PROGRAMS = setcrystal sethdlc smmixer smdiag
 
 man_MANS = sethdlc.8 smdiag.8 smmixer.8 baycom.9 hdlcdrv.9 soundmodem.9
+
+EXTRA_DIST = $(man_MANS)
 
 setcrystal_SOURCES =  	setcrystal.c
 

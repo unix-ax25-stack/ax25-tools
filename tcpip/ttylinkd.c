@@ -35,6 +35,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <config.h>
+
 #define osockaddr sockaddr
 #include <protocols/talkd.h>
 
@@ -45,8 +47,16 @@
 #include <sys/ioctl.h>
 
 #include <sys/socket.h>
+#ifdef HAVE_NETAX25_AX25_H
 #include <netax25/ax25.h>
+#else
+#include <netax25/kernel_ax25.h>
+#endif
+#ifdef HAVE_NETROSE_ROSE_H
 #include <netrose/rose.h>
+#else 
+#include <netax25/kernel_rose.h>
+#endif
 
 #include "../pathnames.h"
 

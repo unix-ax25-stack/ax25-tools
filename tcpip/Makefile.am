@@ -21,3 +21,5 @@ rip98d_SOURCES = 	\
 	rip98t.c	\
 	rip98d.h
 
+rip98d_LDADD = $(AX25_LIB)
+

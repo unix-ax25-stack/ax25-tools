@@ -10,20 +10,28 @@
 #include <netdb.h>
 #include <syslog.h>
 
+#include <config.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 
 #include <net/if.h>
+#ifdef HAVE_NETAX25_AX25_H
 #include <netax25/ax25.h>
+#else
+#include <netax25/kernel_ax25.h>
+#endif
+#ifdef HAVE_NETROSE_ROSE_H
 #include <netrose/rose.h>
+#else 
+#include <netax25/kernel_rose.h>
+#endif
 
 #include <netax25/daemon.h>
 #include <netax25/axlib.h>
 #include <netax25/ttyutils.h>
-
-#include <config.h>
 
 #include "../pathnames.h"
 

@@ -19,6 +19,9 @@ sbin_PROGRAMS = ax25d axctl axparms axspawn beacon bpqparms mheardd rxecho
 
 bin_PROGRAMS = mheard
 
+LDADD = $(AX25_LIB)
+axspawn_LDADD = $(AX25_LIB) $(UTIL_LIB)
+
 man_MANS = ax25.4 ax25d.conf.5 axports.5 axspawn.conf.5 rxecho.conf.5 \
 	   ax25d.8 axctl.8 axparms.8 axspawn.8 beacon.8 bpqparms.8 \
 	   mheard.1 mheardd.8 rxecho.8

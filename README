@@ -1,16 +1,14 @@
 AX25 Tools
 ==========
 
-THESE TOOLS ARE ALPHA CODE AND IS ONLY BEEN RELEASE FOR DEVELOPERS FOR
-DEBUGGING.
-
-This means if you are only installing this because it is the latest
-and greatest and you don't understand how to diagnose bugs, then you
-should probably not run it and go back to the ax25-utils-2*
-packages.
-
 You are supposed to use glibc 2.1 (libc6 unstable libraries) for this
 package.  I have attempted to cater for glibc 2.0 users here.
+
+More specifically, it is recommended that you use a glibc newer than
+2 May 1999, I believe Debian libc6 package 2.1.1-5 will do.
+
+These tools were built on a Debian system, potato release, the libraries
+are libc6 2.1.1-10 and ncurses 4.2-3.2.  Kernel is 2.2.5
 
   - Craig Small <csmall@small.dropbear.id.au>
 

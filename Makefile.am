@@ -9,3 +9,6 @@ installconf:
 	@for app in $(SUBDIRS); do $(MAKE) -C $$app installconf; done
 
 SUBDIRS = ax25 hdlcutil kiss netrom rose tcpip user_call 
+
+EXTRA_DIST = pathnames.h
+
