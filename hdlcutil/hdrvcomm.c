@@ -40,7 +40,7 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <endian.h>
-#include <endian.h>
+#include <netinet/in.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>

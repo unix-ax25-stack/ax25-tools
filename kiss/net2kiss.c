@@ -39,6 +39,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <endian.h>
+#include <netinet/in.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>

@@ -53,6 +53,7 @@
 #include <linux/if_ether.h>
 #endif
 #include <endian.h>
+#include <netinet/in.h>
 
 #include "yam.h"
 
