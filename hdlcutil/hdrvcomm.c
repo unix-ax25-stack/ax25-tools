@@ -39,7 +39,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
-#include <asm/byteorder.h>
+#include <endian.h>
 #include <endian.h>
 #include <fcntl.h>
 #include <unistd.h>
