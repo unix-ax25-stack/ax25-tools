@@ -1,0 +1,6 @@
+Makefile
+sethdlc
+smdiag
+smmixer
+.deps
+*.o
