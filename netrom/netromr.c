@@ -108,7 +108,7 @@ static int add_node(int s, unsigned char *buffer, struct nr_route_struct *nr_nod
 
 	if (!validcallsign(&best_neighbour)) {
 		if (debug && logging)
-			syslog(LOG_DEBUG, "netromr: add_node: invalid best neighbour callsign - %s", &best_neighbour);
+			syslog(LOG_DEBUG, "netromr: add_node: invalid best neighbour callsign - %s", ax25_ntoa(&best_neighbour));
 		return -1;
 	}
 

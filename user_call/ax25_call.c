@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 		err(buffer);
 	}
 
-	if (ax25_aton_arglist(argv + optind + 2, &axconnect) == -1) {
+	if (ax25_aton_arglist((const char**)(&argv[optind + 2]), &axconnect) == -1) {
 		sprintf(buffer, "ERROR: invalid destination callsign or digipeater\r");
 		err(buffer);
 	}

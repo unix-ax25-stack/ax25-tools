@@ -4,12 +4,12 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <signal.h>
+#include <time.h>
 
 #include <config.h>
 
 #include <sys/types.h>
 #include <sys/ioctl.h>
-#include <sys/time.h>
 
 #include <sys/socket.h>
 #include <netinet/in.h>

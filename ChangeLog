@@ -1,3 +1,20 @@
+ax25-tools (0.0.8)
+	* kissattach now tells you where it thinks the config file is
+	* rip98r metric patch form Jean-Paul
+	* Fix for FTLK_LIB for configure.in from Hans
+	* Works better with newer GCCs (thanks again to Hans)
+	* Fixed sockaddr/osockaddr problem in ttylink
+	* Changed bcopy and bzero to memcpy and memset
+	* netromd was printing raw callsigns, now use ax25_ntoa()
+	* synced dmascc_cfg to Klauss' latest
+
+ -- Craig Small <csmall@small.dropbear.id.au>  
+
+ax25-tools (0.0.7)
+	* Fixed automake/autoconf stuff to sort out FLTK tools.
+
+ -- Craig Small <csmall@small.dropbear.id.au>  Thu, 26 Oct 2000 14:19:32 +1100
+
 ax25-tools (0.0.6)
 	* Added the new fltk smdiag and friends and put the old non-X based
 	  ones back in.
