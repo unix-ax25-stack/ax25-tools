@@ -62,7 +62,6 @@ AX25IO_LIB = @AX25IO_LIB@
 AX25_LIB = @AX25_LIB@
 CC = @CC@
 CXX = @CXX@
-DMASCC = @DMASCC@
 FLTK_LIB = @FLTK_LIB@
 MAKEINFO = @MAKEINFO@
 NCURSES_LIB = @NCURSES_LIB@
@@ -71,8 +70,7 @@ UTIL_LIB = @UTIL_LIB@
 VERSION = @VERSION@
 Z_LIB = @Z_LIB@
 
-dmascc = @DMASCC@
-SUBDIRS = ax25 hdlcutil kiss netrom rose tcpip user_call yamdrv $(dmascc)
+SUBDIRS = ax25 hdlcutil kiss netrom rose tcpip user_call yamdrv dmascc
 
 EXTRA_DIST = pathnames.h
 
@@ -97,9 +95,9 @@ GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
@@ -266,10 +264,15 @@ distdir: $(DISTFILES)
 	-rm -rf $(distdir)
 	mkdir $(distdir)
 	-chmod 777 $(distdir)
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	cd $(top_srcdir) \
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
