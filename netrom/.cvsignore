@@ -6,3 +6,4 @@ nrbroadcast
 nrparms
 nrsdrv
 .deps
+*.o

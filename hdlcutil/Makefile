@@ -70,27 +70,31 @@ UTIL_LIB = -lutil
 VERSION = 0.0.9
 Z_LIB = -lz
 
-sbin_PROGRAMS = rsattach rsdwnlnk rsmemsiz rsparms rsuplnk 
+X11_bin_programs = smdiag
 
-LDADD = $(AX25_LIB)
+SUBDIRS = fl
 
-rsmemsiz_LDADD = 
+bin_PROGRAMS = sethdlc smmixer $(X11_bin_programs)
 
-sbin_SCRIPTS = rsusers.sh
+sethdlc_SOURCES = sethdlc.c hdrvcomm.c hdrvcomm.h usersmdiag.h
+smmixer_SOURCES = smmixer.c hdrvcomm.c hdrvcomm.h usersmdiag.h
+smdiag_SOURCES = smdiag.c hdrvcomm.c hdrvcomm.h usersmdiag.h
 
-man_MANS = rose.4 rsattach.8 rsparms.8 rsdwnlnk.8 rsuplnk.8
-
-EXTRA_DIST = $(man_MANS) $(sbin_SCRIPTS)
+smdiag_LDADD = $(X_LIBS) -lX11 $(X_EXTRA_LIBS)
 
 INCLUDES = -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" 	   -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\" 
 
 
-AX25_SYSCONFDIR = ${sysconfdir}/ax25/
-AX25_LOCALSTATEDIR = ${localstatedir}/ax25/
+AX25_SYSCONFDIR = $(sysconfdir)/ax25/
+AX25_LOCALSTATEDIR = $(localstatedir)/ax25/
+
+man_MANS = sethdlc.8 smmixer.8 baycom.9 hdlcdrv.9 soundmodem.9 smdiag.8
+
+EXTRA_DIST = $(man_MANS) 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
-PROGRAMS =  $(sbin_PROGRAMS)
+PROGRAMS =  $(bin_PROGRAMS)
 
 
 DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I..
@@ -101,38 +105,23 @@ X_CFLAGS =
 X_LIBS =  -L/usr/X11R6/lib
 X_EXTRA_LIBS = 
 X_PRE_LIBS =  -lSM -lICE
-rsattach_SOURCES = rsattach.c
-rsattach_OBJECTS =  rsattach.o
-rsattach_LDADD = $(LDADD)
-rsattach_DEPENDENCIES = 
-rsattach_LDFLAGS = 
-rsdwnlnk_SOURCES = rsdwnlnk.c
-rsdwnlnk_OBJECTS =  rsdwnlnk.o
-rsdwnlnk_LDADD = $(LDADD)
-rsdwnlnk_DEPENDENCIES = 
-rsdwnlnk_LDFLAGS = 
-rsmemsiz_SOURCES = rsmemsiz.c
-rsmemsiz_OBJECTS =  rsmemsiz.o
-rsmemsiz_DEPENDENCIES = 
-rsmemsiz_LDFLAGS = 
-rsparms_SOURCES = rsparms.c
-rsparms_OBJECTS =  rsparms.o
-rsparms_LDADD = $(LDADD)
-rsparms_DEPENDENCIES = 
-rsparms_LDFLAGS = 
-rsuplnk_SOURCES = rsuplnk.c
-rsuplnk_OBJECTS =  rsuplnk.o
-rsuplnk_LDADD = $(LDADD)
-rsuplnk_DEPENDENCIES = 
-rsuplnk_LDFLAGS = 
-SCRIPTS =  $(sbin_SCRIPTS)
-
+sethdlc_OBJECTS =  sethdlc.o hdrvcomm.o
+sethdlc_LDADD = $(LDADD)
+sethdlc_DEPENDENCIES = 
+sethdlc_LDFLAGS = 
+smmixer_OBJECTS =  smmixer.o hdrvcomm.o
+smmixer_LDADD = $(LDADD)
+smmixer_DEPENDENCIES = 
+smmixer_LDFLAGS = 
+smdiag_OBJECTS =  smdiag.o hdrvcomm.o
+smdiag_DEPENDENCIES = 
+smdiag_LDFLAGS = 
 CFLAGS = -g -O2 -Wall
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
-man4dir = $(mandir)/man4
 man8dir = $(mandir)/man8
+man9dir = $(mandir)/man9
 MANS = $(man_MANS)
 
 NROFF = nroff
@@ -143,45 +132,45 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/rsattach.P .deps/rsdwnlnk.P .deps/rsmemsiz.P \
-.deps/rsparms.P .deps/rsuplnk.P
-SOURCES = rsattach.c rsdwnlnk.c rsmemsiz.c rsparms.c rsuplnk.c
-OBJECTS = rsattach.o rsdwnlnk.o rsmemsiz.o rsparms.o rsuplnk.o
+DEP_FILES =  .deps/hdrvcomm.P .deps/sethdlc.P .deps/smdiag.P \
+.deps/smmixer.P
+SOURCES = $(sethdlc_SOURCES) $(smmixer_SOURCES) $(smdiag_SOURCES)
+OBJECTS = $(sethdlc_OBJECTS) $(smmixer_OBJECTS) $(smdiag_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu rose/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu hdlcutil/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 
-mostlyclean-sbinPROGRAMS:
+mostlyclean-binPROGRAMS:
 
-clean-sbinPROGRAMS:
-	-test -z "$(sbin_PROGRAMS)" || rm -f $(sbin_PROGRAMS)
+clean-binPROGRAMS:
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-distclean-sbinPROGRAMS:
+distclean-binPROGRAMS:
 
-maintainer-clean-sbinPROGRAMS:
+maintainer-clean-binPROGRAMS:
 
-install-sbinPROGRAMS: $(sbin_PROGRAMS)
+install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(sbindir)
-	@list='$(sbin_PROGRAMS)'; for p in $$list; do \
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo "  $(INSTALL_PROGRAM) $$p $(DESTDIR)$(sbindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`"; \
-	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(sbindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	    echo "  $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`"; \
+	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
 	  else :; fi; \
 	done
 
-uninstall-sbinPROGRAMS:
+uninstall-binPROGRAMS:
 	@$(NORMAL_UNINSTALL)
-	list='$(sbin_PROGRAMS)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(sbindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
 	done
 
 .s.o:
@@ -200,77 +189,17 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-rsattach: $(rsattach_OBJECTS) $(rsattach_DEPENDENCIES)
-	@rm -f rsattach
-	$(LINK) $(rsattach_LDFLAGS) $(rsattach_OBJECTS) $(rsattach_LDADD) $(LIBS)
+sethdlc: $(sethdlc_OBJECTS) $(sethdlc_DEPENDENCIES)
+	@rm -f sethdlc
+	$(LINK) $(sethdlc_LDFLAGS) $(sethdlc_OBJECTS) $(sethdlc_LDADD) $(LIBS)
 
-rsdwnlnk: $(rsdwnlnk_OBJECTS) $(rsdwnlnk_DEPENDENCIES)
-	@rm -f rsdwnlnk
-	$(LINK) $(rsdwnlnk_LDFLAGS) $(rsdwnlnk_OBJECTS) $(rsdwnlnk_LDADD) $(LIBS)
+smmixer: $(smmixer_OBJECTS) $(smmixer_DEPENDENCIES)
+	@rm -f smmixer
+	$(LINK) $(smmixer_LDFLAGS) $(smmixer_OBJECTS) $(smmixer_LDADD) $(LIBS)
 
-rsmemsiz: $(rsmemsiz_OBJECTS) $(rsmemsiz_DEPENDENCIES)
-	@rm -f rsmemsiz
-	$(LINK) $(rsmemsiz_LDFLAGS) $(rsmemsiz_OBJECTS) $(rsmemsiz_LDADD) $(LIBS)
-
-rsparms: $(rsparms_OBJECTS) $(rsparms_DEPENDENCIES)
-	@rm -f rsparms
-	$(LINK) $(rsparms_LDFLAGS) $(rsparms_OBJECTS) $(rsparms_LDADD) $(LIBS)
-
-rsuplnk: $(rsuplnk_OBJECTS) $(rsuplnk_DEPENDENCIES)
-	@rm -f rsuplnk
-	$(LINK) $(rsuplnk_LDFLAGS) $(rsuplnk_OBJECTS) $(rsuplnk_LDADD) $(LIBS)
-
-install-sbinSCRIPTS: $(sbin_SCRIPTS)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(sbindir)
-	@list='$(sbin_SCRIPTS)'; for p in $$list; do \
-	  if test -f $$p; then \
-	    echo " $(INSTALL_SCRIPT) $$p $(DESTDIR)$(sbindir)/`echo $$p|sed '$(transform)'`"; \
-	    $(INSTALL_SCRIPT) $$p $(DESTDIR)$(sbindir)/`echo $$p|sed '$(transform)'`; \
-	  else if test -f $(srcdir)/$$p; then \
-	    echo " $(INSTALL_SCRIPT) $(srcdir)/$$p $(DESTDIR)$(sbindir)/`echo $$p|sed '$(transform)'`"; \
-	    $(INSTALL_SCRIPT) $(srcdir)/$$p $(DESTDIR)$(sbindir)/`echo $$p|sed '$(transform)'`; \
-	  else :; fi; fi; \
-	done
-
-uninstall-sbinSCRIPTS:
-	@$(NORMAL_UNINSTALL)
-	list='$(sbin_SCRIPTS)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(sbindir)/`echo $$p|sed '$(transform)'`; \
-	done
-
-install-man4:
-	$(mkinstalldirs) $(DESTDIR)$(man4dir)
-	@list='$(man4_MANS)'; \
-	l2='$(man_MANS)'; for i in $$l2; do \
-	  case "$$i" in \
-	    *.4*) list="$$list $$i" ;; \
-	  esac; \
-	done; \
-	for i in $$list; do \
-	  if test -f $(srcdir)/$$i; then file=$(srcdir)/$$i; \
-	  else file=$$i; fi; \
-	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
-	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
-	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " $(INSTALL_DATA) $$file $(DESTDIR)$(man4dir)/$$inst"; \
-	  $(INSTALL_DATA) $$file $(DESTDIR)$(man4dir)/$$inst; \
-	done
-
-uninstall-man4:
-	@list='$(man4_MANS)'; \
-	l2='$(man_MANS)'; for i in $$l2; do \
-	  case "$$i" in \
-	    *.4*) list="$$list $$i" ;; \
-	  esac; \
-	done; \
-	for i in $$list; do \
-	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
-	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
-	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " rm -f $(DESTDIR)$(man4dir)/$$inst"; \
-	  rm -f $(DESTDIR)$(man4dir)/$$inst; \
-	done
+smdiag: $(smdiag_OBJECTS) $(smdiag_DEPENDENCIES)
+	@rm -f smdiag
+	$(LINK) $(smdiag_LDFLAGS) $(smdiag_OBJECTS) $(smdiag_LDADD) $(LIBS)
 
 install-man8:
 	$(mkinstalldirs) $(DESTDIR)$(man8dir)
@@ -304,12 +233,100 @@ uninstall-man8:
 	  echo " rm -f $(DESTDIR)$(man8dir)/$$inst"; \
 	  rm -f $(DESTDIR)$(man8dir)/$$inst; \
 	done
+
+install-man9:
+	$(mkinstalldirs) $(DESTDIR)$(man9dir)
+	@list='$(man9_MANS)'; \
+	l2='$(man_MANS)'; for i in $$l2; do \
+	  case "$$i" in \
+	    *.9*) list="$$list $$i" ;; \
+	  esac; \
+	done; \
+	for i in $$list; do \
+	  if test -f $(srcdir)/$$i; then file=$(srcdir)/$$i; \
+	  else file=$$i; fi; \
+	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
+	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
+	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
+	  echo " $(INSTALL_DATA) $$file $(DESTDIR)$(man9dir)/$$inst"; \
+	  $(INSTALL_DATA) $$file $(DESTDIR)$(man9dir)/$$inst; \
+	done
+
+uninstall-man9:
+	@list='$(man9_MANS)'; \
+	l2='$(man_MANS)'; for i in $$l2; do \
+	  case "$$i" in \
+	    *.9*) list="$$list $$i" ;; \
+	  esac; \
+	done; \
+	for i in $$list; do \
+	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
+	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
+	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
+	  echo " rm -f $(DESTDIR)$(man9dir)/$$inst"; \
+	  rm -f $(DESTDIR)$(man9dir)/$$inst; \
+	done
 install-man: $(MANS)
 	@$(NORMAL_INSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) install-man4 install-man8
+	$(MAKE) $(AM_MAKEFLAGS) install-man8 install-man9
 uninstall-man:
 	@$(NORMAL_UNINSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) uninstall-man4 uninstall-man8
+	$(MAKE) $(AM_MAKEFLAGS) uninstall-man8 uninstall-man9
+
+# This directory's subdirectories are mostly independent; you can cd
+# into them and run `make' without going through this Makefile.
+# To change the values of `make' variables: instead of editing Makefiles,
+# (1) if the variable is set in `config.status', edit `config.status'
+#     (which will cause the Makefiles to be regenerated when you run `make');
+# (2) otherwise, pass the desired values on the `make' command line.
+
+
+
+all-recursive install-data-recursive install-exec-recursive \
+installdirs-recursive install-recursive uninstall-recursive  \
+check-recursive installcheck-recursive info-recursive dvi-recursive:
+	@set fnord $(MAKEFLAGS); amf=$$2; \
+	dot_seen=no; \
+	target=`echo $@ | sed s/-recursive//`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    dot_seen=yes; \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	   || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \
+	done; \
+	if test "$$dot_seen" = "no"; then \
+	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
+	fi; test -z "$$fail"
+
+mostlyclean-recursive clean-recursive distclean-recursive \
+maintainer-clean-recursive:
+	@set fnord $(MAKEFLAGS); amf=$$2; \
+	dot_seen=no; \
+	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
+	  rev="$$subdir $$rev"; \
+	  test "$$subdir" = "." && dot_seen=yes; \
+	done; \
+	test "$$dot_seen" = "no" && rev=". $$rev"; \
+	target=`echo $@ | sed s/-recursive//`; \
+	for subdir in $$rev; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	   || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \
+	done && test -z "$$fail"
+tags-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
+	done
 
 tags: TAGS
 
@@ -321,9 +338,14 @@ ID: $(HEADERS) $(SOURCES) $(LISP)
 	here=`pwd` && cd $(srcdir) \
 	  && mkid -f$$here/ID $$unique $(LISP)
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
 	tags=; \
 	here=`pwd`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+   if test "$$subdir" = .; then :; else \
+	    test -f $$subdir/TAGS && tags="$$tags -i $$here/$$subdir/TAGS"; \
+   fi; \
+	done; \
 	list='$(SOURCES) $(HEADERS)'; \
 	unique=`for i in $$list; do echo $$i; done | \
 	  awk '    { files[$$0] = 1; } \
@@ -342,14 +364,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = rose
+subdir = hdlcutil
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu rose/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu hdlcutil/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -358,6 +380,16 @@ distdir: $(DISTFILES)
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
+	for subdir in $(SUBDIRS); do \
+	  if test "$$subdir" = .; then :; else \
+	    test -d $(distdir)/$$subdir \
+	    || mkdir $(distdir)/$$subdir \
+	    || exit 1; \
+	    chmod 777 $(distdir)/$$subdir; \
+	    (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir=../$(top_distdir) distdir=../$(distdir)/$$subdir distdir) \
+	      || exit 1; \
 	  fi; \
 	done
 
@@ -393,31 +425,32 @@ maintainer-clean-depend:
 	    >> .deps/$(*F).P; \
 	rm -f .deps/$(*F).pp
 info-am:
-info: info-am
+info: info-recursive
 dvi-am:
-dvi: dvi-am
+dvi: dvi-recursive
 check-am: all-am
-check: check-am
+check: check-recursive
 installcheck-am:
-installcheck: installcheck-am
-install-exec-am: install-sbinPROGRAMS install-sbinSCRIPTS
-install-exec: install-exec-am
+installcheck: installcheck-recursive
+install-exec-am: install-binPROGRAMS
+install-exec: install-exec-recursive
 
 install-data-am: install-man
-install-data: install-data-am
+install-data: install-data-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-install: install-am
-uninstall-am: uninstall-sbinPROGRAMS uninstall-sbinSCRIPTS uninstall-man
-uninstall: uninstall-am
-all-am: Makefile $(PROGRAMS) $(SCRIPTS) $(MANS)
-all-redirect: all-am
+install: install-recursive
+uninstall-am: uninstall-binPROGRAMS uninstall-man
+uninstall: uninstall-recursive
+all-am: Makefile $(PROGRAMS) $(MANS)
+all-redirect: all-recursive
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
-installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(sbindir) $(DESTDIR)$(sbindir) \
-		$(DESTDIR)$(mandir)/man4 $(DESTDIR)$(mandir)/man8
+installdirs: installdirs-recursive
+installdirs-am:
+	$(mkinstalldirs)  $(DESTDIR)$(bindir) $(DESTDIR)$(mandir)/man8 \
+		$(DESTDIR)$(mandir)/man9
 
 
 mostlyclean-generic:
@@ -429,42 +462,46 @@ distclean-generic:
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-mostlyclean-am:  mostlyclean-sbinPROGRAMS mostlyclean-compile \
+mostlyclean-am:  mostlyclean-binPROGRAMS mostlyclean-compile \
 		mostlyclean-tags mostlyclean-depend mostlyclean-generic
 
-mostlyclean: mostlyclean-am
+mostlyclean: mostlyclean-recursive
 
-clean-am:  clean-sbinPROGRAMS clean-compile clean-tags clean-depend \
+clean-am:  clean-binPROGRAMS clean-compile clean-tags clean-depend \
 		clean-generic mostlyclean-am
 
-clean: clean-am
+clean: clean-recursive
 
-distclean-am:  distclean-sbinPROGRAMS distclean-compile distclean-tags \
+distclean-am:  distclean-binPROGRAMS distclean-compile distclean-tags \
 		distclean-depend distclean-generic clean-am
 
-distclean: distclean-am
+distclean: distclean-recursive
 
-maintainer-clean-am:  maintainer-clean-sbinPROGRAMS \
+maintainer-clean-am:  maintainer-clean-binPROGRAMS \
 		maintainer-clean-compile maintainer-clean-tags \
 		maintainer-clean-depend maintainer-clean-generic \
 		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
-maintainer-clean: maintainer-clean-am
+maintainer-clean: maintainer-clean-recursive
 
-.PHONY: mostlyclean-sbinPROGRAMS distclean-sbinPROGRAMS \
-clean-sbinPROGRAMS maintainer-clean-sbinPROGRAMS uninstall-sbinPROGRAMS \
-install-sbinPROGRAMS mostlyclean-compile distclean-compile \
-clean-compile maintainer-clean-compile uninstall-sbinSCRIPTS \
-install-sbinSCRIPTS install-man4 uninstall-man4 install-man8 \
-uninstall-man8 install-man uninstall-man tags mostlyclean-tags \
+.PHONY: mostlyclean-binPROGRAMS distclean-binPROGRAMS clean-binPROGRAMS \
+maintainer-clean-binPROGRAMS uninstall-binPROGRAMS install-binPROGRAMS \
+mostlyclean-compile distclean-compile clean-compile \
+maintainer-clean-compile install-man8 uninstall-man8 install-man9 \
+uninstall-man9 install-man uninstall-man install-data-recursive \
+uninstall-data-recursive install-exec-recursive \
+uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
+all-recursive check-recursive installcheck-recursive info-recursive \
+dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
+maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
 distclean-tags clean-tags maintainer-clean-tags distdir \
 mostlyclean-depend distclean-depend clean-depend \
 maintainer-clean-depend info-am info dvi-am dvi check check-am \
 installcheck-am installcheck install-exec-am install-exec \
 install-data-am install-data install-am install uninstall-am uninstall \
-all-redirect all-am all installdirs mostlyclean-generic \
+all-redirect all-am all installdirs-am installdirs mostlyclean-generic \
 distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 

@@ -2,4 +2,4 @@ Makefile
 ttylinkd
 rip98d
 .deps
-
+*.o

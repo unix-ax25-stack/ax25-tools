@@ -5,3 +5,4 @@ rsparms
 rsuplnk
 rsmemsiz
 .deps
+*.o

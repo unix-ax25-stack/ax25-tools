@@ -5,3 +5,4 @@ kissparms
 mkiss
 net2kiss
 .deps
+*.o

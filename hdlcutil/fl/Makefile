@@ -15,7 +15,7 @@
 SHELL = /bin/sh
 
 srcdir = .
-top_srcdir = ..
+top_srcdir = ../..
 prefix = /usr/local
 exec_prefix = ${prefix}
 
@@ -38,7 +38,7 @@ pkgdatadir = $(datadir)/ax25-tools
 pkglibdir = $(libdir)/ax25-tools
 pkgincludedir = $(includedir)/ax25-tools
 
-top_builddir = ..
+top_builddir = ../..
 
 ACLOCAL = aclocal
 AUTOCONF = autoconf
@@ -70,73 +70,53 @@ UTIL_LIB = -lutil
 VERSION = 0.0.9
 Z_LIB = -lz
 
-etcfiles = nrbroadcast 
+#sbin_PROGRAMS = xfsmmixer xfhdlcchpar xfhdlcst xfsmdiag
 
-sbin_PROGRAMS = netromd nodesave nrattach nrparms nrsdrv
+INCLUDES = $(X_CFLAGS) -I..
+LDFLAGS = $(X_LIBS) -lX11 $(FLTK_LIB)
+LDADD = hdrvcomm.o
 
-LDADD = $(AX25_LIB)
-
-man_MANS = netrom.4 nrbroadcast.5 netromd.8 nodesave.8 	   nrattach.8 nrparms.8 nrsdrv.8
-
-
-EXTRA_DIST = $(man_MANS) $(etcfiles)
-
-netromd_SOURCES =  	netromd.c 	netromd.h 	netromr.c 	netromt.c 
-
-
-INCLUDES = -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" 	   -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\" 
-
-
-AX25_SYSCONFDIR = ${sysconfdir}/ax25/
-AX25_LOCALSTATEDIR = ${localstatedir}/ax25/
+xfsmmixer_SOURCES = xfsmmixer.cxx xfsmmixer_main.cxx xfsmmixer.h
+xfhdlcchpar_SOURCES = xfhdlcchpar.cxx xfhdlcchpar_main.cxx xfhdlcchpar.h
+xfhdlcst_SOURCES = xfhdlcst.cxx xfhdlcst_main.cxx xfhdlcst.h
+xfsmdiag_SOURCES = xfsmdiag.cxx xfsmdiag_main.cxx xfsmdiag.h xfsmdiag_main.h
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = ../config.h
+CONFIG_HEADER = ../../config.h
 CONFIG_CLEAN_FILES = 
 PROGRAMS =  $(sbin_PROGRAMS)
 
 
-DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I..
+DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I../..
 CPPFLAGS = 
-LDFLAGS = 
 LIBS = 
 X_CFLAGS = 
 X_LIBS =  -L/usr/X11R6/lib
 X_EXTRA_LIBS = 
 X_PRE_LIBS =  -lSM -lICE
-netromd_OBJECTS =  netromd.o netromr.o netromt.o
-netromd_LDADD = $(LDADD)
-netromd_DEPENDENCIES = 
-netromd_LDFLAGS = 
-nodesave_SOURCES = nodesave.c
-nodesave_OBJECTS =  nodesave.o
-nodesave_LDADD = $(LDADD)
-nodesave_DEPENDENCIES = 
-nodesave_LDFLAGS = 
-nrattach_SOURCES = nrattach.c
-nrattach_OBJECTS =  nrattach.o
-nrattach_LDADD = $(LDADD)
-nrattach_DEPENDENCIES = 
-nrattach_LDFLAGS = 
-nrparms_SOURCES = nrparms.c
-nrparms_OBJECTS =  nrparms.o
-nrparms_LDADD = $(LDADD)
-nrparms_DEPENDENCIES = 
-nrparms_LDFLAGS = 
-nrsdrv_SOURCES = nrsdrv.c
-nrsdrv_OBJECTS =  nrsdrv.o
-nrsdrv_LDADD = $(LDADD)
-nrsdrv_DEPENDENCIES = 
-nrsdrv_LDFLAGS = 
+xfsmmixer_OBJECTS =  xfsmmixer.o xfsmmixer_main.o
+xfsmmixer_LDADD = $(LDADD)
+xfsmmixer_DEPENDENCIES =  hdrvcomm.o
+xfsmmixer_LDFLAGS = 
+xfhdlcchpar_OBJECTS =  xfhdlcchpar.o xfhdlcchpar_main.o
+xfhdlcchpar_LDADD = $(LDADD)
+xfhdlcchpar_DEPENDENCIES =  hdrvcomm.o
+xfhdlcchpar_LDFLAGS = 
+xfhdlcst_OBJECTS =  xfhdlcst.o xfhdlcst_main.o
+xfhdlcst_LDADD = $(LDADD)
+xfhdlcst_DEPENDENCIES =  hdrvcomm.o
+xfhdlcst_LDFLAGS = 
+xfsmdiag_OBJECTS =  xfsmdiag.o xfsmdiag_main.o
+xfsmdiag_LDADD = $(LDADD)
+xfsmdiag_DEPENDENCIES =  hdrvcomm.o
+xfsmdiag_LDFLAGS = 
+CXXFLAGS = -g -O2
+CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+CXXLD = $(CXX)
+CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
 CFLAGS = -g -O2 -Wall
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
-man4dir = $(mandir)/man4
-man5dir = $(mandir)/man5
-man8dir = $(mandir)/man8
-MANS = $(man_MANS)
-
-NROFF = nroff
 DIST_COMMON =  Makefile.am Makefile.in
 
 
@@ -144,16 +124,17 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/netromd.P .deps/netromr.P .deps/netromt.P \
-.deps/nodesave.P .deps/nrattach.P .deps/nrparms.P .deps/nrsdrv.P
-SOURCES = $(netromd_SOURCES) nodesave.c nrattach.c nrparms.c nrsdrv.c
-OBJECTS = $(netromd_OBJECTS) nodesave.o nrattach.o nrparms.o nrsdrv.o
+DEP_FILES =  .deps/xfhdlcchpar.P .deps/xfhdlcchpar_main.P \
+.deps/xfhdlcst.P .deps/xfhdlcst_main.P .deps/xfsmdiag.P \
+.deps/xfsmdiag_main.P .deps/xfsmmixer.P .deps/xfsmmixer_main.P
+SOURCES = $(xfsmmixer_SOURCES) $(xfhdlcchpar_SOURCES) $(xfhdlcst_SOURCES) $(xfsmdiag_SOURCES)
+OBJECTS = $(xfsmmixer_OBJECTS) $(xfhdlcchpar_OBJECTS) $(xfhdlcst_OBJECTS) $(xfsmdiag_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .o .s
+.SUFFIXES: .S .c .cxx .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu netrom/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu hdlcutil/fl/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -201,130 +182,23 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-netromd: $(netromd_OBJECTS) $(netromd_DEPENDENCIES)
-	@rm -f netromd
-	$(LINK) $(netromd_LDFLAGS) $(netromd_OBJECTS) $(netromd_LDADD) $(LIBS)
+xfsmmixer: $(xfsmmixer_OBJECTS) $(xfsmmixer_DEPENDENCIES)
+	@rm -f xfsmmixer
+	$(CXXLINK) $(xfsmmixer_LDFLAGS) $(xfsmmixer_OBJECTS) $(xfsmmixer_LDADD) $(LIBS)
 
-nodesave: $(nodesave_OBJECTS) $(nodesave_DEPENDENCIES)
-	@rm -f nodesave
-	$(LINK) $(nodesave_LDFLAGS) $(nodesave_OBJECTS) $(nodesave_LDADD) $(LIBS)
+xfhdlcchpar: $(xfhdlcchpar_OBJECTS) $(xfhdlcchpar_DEPENDENCIES)
+	@rm -f xfhdlcchpar
+	$(CXXLINK) $(xfhdlcchpar_LDFLAGS) $(xfhdlcchpar_OBJECTS) $(xfhdlcchpar_LDADD) $(LIBS)
 
-nrattach: $(nrattach_OBJECTS) $(nrattach_DEPENDENCIES)
-	@rm -f nrattach
-	$(LINK) $(nrattach_LDFLAGS) $(nrattach_OBJECTS) $(nrattach_LDADD) $(LIBS)
+xfhdlcst: $(xfhdlcst_OBJECTS) $(xfhdlcst_DEPENDENCIES)
+	@rm -f xfhdlcst
+	$(CXXLINK) $(xfhdlcst_LDFLAGS) $(xfhdlcst_OBJECTS) $(xfhdlcst_LDADD) $(LIBS)
 
-nrparms: $(nrparms_OBJECTS) $(nrparms_DEPENDENCIES)
-	@rm -f nrparms
-	$(LINK) $(nrparms_LDFLAGS) $(nrparms_OBJECTS) $(nrparms_LDADD) $(LIBS)
-
-nrsdrv: $(nrsdrv_OBJECTS) $(nrsdrv_DEPENDENCIES)
-	@rm -f nrsdrv
-	$(LINK) $(nrsdrv_LDFLAGS) $(nrsdrv_OBJECTS) $(nrsdrv_LDADD) $(LIBS)
-
-install-man4:
-	$(mkinstalldirs) $(DESTDIR)$(man4dir)
-	@list='$(man4_MANS)'; \
-	l2='$(man_MANS)'; for i in $$l2; do \
-	  case "$$i" in \
-	    *.4*) list="$$list $$i" ;; \
-	  esac; \
-	done; \
-	for i in $$list; do \
-	  if test -f $(srcdir)/$$i; then file=$(srcdir)/$$i; \
-	  else file=$$i; fi; \
-	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
-	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
-	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " $(INSTALL_DATA) $$file $(DESTDIR)$(man4dir)/$$inst"; \
-	  $(INSTALL_DATA) $$file $(DESTDIR)$(man4dir)/$$inst; \
-	done
-
-uninstall-man4:
-	@list='$(man4_MANS)'; \
-	l2='$(man_MANS)'; for i in $$l2; do \
-	  case "$$i" in \
-	    *.4*) list="$$list $$i" ;; \
-	  esac; \
-	done; \
-	for i in $$list; do \
-	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
-	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
-	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " rm -f $(DESTDIR)$(man4dir)/$$inst"; \
-	  rm -f $(DESTDIR)$(man4dir)/$$inst; \
-	done
-
-install-man5:
-	$(mkinstalldirs) $(DESTDIR)$(man5dir)
-	@list='$(man5_MANS)'; \
-	l2='$(man_MANS)'; for i in $$l2; do \
-	  case "$$i" in \
-	    *.5*) list="$$list $$i" ;; \
-	  esac; \
-	done; \
-	for i in $$list; do \
-	  if test -f $(srcdir)/$$i; then file=$(srcdir)/$$i; \
-	  else file=$$i; fi; \
-	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
-	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
-	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " $(INSTALL_DATA) $$file $(DESTDIR)$(man5dir)/$$inst"; \
-	  $(INSTALL_DATA) $$file $(DESTDIR)$(man5dir)/$$inst; \
-	done
-
-uninstall-man5:
-	@list='$(man5_MANS)'; \
-	l2='$(man_MANS)'; for i in $$l2; do \
-	  case "$$i" in \
-	    *.5*) list="$$list $$i" ;; \
-	  esac; \
-	done; \
-	for i in $$list; do \
-	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
-	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
-	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " rm -f $(DESTDIR)$(man5dir)/$$inst"; \
-	  rm -f $(DESTDIR)$(man5dir)/$$inst; \
-	done
-
-install-man8:
-	$(mkinstalldirs) $(DESTDIR)$(man8dir)
-	@list='$(man8_MANS)'; \
-	l2='$(man_MANS)'; for i in $$l2; do \
-	  case "$$i" in \
-	    *.8*) list="$$list $$i" ;; \
-	  esac; \
-	done; \
-	for i in $$list; do \
-	  if test -f $(srcdir)/$$i; then file=$(srcdir)/$$i; \
-	  else file=$$i; fi; \
-	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
-	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
-	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " $(INSTALL_DATA) $$file $(DESTDIR)$(man8dir)/$$inst"; \
-	  $(INSTALL_DATA) $$file $(DESTDIR)$(man8dir)/$$inst; \
-	done
-
-uninstall-man8:
-	@list='$(man8_MANS)'; \
-	l2='$(man_MANS)'; for i in $$l2; do \
-	  case "$$i" in \
-	    *.8*) list="$$list $$i" ;; \
-	  esac; \
-	done; \
-	for i in $$list; do \
-	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
-	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
-	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
-	  echo " rm -f $(DESTDIR)$(man8dir)/$$inst"; \
-	  rm -f $(DESTDIR)$(man8dir)/$$inst; \
-	done
-install-man: $(MANS)
-	@$(NORMAL_INSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) install-man4 install-man5 install-man8
-uninstall-man:
-	@$(NORMAL_UNINSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) uninstall-man4 uninstall-man5 uninstall-man8
+xfsmdiag: $(xfsmdiag_OBJECTS) $(xfsmdiag_DEPENDENCIES)
+	@rm -f xfsmdiag
+	$(CXXLINK) $(xfsmdiag_LDFLAGS) $(xfsmdiag_OBJECTS) $(xfsmdiag_LDADD) $(LIBS)
+.cxx.o:
+	$(CXXCOMPILE) -c $<
 
 tags: TAGS
 
@@ -357,14 +231,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = netrom
+subdir = hdlcutil/fl
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu netrom/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu hdlcutil/fl/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -407,6 +281,25 @@ maintainer-clean-depend:
 	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
 	    >> .deps/$(*F).P; \
 	rm -f .deps/$(*F).pp
+
+%.o: %.cxx
+	@echo '$(CXXCOMPILE) -c $<'; \
+	$(CXXCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+%.lo: %.cxx
+	@echo '$(LTCXXCOMPILE) -c $<'; \
+	$(LTCXXCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+	  < .deps/$(*F).pp > .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm -f .deps/$(*F).pp
 info-am:
 info: info-am
 dvi-am:
@@ -418,21 +311,20 @@ installcheck: installcheck-am
 install-exec-am: install-sbinPROGRAMS
 install-exec: install-exec-am
 
-install-data-am: install-man
+install-data-am:
 install-data: install-data-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-sbinPROGRAMS uninstall-man
+uninstall-am: uninstall-sbinPROGRAMS
 uninstall: uninstall-am
-all-am: Makefile $(PROGRAMS) $(MANS)
+all-am: Makefile $(PROGRAMS)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(sbindir) $(DESTDIR)$(mandir)/man4 \
-		$(DESTDIR)$(mandir)/man5 $(DESTDIR)$(mandir)/man8
+	$(mkinstalldirs)  $(DESTDIR)$(sbindir)
 
 
 mostlyclean-generic:
@@ -471,24 +363,18 @@ maintainer-clean: maintainer-clean-am
 .PHONY: mostlyclean-sbinPROGRAMS distclean-sbinPROGRAMS \
 clean-sbinPROGRAMS maintainer-clean-sbinPROGRAMS uninstall-sbinPROGRAMS \
 install-sbinPROGRAMS mostlyclean-compile distclean-compile \
-clean-compile maintainer-clean-compile install-man4 uninstall-man4 \
-install-man5 uninstall-man5 install-man8 uninstall-man8 install-man \
-uninstall-man tags mostlyclean-tags distclean-tags clean-tags \
-maintainer-clean-tags distdir mostlyclean-depend distclean-depend \
-clean-depend maintainer-clean-depend info-am info dvi-am dvi check \
-check-am installcheck-am installcheck install-exec-am install-exec \
+clean-compile maintainer-clean-compile tags mostlyclean-tags \
+distclean-tags clean-tags maintainer-clean-tags distdir \
+mostlyclean-depend distclean-depend clean-depend \
+maintainer-clean-depend info-am info dvi-am dvi check check-am \
+installcheck-am installcheck install-exec-am install-exec \
 install-data-am install-data install-am install uninstall-am uninstall \
 all-redirect all-am all installdirs mostlyclean-generic \
 distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 
 
-installconf:
-	$(mkinstalldirs) $(DESTDIR)$(AX25_SYSCONFDIR)
-	@list='$(etcfiles)'; for p in $$list; do \
-	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_SYSCONFDIR)/$$p"; \
-	  $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_SYSCONFDIR)/$$p; \
-	done
+hdrvcomm.o: ../hdrvcomm.o
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by configure.
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p4 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -62,13 +62,12 @@ AX25IO_LIB =
 AX25_LIB = -lax25
 CC = gcc
 CXX = c++
-DMASCC = 
-FLTK_LIB = -lfltk -lGL  -lSM -lICE -lXi -lXext -lX11 
-MAKEINFO = /home/csmall/ax25/ax25-tools/missing makeinfo
+FLTK_LIB = 
+MAKEINFO = makeinfo
 NCURSES_LIB = -lncurses
 PACKAGE = ax25-tools
 UTIL_LIB = -lutil
-VERSION = 0.0.8cvs
+VERSION = 0.0.9
 Z_LIB = -lz
 
 sbin_PROGRAMS = ax25_call netrom_call rose_call tcp_call
@@ -103,7 +102,7 @@ DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I..
 CPPFLAGS = 
 LDFLAGS = 
 LIBS = 
-X_CFLAGS =  -I/usr/X11R6/include
+X_CFLAGS = 
 X_LIBS =  -L/usr/X11R6/lib
 X_EXTRA_LIBS = 
 X_PRE_LIBS =  -lSM -lICE
