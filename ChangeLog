@@ -1,3 +1,14 @@
+ax25-tools (0.0.4)
+	
+	* Changed kissattach so that it demands an IP address
+	* The hdlc stuff now has -i in it
+	* mheardd.c patch for old glibc headers
+	* kissattach.c basename changed to kiss_bname due to conflict
+	* configure checks for linux/dmascc.h
+	* kiss/Makefile.am uses ln -sf instead of ln -s
+
+  - Tue, 10 Aug 1999 11:44:19 +1000, Craig Small <csmall@small.dropbear.id.au>
+
 ax25-tools (0.0.3)
 
   * Fixed configure.in so it doesn't check for libax25io

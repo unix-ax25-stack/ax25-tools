@@ -61,6 +61,7 @@ AWK = @AWK@
 AX25IO_LIB = @AX25IO_LIB@
 AX25_LIB = @AX25_LIB@
 CC = @CC@
+DMASCC = @DMASCC@
 MAKEINFO = @MAKEINFO@
 NCURSES_LIB = @NCURSES_LIB@
 PACKAGE = @PACKAGE@
@@ -91,10 +92,6 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I..
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-X_CFLAGS = @X_CFLAGS@
-X_LIBS = @X_LIBS@
-X_EXTRA_LIBS = @X_EXTRA_LIBS@
-X_PRE_LIBS = @X_PRE_LIBS@
 kissattach_SOURCES = kissattach.c
 kissattach_OBJECTS =  kissattach.o
 kissattach_LDADD = $(LDADD)
@@ -372,7 +369,7 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 installconf:
 
 install-exec-local:
-	(cd $(DESTDIR)$(sbindir) ; ln -s kissattach spattach)
+	(cd $(DESTDIR)$(sbindir) ; ln -sf kissattach spattach)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

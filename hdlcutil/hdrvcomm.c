@@ -43,7 +43,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
-/*#include <linux/if.h>*/
+#ifdef __GLIBC__
+#include <netinet/if_ether.h>
+#else
+#include <linux/if_ether.h>
+#endif
 #include <net/if.h>
 #include "hdrvcomm.h"
 #include "usersmdiag.h"

@@ -45,7 +45,7 @@ static int  mtu     = 0;
 static int  logging = FALSE;
 static char *progname;
 
-static char *basename(char *s)
+static char *kiss_bname(char *s)
 {
 	char *p = strrchr(s, '/');
 	return p ? p + 1 : s;
@@ -206,6 +206,10 @@ static int startiface(char *dev, struct hostent *hp)
 	return TRUE;
 }
 	
+static void usage(char *progname)
+{
+        fprintf(stderr, "usage: %s [-l] [-m mtu] [-v] ttyinterface port inetaddr\n", progname);
+}
 
 int main(int argc, char *argv[])
 {
@@ -215,7 +219,7 @@ int main(int argc, char *argv[])
 	int  v = 4;
 	struct hostent *hp = NULL;
 
-	progname = basename(argv[0]);
+	progname = kiss_bname(argv[0]);
 
 	if (!strcmp(progname, "spattach"))
 		disc = N_6PACK;
@@ -226,6 +230,7 @@ int main(int argc, char *argv[])
 				disc = N_6PACK;
 				break;
 			case 'i':
+                                fprintf(stderr,"%s: -i flag depreciated, use new command line format instead.\n", progname);
 				if ((hp = gethostbyname(optarg)) == NULL) {
 					fprintf(stderr, "%s: invalid internet name/address - %s\n", progname, optarg);
 					return 1;
@@ -245,13 +250,13 @@ int main(int argc, char *argv[])
 				return 0;
 			case ':':
 			case '?':
-				fprintf(stderr, "usage: %s [-i inetaddr] [-l] [-m mtu] [-v] ttyinterface port\n", progname);
+                                usage(progname);
 				return 1;
 		}
 	}
 
-	if ((argc - optind) != 2) {
-		fprintf(stderr, "usage: %s [-i inetaddr] [-l] [-m mtu] [-v] ttyinterface port\n", progname);
+	if ((argc - optind) != 3 && ((argc - optind) != 2 || hp == NULL)) {
+                usage(progname);
 		return 1;
 	}
 
@@ -262,6 +267,12 @@ int main(int argc, char *argv[])
 
 	if (!readconfig(argv[optind + 1]))
 		return 1;
+
+        if ((argc - optind) == 3) {
+	        if ((hp = gethostbyname(argv[optind + 2])) == NULL) {
+		        fprintf(stderr, "%s: invalid internet name/address - %s\n", progname, argv[optind+2]);
+                }
+        }
 
 	if ((fd = open(argv[optind], O_RDONLY | O_NONBLOCK)) == -1) {
 		fprintf(stderr, "%s: ", progname);

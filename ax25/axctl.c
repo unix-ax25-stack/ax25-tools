@@ -20,7 +20,7 @@
 #ifdef HAVE_NETROSE_ROSE_H
 #include <netrose/rose.h>
 #else
-#include <netrose/rose.h>
+#include <netax25/kernel_rose.h>
 #endif
 
 #include <netax25/axlib.h>

@@ -30,7 +30,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#ifdef __GLIBC__
 #include <sys/io.h>
+#else
+#include <asm/io.h>
+#endif
 
 /* --------------------------------------------------------------------- */
 

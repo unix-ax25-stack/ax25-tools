@@ -47,7 +47,13 @@
 
 #include <sys/socket.h>
 #include <net/if.h>
+
+#ifdef __GLIBC__
 #include <net/ethernet.h>
+#else
+#include <linux/if_ether.h>
+#endif
+
 
 /* --------------------------------------------------------------------- */
 

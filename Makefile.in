@@ -61,6 +61,7 @@ AWK = @AWK@
 AX25IO_LIB = @AX25IO_LIB@
 AX25_LIB = @AX25_LIB@
 CC = @CC@
+DMASCC = @DMASCC@
 MAKEINFO = @MAKEINFO@
 NCURSES_LIB = @NCURSES_LIB@
 PACKAGE = @PACKAGE@
@@ -68,7 +69,8 @@ UTIL_LIB = @UTIL_LIB@
 VERSION = @VERSION@
 Z_LIB = @Z_LIB@
 
-SUBDIRS = ax25 hdlcutil kiss netrom rose tcpip user_call yamdrv dmascc
+dmascc = @DMASCC@
+SUBDIRS = ax25 hdlcutil kiss netrom rose tcpip user_call yamdrv $(dmascc)
 
 EXTRA_DIST = pathnames.h
 

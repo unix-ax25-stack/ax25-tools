@@ -56,7 +56,13 @@
 #include <config.h>
 
 #include <sys/socket.h>
+
+#ifdef __GLIBC__ 
 #include <net/ethernet.h>
+#else
+#include <linux/if_ether.h>
+#endif
+
 #include <netinet/in.h>
 
 #ifdef HAVE_NETAX25_AX25_H

@@ -36,9 +36,6 @@
 /* Define to `int' if <sys/types.h> doesn't define.  */
 #undef uid_t
 
-/* Define if the X Window System is missing or not being used.  */
-#undef X_DISPLAY_MISSING
-
 /* Define if you have a proper netax25/ax25.h header file. */
 #undef HAVE_NETAX25_AX25_H 
 
@@ -89,6 +86,9 @@
 
 /* Define if you have the <limits.h> header file.  */
 #undef HAVE_LIMITS_H
+
+/* Define if you have the <linux/dmascc.h> header file.  */
+#undef HAVE_LINUX_DMASCC_H
 
 /* Define if you have the <paths.h> header file.  */
 #undef HAVE_PATHS_H

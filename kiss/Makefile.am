@@ -16,5 +16,5 @@ AX25_SYSCONFDIR=${sysconfdir}/ax25/
 AX25_LOCALSTATEDIR=${localstatedir}/ax25/
 
 install-exec-local:
-	(cd $(DESTDIR)$(sbindir) ; ln -s kissattach spattach)
+	(cd $(DESTDIR)$(sbindir) ; ln -sf kissattach spattach)
 
