@@ -115,7 +115,7 @@ void receive_routes(int s)
 		syslog(LOG_DEBUG, "RIP98 message received from %s\n", inet_ntoa(rem_addr.sin_addr));
 
 	for (p = message + RIP98_HEADER; p < message + mess_len; p += RIP98_ENTRY) {
-		bcopy((char *)p, (char *)&addr, sizeof(addr));
+		memcpy((char *)&addr, (char *)p, sizeof(addr));
 		bits   = p[4];
 		metric = p[5];	
 
@@ -203,12 +203,12 @@ void receive_routes(int s)
 	
 	for (route = first_route; route != NULL; route = route->next) {
 		if (route->action == DEL_ROUTE) {
-			bzero((char *)&rt, sizeof(rt));
+			memset((char *)&rt, 0, sizeof(rt));
 
 			trg.sin_family = AF_INET;
 			trg.sin_addr   = route->addr;
 			trg.sin_port   = 0;
-			bcopy((char *)&trg, (char *)&rt.rt_dst, sizeof(struct sockaddr));
+			memcpy((char *)&rt.rt_dst, (char *)&trg, sizeof(struct sockaddr));
 
 			if (ioctl(s, SIOCDELRT, &rt) < 0) {
 				if (logging)
@@ -219,12 +219,12 @@ void receive_routes(int s)
 
 	for (route = first_route; route != NULL; route = route->next) {
 		if (route->action == NEW_ROUTE) {
-			bzero((char *)&rt, sizeof(rt));
+			memset((char *)&rt, 0, sizeof(rt));
 
 			trg.sin_family = AF_INET;
 			trg.sin_addr   = route->addr;
 			trg.sin_port   = 0;
-			bcopy((char *)&trg, (char *)&rt.rt_dst, sizeof(struct sockaddr));
+			memcpy((char *)&rt.rt_dst, (char *)&trg, sizeof(struct sockaddr));
 
 			rt.rt_flags = RTF_UP | RTF_GATEWAY | RTF_DYNAMIC;
 
@@ -234,17 +234,17 @@ void receive_routes(int s)
 				netmask = bits2mask(route->bits);
 			
 				trg.sin_family = AF_INET;
-				bcopy((char *)&netmask, (char *)&trg.sin_addr, sizeof(struct in_addr));
+				memcpy((char *)&trg.sin_addr, (char *)&netmask, sizeof(struct in_addr));
 				trg.sin_port   = 0;
-				bcopy((char *)&trg, (char *)&rt.rt_genmask, sizeof(struct sockaddr));
+				memcpy((char *)&rt.rt_genmask, (char *)&trg, sizeof(struct sockaddr));
 			}
 
-			rt.rt_metric = route->metric;
+			rt.rt_metric = route->metric + 1;
 
 			trg.sin_family = AF_INET;
 			trg.sin_addr   = rem_addr.sin_addr;
 			trg.sin_port   = 0;
-			bcopy((char *)&trg, (char *)&rt.rt_gateway, sizeof(struct sockaddr));
+			memcpy((char *)&rt.rt_gateway, (char *)&trg, sizeof(struct sockaddr));
 
 			if (ioctl(s, SIOCADDRT, &rt) < 0) {
 				if (logging)

@@ -1,3 +1,8 @@
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,10 +10,10 @@
 #include <netdb.h>
 #include <syslog.h>
 #include <signal.h>
+#include <time.h>
 
 #include <sys/types.h>
 #include <sys/ioctl.h>
-#include <sys/time.h>
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -18,7 +23,6 @@
 
 #include <netax25/daemon.h>
 
-#include <config.h>
 
 #include "../pathnames.h"
 #include "rip98d.h"
@@ -246,7 +250,7 @@ static int load_dests(void)
 			return FALSE;
 		}
 
-		bcopy(host->h_addr, (char *)&dest_list[dest_count].dest_addr, host->h_length);
+		memcpy((char *)&dest_list[dest_count].dest_addr, host->h_addr, host->h_length);
 		dest_count++;
 	}
 	
@@ -309,7 +313,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	bzero((char *)&loc_addr, sizeof(loc_addr));
+	memset((char *)&loc_addr, 0, sizeof(loc_addr));
 	loc_addr.sin_family      = AF_INET;
 	loc_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	loc_addr.sin_port        = htons(RIP_PORT);	

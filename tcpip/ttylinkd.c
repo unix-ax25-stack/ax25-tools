@@ -38,7 +38,6 @@
 
 #include <config.h>
 
-#define osockaddr sockaddr
 #include <protocols/talkd.h>
 
 #include <syslog.h>
@@ -104,7 +103,7 @@ static char *Responses[] = {
 
 int main(int argc, char *argv[])
 {
-	struct sockaddr_in sin, ctl_sin;
+	struct sockaddr_in ctl_sin;
 	struct in_addr my_addr, rem_addr;
 	int ctl_skt, skt, new_skt;
 	int length;
@@ -116,9 +115,9 @@ int main(int argc, char *argv[])
 	int local_id, remote_id;
 	char buf[256];
 	char user[NAME_SIZE];
-	struct sockaddr sa;
+	struct sockaddr sa, msg_sa;
 	int sa_len, i;
-	struct sockaddr_in *peer_sin=NULL;
+	struct sockaddr_in *peer_sin=NULL, *msg_sin;
 	struct sockaddr_ax25 *peer_sax;
 	struct sockaddr_rose *peer_srose;
 		
@@ -129,7 +128,7 @@ int main(int argc, char *argv[])
 	
 	/* Work out who is calling us */
 	userfamily = AF_UNSPEC;
-	bzero(user, NAME_SIZE);
+	memset(user, 0, NAME_SIZE);
 	strcpy(sysop_addr, SYSOP_USER);
 	strcpy(config_file, CONF_TTYLINKD_FILE);
 	for(i=1 ; i < argc ; i++)
@@ -260,7 +259,7 @@ int main(int argc, char *argv[])
 			exit(1);
 		}
 	}
-	bcopy(rhe->h_addr, (char*)&rem_addr, rhe->h_length);
+	memcpy((char*)&rem_addr, rhe->h_addr, rhe->h_length);
 
 	/* Get our local address */
 	if ((phe = gethostbyname(hostname)) == NULL)
@@ -268,14 +267,15 @@ int main(int argc, char *argv[])
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): gethostbyname failed.");
 		exit(1);
 	}
-	bcopy(phe->h_addr, (char*)&my_addr, phe->h_length);
+	memcpy((char*)&my_addr, phe->h_addr, phe->h_length);
 
 	/* Create local data socket */
-	bzero((char*)&sin, sizeof(sin));
+	memset((char*)&msg_sa, 0, sizeof(msg_sa));
 
-	sin.sin_family = AF_INET;
-	sin.sin_port = htons(0);
-	bcopy(phe->h_addr, (char*)&sin.sin_addr, phe->h_length);
+	msg_sa.sa_family = AF_INET;
+        msg_sin = (struct sockaddr_in*)&msg_sa;
+	msg_sin->sin_port = htons(0);
+	memcpy((char*)&(msg_sin->sin_addr), phe->h_addr, phe->h_length);
 	
 	if ((skt = socket(PF_INET, SOCK_STREAM, 0)) < 0)
 	{
@@ -283,24 +283,24 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	
-	if (bind( skt, (struct sockaddr*)&sin, sizeof(sin)) != 0)
+	if (bind( skt, &msg_sa, sizeof(msg_sa)) != 0)
 	{
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): bind() failed.");
 		exit(1);
 	}
 	
-	length = sizeof(sin);
-	if (getsockname(skt, (struct sockaddr*)&sin, &length) < 0)
+	length = sizeof(msg_sa);
+	if (getsockname(skt, &msg_sa, &length) < 0)
 	{
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): getsockname() failed.");
 		exit(1);
 	}
 
 	/* Create local control socket */
-	bzero((char*)&ctl_sin, sizeof(ctl_sin));
+	memset((char*)&ctl_sin, 0, sizeof(ctl_sin));
 
 	ctl_sin.sin_family = AF_INET;
-	bcopy(phe->h_addr, (char*)&ctl_sin.sin_addr, phe->h_length);
+	memcpy((char*)&ctl_sin.sin_addr, phe->h_addr, phe->h_length);
 	ctl_sin.sin_port = htons(0);
 	
 	if ((ctl_skt = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
@@ -327,12 +327,13 @@ int main(int argc, char *argv[])
 	}
 	
 	/* Start talking to the talk daemon */
-	bzero((char*)&msg, sizeof(msg));
+	memset((char*)&msg, 0, sizeof(msg));
 	msg.vers = TALK_VERSION;
 	msg.id_num = htonl(0);
 	msg.addr.sa_family = ntohs(AF_INET);
-	msg.ctl_addr = *(struct sockaddr*)&ctl_sin;
-	msg.ctl_addr = *(struct sockaddr*)&ctl_sin;
+        memcpy(&(msg.ctl_addr), &msg_sa, sizeof(struct osockaddr));
+	/*msg.ctl_addr = *(struct sockaddr*)&ctl_sin;
+	msg.ctl_addr = *(struct sockaddr*)&ctl_sin;*/
 	msg.ctl_addr.sa_family = ntohs(AF_INET);
 	msg.pid = htonl(getpid());
 	strncpy(msg.l_name, user, NAME_SIZE-1);
@@ -345,7 +346,7 @@ int main(int argc, char *argv[])
 
 	/* The person not there? Send an announce and wake him up */
 	msg.type = ANNOUNCE;
-	msg.addr = *(struct sockaddr*)&sin;
+	memcpy((char*)&(msg.addr), (char*)&msg_sa, sizeof(struct osockaddr));
 	msg.addr.sa_family = htons(AF_INET);
 	msg.id_num = -1;
 	i = send_control(ctl_skt, rem_addr, msg, &resp);
@@ -495,7 +496,7 @@ int send_control(int skt, struct in_addr addr, CTL_MSG msg, CTL_RESPONSE *resp)
 	}
 
 	/* Create the socket address */
-	bzero((char*)&sin, sizeof(sin));
+	memset((char*)&sin, 0, sizeof(sin));
 	sin.sin_addr = addr;
 	sin.sin_family = AF_INET;
 	sin.sin_port = talk_port;

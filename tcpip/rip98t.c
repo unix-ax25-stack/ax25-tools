@@ -42,7 +42,7 @@ void transmit_routes(int s)
 		if (debug && logging)
 			syslog(LOG_DEBUG, "transmit_routes: sending routing message to %s\n", inet_ntoa(dest_list[i].dest_addr));
 
-		bzero((char *)&rem_addr, sizeof(rem_addr));
+		memset((char *)&rem_addr, 0, sizeof(rem_addr));
 		rem_addr.sin_family = AF_INET;
 		rem_addr.sin_addr   = dest_list[i].dest_addr;
 		rem_addr.sin_port   = htons(RIP_PORT);		
@@ -55,7 +55,7 @@ void transmit_routes(int s)
 
 			while (mess_len < 184 && route != NULL) {
 				if (route->action != DEL_ROUTE) {
-					bcopy((char *)&route->addr, message + mess_len + 0, sizeof(struct in_addr));
+					memcpy(message + mess_len + 0, (char *)&route->addr, sizeof(struct in_addr));
 					message[mess_len + 4] = route->bits;
 					message[mess_len + 5] = route->metric;
 				
