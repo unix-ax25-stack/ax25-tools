@@ -262,7 +262,7 @@ void hdrvc_init(void)
 
 /* ---------------------------------------------------------------------- */
 
-extern __inline__ void hdrvc_sendmsg(struct usersmmsg *msg, int len)
+void hdrvc_sendmsg(struct usersmmsg *msg, int len)
 {
 	if (msgsnd(msqid, (struct msgbuf *)msg, len+sizeof(msg->hdr)-sizeof(long), 0) < 0) {
 		perror("msgsnd");
@@ -270,7 +270,7 @@ extern __inline__ void hdrvc_sendmsg(struct usersmmsg *msg, int len)
 	}
 }
 
-extern __inline__ int hdrvc_recvmsg(struct usersmmsg *msg, int maxlen, long type) 
+int hdrvc_recvmsg(struct usersmmsg *msg, int maxlen, long type) 
 {
 	int len;
 

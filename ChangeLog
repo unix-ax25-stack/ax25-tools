@@ -1,7 +1,8 @@
 ax25-tools (0.0.9)
 	* Fix for mkiss pid problem 
+	* Removed inline statesment in hdrvcomm.c
 
- -- Craig Small <csmall@small.dropbear.id.au>  
+ -- Craig Small <csmall@small.dropbear.id.au>  NO RELEASE YET
 
 ax25-tools (0.0.8)
 	* kissattach now tells you where it thinks the config file is
