@@ -21,6 +21,8 @@
 #include <netax25/kernel_rose.h>
 #endif
 
+#include <netax25/axconfig.h>
+
 #define	PARAM_TXDELAY	1
 #define	PARAM_PERSIST	2
 #define	PARAM_SLOTTIME	3

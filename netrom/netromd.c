@@ -44,8 +44,8 @@ struct port_struct port_list[20];
 
 int port_count = FALSE;
 int compliant  = FALSE;
-int debug      = FALSE;
 int logging    = FALSE;
+int debug      = 0;
 
 ax25_address my_call;
 ax25_address node_call;
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 				compliant = TRUE;
 				break;
 			case 'd':
-				debug = TRUE;
+				debug++;
 				break;
 			case 'i':
 				timelast = 0;

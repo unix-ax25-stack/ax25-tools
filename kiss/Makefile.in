@@ -72,9 +72,15 @@ sbin_PROGRAMS = kissattach kissnetd kissparms mkiss net2kiss
 
 LDADD = $(AX25_LIB)
 
-man_MANS = kissattach.8 kissnetd.8 kissparms.8 mkiss.8 net2kiss.8
+man_MANS = kissattach.8 spattach.8 kissnetd.8 kissparms.8 mkiss.8 net2kiss.8
 
 EXTRA_DIST = $(man_MANS)
+
+INCLUDES = -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" 	   -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\" 
+
+
+AX25_SYSCONFDIR = ${sysconfdir}/ax25/
+AX25_LOCALSTATEDIR = ${localstatedir}/ax25/
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
@@ -290,11 +296,6 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-kissattach.o: kissattach.c ../config.h ../pathnames.h
-kissnetd.o: kissnetd.c
-kissparms.o: kissparms.c ../config.h
-mkiss.o: mkiss.c ../config.h
-net2kiss.o: net2kiss.c
 
 info-am:
 info: info-am
@@ -304,7 +305,7 @@ check-am: all-am
 check: check-am
 installcheck-am:
 installcheck: installcheck-am
-install-exec-am: install-sbinPROGRAMS
+install-exec-am: install-sbinPROGRAMS install-exec-local
 install-exec: install-exec-am
 
 install-data-am: install-man
@@ -361,14 +362,17 @@ install-sbinPROGRAMS mostlyclean-compile distclean-compile \
 clean-compile maintainer-clean-compile install-man8 uninstall-man8 \
 install-man uninstall-man tags mostlyclean-tags distclean-tags \
 clean-tags maintainer-clean-tags distdir info-am info dvi-am dvi check \
-check-am installcheck-am installcheck install-exec-am install-exec \
-install-data-am install-data install-am install uninstall-am uninstall \
-all-redirect all-am all installdirs mostlyclean-generic \
-distclean-generic clean-generic maintainer-clean-generic clean \
-mostlyclean distclean maintainer-clean
+check-am installcheck-am installcheck install-exec-local \
+install-exec-am install-exec install-data-am install-data install-am \
+install uninstall-am uninstall all-redirect all-am all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 installconf:
+
+install-exec-local:
+	(cd $(DESTDIR)$(sbindir) ; ln -s kissattach spattach)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

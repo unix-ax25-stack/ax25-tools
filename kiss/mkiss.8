@@ -1,8 +1,8 @@
-.TH MKISS 8 "05 January 1997" Linux "Linux System Managers Manual"
+.TH MKISS 8 "4 July 1999" Linux "Linux System Managers Manual"
 .SH NAME
 mkiss \- Attach a multi KISS interface
 .SH SYNOPSIS
-.B mkiss [-c] [-h] [-l] [-s speed] [-p] [-v] ttyinterface pty...
+.B mkiss [-c] [-f] [-h] [-l] [-s speed] [-p pollrate] [-v] ttyinterface pty...
 .SH DESCRIPTION
 .LP
 .B Mkiss
@@ -37,6 +37,11 @@ This enables a one-byte checksum on each incoming and outgoing KISS frame on
 the serial port. This checksum is used by G8BPQ KISS roms to maintain the
 integrity of KISS frames.
 .TP 10
+.BI \-f
+This enables a 16-bit checksum on each incoming and outgoing KISS frame on
+the serial port. This checksum is used by Flexnet Node and BayCom Mailbox
+to maintain the integrity of KISS frames.
+.TP 10
 .BI \-h
 Enables hardware handshaking on the serial line to the TNC. The KISS
 specification states that no hardware flow control shall be used so the
@@ -48,9 +53,10 @@ Enables system logging, the default is off.
 .BI "\-s speed"
 Set the speed of the serial port.
 .TP 10
-.BI "\-p"
+.BI "\-p pollrate"
 Enables polling. Polled mode is used by G8BPQ KISS roms to prevent
 contention on systems where multiple TNCs share the same serial line.
+Pollrate is interval between polls (in 100ms units).
 .TP 10
 .BI \-v
 Display the version.

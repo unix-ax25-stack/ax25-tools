@@ -89,6 +89,8 @@ int main(int argc, char **argv)
 		else if (strcmp(argv[4], "-paclen") == 0)
 			ax25_ctl.cmd = AX25_PACLEN;
 	}
+
+	ax25_ctl.digi_count = 0;
 	
 	if (ioctl(s, SIOCAX25CTLCON, &ax25_ctl) != 0) {
 		perror("axctl: SIOAX25CTLCON");

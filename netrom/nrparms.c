@@ -37,7 +37,6 @@ void nodes(int s, char *nodecall, char *op, char *ident, int quality, int count,
 {
 	struct nr_route_struct nr_node;
 	char *p, *q, *dev;
-	int i;
 
 	if (ax25_config_load_ports() == 0) {
 		fprintf(stderr, "nrparms: nodes: no AX.25 ports configured\n");
@@ -144,7 +143,7 @@ void routes(int s, char *port, char *nodecall, char *rest[])
 	}
 
 	nr_neigh.type   = NETROM_NEIGH;
-	/*nr_neigh.ndigis = 0;
+	nr_neigh.ndigis = 0;
 
 	for (i = 0; i < AX25_MAX_DIGIS && rest[i][0] != '-' && rest[i][0] != '+'; i++) {
 		if (ax25_aton_entry(rest[i], nr_neigh.digipeaters[i].ax25_call) != 0) {
@@ -154,7 +153,6 @@ void routes(int s, char *port, char *nodecall, char *rest[])
 		}
 		nr_neigh.ndigis++;
 	}
-	*/
 
 	op      = rest[i + 0];
 	quality = atoi(rest[i + 1]);

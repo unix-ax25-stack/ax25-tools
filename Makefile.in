@@ -68,9 +68,15 @@ UTIL_LIB = @UTIL_LIB@
 VERSION = @VERSION@
 Z_LIB = @Z_LIB@
 
-SUBDIRS = ax25 hdlcutil kiss netrom rose tcpip user_call 
+SUBDIRS = ax25 hdlcutil kiss netrom rose tcpip user_call yamdrv dmascc
 
 EXTRA_DIST = pathnames.h
+
+INCLUDES = -DAX25_SYSCONFDIR=\""$(sysconfdir)/ax25/"\" 	   -DAX25_LOCALSTATEDIR=\""$(localstatedir)/ax25/"\" 
+
+
+AX25_SYSCONFDIR = @sysconfdir@/ax25/
+AX25_LOCALSTATEDIR = @localstatedir@/ax25/
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
@@ -351,12 +357,6 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 installconf:
-	@echo "**** WARNING - This will overwrite any existing files ****"
-	@echo "**** WARNING - This will overwrite any existing files ****"
-	@echo "**** WARNING - This will overwrite any existing files ****"
-	@echo
-	@echo Hit the return key to proceed, or ^C to exit.
-	@read
 	@for app in $(SUBDIRS); do $(MAKE) -C $$app installconf; done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

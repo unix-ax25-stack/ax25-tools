@@ -679,7 +679,7 @@ static int ReadConfig(void)
 	int af_type = 0;	/* Keep GCC happy */
 	int line = 0;
 	int hunt = TRUE, error = FALSE;
-	int iamdigi = FALSE, yes;
+	int iamdigi = FALSE;
 	int parameters = 0;
 
 	memset(&axl_defaults, 0, sizeof(axl_defaults));

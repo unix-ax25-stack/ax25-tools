@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -8,8 +9,8 @@
 
 #include <sys/time.h>
 #include <sys/types.h>
-
 #include <sys/socket.h>
+
 #ifdef HAVE_NETAX25_AX25_H
 #include <netax25/ax25.h>
 #else
@@ -25,27 +26,46 @@
 #include <netax25/axconfig.h>
 #include <netax25/rsconfig.h>
 
+#include "user_io.h"
+
 void alarm_handler(int sig)
 {
 }
 
-void err(char *message)
-{
-	write(STDOUT_FILENO, message, strlen(message));
-	exit(1);
-}
-
 int main(int argc, char **argv)
 {
-	char buffer[512], *addr;
-	fd_set read_fd;
-	int n, s, addrlen = sizeof(struct sockaddr_rose);
+	char buffer[256], *addr;
+	int s, addrlen = sizeof(struct sockaddr_rose);
 	struct sockaddr_rose rosebind, roseconnect;
+
+	while ((s = getopt(argc, argv, "ci:o:")) != -1) {
+		switch (s) {
+		case 'c':
+			init_compress();
+			compression = 1;
+			break;
+		case 'i':
+			paclen_in = atoi(optarg);
+			break;
+		case 'o':
+			paclen_out = atoi(optarg);
+			break;
+		case ':':
+		case '?':
+			err("ERROR: invalid option usage\r");
+			return 1;
+		}
+	}
+
+	if (paclen_in < 1 || paclen_out < 1) {
+		err("ERROR: invalid paclen\r");
+		return 1;
+	}
 
 	/*
 	 * Arguments should be "rose_call port mycall remcall remaddr"
 	 */
-	if (argc != 5) {
+	if ((argc - optind) != 4) {
 		strcpy(buffer, "ERROR: invalid number of parameters\r");
 		err(buffer);
 	}
@@ -61,28 +81,28 @@ int main(int argc, char **argv)
 	roseconnect.srose_family = rosebind.srose_family = AF_ROSE;
 	roseconnect.srose_ndigis = rosebind.srose_ndigis = 0;
 
-	if ((addr = rs_config_get_addr(argv[1])) == NULL) {
-		sprintf(buffer, "ERROR: invalid Rose port name - %s\r", argv[1]);
+	if ((addr = rs_config_get_addr(argv[optind])) == NULL) {
+		sprintf(buffer, "ERROR: invalid Rose port name - %s\r", argv[optind]);
 		err(buffer);
 	}
 
 	if (rose_aton(addr, rosebind.srose_addr.rose_addr) == -1) {
-		sprintf(buffer, "ERROR: invalid Rose port address - %s\r", argv[1]);
+		sprintf(buffer, "ERROR: invalid Rose port address - %s\r", argv[optind]);
 		err(buffer);
 	}
 
-	if (ax25_aton_entry(argv[2], rosebind.srose_call.ax25_call) == -1) {
-		sprintf(buffer, "ERROR: invalid callsign - %s\r", argv[2]);
+	if (ax25_aton_entry(argv[optind + 1], rosebind.srose_call.ax25_call) == -1) {
+		sprintf(buffer, "ERROR: invalid callsign - %s\r", argv[optind + 1]);
 		err(buffer);
 	}
 
-	if (ax25_aton_entry(argv[3], roseconnect.srose_call.ax25_call) == -1) {
-		sprintf(buffer, "ERROR: invalid callsign - %s\r", argv[3]);
+	if (ax25_aton_entry(argv[optind + 2], roseconnect.srose_call.ax25_call) == -1) {
+		sprintf(buffer, "ERROR: invalid callsign - %s\r", argv[optind + 2]);
 		err(buffer);
 	}
 
-	if (rose_aton(argv[4], roseconnect.srose_addr.rose_addr) == -1) {
-		sprintf(buffer, "ERROR: invalid Rose address - %s\r", argv[4]);
+	if (rose_aton(argv[optind + 3], roseconnect.srose_addr.rose_addr) == -1) {
+		sprintf(buffer, "ERROR: invalid Rose address - %s\r", argv[optind + 3]);
 		err(buffer);
 	}
 
@@ -102,8 +122,8 @@ int main(int argc, char **argv)
 		err(buffer);
 	}
 
-	sprintf(buffer, "Connecting to %s @ %s ...\r", argv[3], argv[4]);
-	write(STDOUT_FILENO, buffer, strlen(buffer));
+	sprintf(buffer, "Connecting to %s @ %s ...\r", argv[optind + 2], argv[optind + 3]);
+	user_write(STDOUT_FILENO, buffer, strlen(buffer));
 
 	/*
 	 * If no response in 30 seconds, go away.
@@ -140,34 +160,14 @@ int main(int argc, char **argv)
 	alarm(0);
 
 	strcpy(buffer, "*** Connected\r");
-	write(STDOUT_FILENO, buffer, strlen(buffer));
+	user_write(STDOUT_FILENO, buffer, strlen(buffer));
 
-	/*
-	 * Loop until one end of the connection goes away.
-	 */
-	for (;;) {
-		FD_ZERO(&read_fd);
-		FD_SET(STDIN_FILENO, &read_fd);
-		FD_SET(s, &read_fd);
-		
-		select(s + 1, &read_fd, NULL, NULL, NULL);
+	select_loop(s);
 
-		if (FD_ISSET(s, &read_fd)) {
-			if ((n = read(s, buffer, 512)) == -1) {
-				strcpy(buffer, "\r*** Disconnected\r");
-				err(buffer);
-			}
-			write(STDOUT_FILENO, buffer, n);
-		}
+	strcpy(buffer, "\r*** Disconnected\r");
+	user_write(STDOUT_FILENO, buffer, strlen(buffer));
 
-		if (FD_ISSET(STDIN_FILENO, &read_fd)) {
-			if ((n = read(STDIN_FILENO, buffer, 512)) == -1) {
-				close(s);
-				break;
-			}
-			write(s, buffer, n);
-		}
-	}
+	end_compress();
 
 	return 0;
 }

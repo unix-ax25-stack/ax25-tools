@@ -69,18 +69,26 @@ VERSION = @VERSION@
 Z_LIB = @Z_LIB@
 
 etcfiles = rip98.conf ttylinkd.conf
-etcdir = $(sysconfdir)/ax25
 
 sbin_PROGRAMS = rip98d ttylinkd
 
 man_MANS = rip98.conf.5 rip98d.8 ttylinkd.conf.5 ttylinkd.8
 
-EXTRA_DIST = $(man_MANS) $(etcfiles)
+docdir = ${prefix}/doc/ax25-tools
+doc_DATA = ttylinkd.README ttylinkd.INSTALL
+
+EXTRA_DIST = $(man_MANS) $(etcfiles) $(doc_DATA)
 
 rip98d_SOURCES =  	rip98d.c		rip98r.c		rip98t.c		rip98d.h
 
 
 rip98d_LDADD = $(AX25_LIB)
+
+INCLUDES = -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" 	   -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\" 
+
+
+AX25_SYSCONFDIR = ${sysconfdir}/ax25/
+AX25_LOCALSTATEDIR = ${localstatedir}/ax25/
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
@@ -112,6 +120,8 @@ man8dir = $(mandir)/man8
 MANS = $(man_MANS)
 
 NROFF = nroff
+DATA =  $(doc_DATA)
+
 DIST_COMMON =  Makefile.am Makefile.in
 
 
@@ -257,6 +267,25 @@ uninstall-man:
 	@$(NORMAL_UNINSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) uninstall-man5 uninstall-man8
 
+install-docDATA: $(doc_DATA)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(docdir)
+	@list='$(doc_DATA)'; for p in $$list; do \
+	  if test -f $(srcdir)/$$p; then \
+	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(docdir)/$$p"; \
+	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(docdir)/$$p; \
+	  else if test -f $$p; then \
+	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(docdir)/$$p"; \
+	    $(INSTALL_DATA) $$p $(DESTDIR)$(docdir)/$$p; \
+	  fi; fi; \
+	done
+
+uninstall-docDATA:
+	@$(NORMAL_UNINSTALL)
+	list='$(doc_DATA)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(docdir)/$$p; \
+	done
+
 tags: TAGS
 
 ID: $(HEADERS) $(SOURCES) $(LISP)
@@ -301,10 +330,6 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-rip98d.o: rip98d.c ../config.h ../pathnames.h rip98d.h
-rip98r.o: rip98r.c rip98d.h
-rip98t.o: rip98t.c rip98d.h
-ttylinkd.o: ttylinkd.c ../config.h ../pathnames.h
 
 info-am:
 info: info-am
@@ -317,21 +342,21 @@ installcheck: installcheck-am
 install-exec-am: install-sbinPROGRAMS
 install-exec: install-exec-am
 
-install-data-am: install-man
+install-data-am: install-man install-docDATA
 install-data: install-data-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-sbinPROGRAMS uninstall-man
+uninstall-am: uninstall-sbinPROGRAMS uninstall-man uninstall-docDATA
 uninstall: uninstall-am
-all-am: Makefile $(PROGRAMS) $(MANS)
+all-am: Makefile $(PROGRAMS) $(MANS) $(DATA)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
 	$(mkinstalldirs)  $(DESTDIR)$(sbindir) $(DESTDIR)$(mandir)/man5 \
-		$(DESTDIR)$(mandir)/man8
+		$(DESTDIR)$(mandir)/man8 $(DESTDIR)$(docdir)
 
 
 mostlyclean-generic:
@@ -370,20 +395,21 @@ maintainer-clean: maintainer-clean-am
 clean-sbinPROGRAMS maintainer-clean-sbinPROGRAMS uninstall-sbinPROGRAMS \
 install-sbinPROGRAMS mostlyclean-compile distclean-compile \
 clean-compile maintainer-clean-compile install-man5 uninstall-man5 \
-install-man8 uninstall-man8 install-man uninstall-man tags \
-mostlyclean-tags distclean-tags clean-tags maintainer-clean-tags \
-distdir info-am info dvi-am dvi check check-am installcheck-am \
-installcheck install-exec-am install-exec install-data-am install-data \
-install-am install uninstall-am uninstall all-redirect all-am all \
-installdirs mostlyclean-generic distclean-generic clean-generic \
-maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+install-man8 uninstall-man8 install-man uninstall-man uninstall-docDATA \
+install-docDATA tags mostlyclean-tags distclean-tags clean-tags \
+maintainer-clean-tags distdir info-am info dvi-am dvi check check-am \
+installcheck-am installcheck install-exec-am install-exec \
+install-data-am install-data install-am install uninstall-am uninstall \
+all-redirect all-am all installdirs mostlyclean-generic \
+distclean-generic clean-generic maintainer-clean-generic clean \
+mostlyclean distclean maintainer-clean
 
 
 installconf:
-	$(mkinstalldirs) $(DESTDIR)$(etcdir)
+	$(mkinstalldirs) $(DESTDIR)$(AX25_SYSCONFDIR)
 	@list='$(etcfiles)'; for p in $$list; do \
-	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(etcdir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(DESTDIR)$(etcdir)/$$p; \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_SYSCONFDIR)/$$p"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_SYSCONFDIR)/$$p; \
 	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

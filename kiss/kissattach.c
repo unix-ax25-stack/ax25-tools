@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +8,7 @@
 #include <ctype.h>
 #include <netdb.h>
 #include <syslog.h>
+#include <errno.h>
 
 #include <config.h>
 
@@ -35,10 +35,21 @@
 
 #include "../pathnames.h"
 
+#ifndef N_6PACK
+#define N_6PACK 7	/* This is valid for all architectures in 2.2.x */
+#endif
+
 static char *callsign;
 static int  speed   = 0;
 static int  mtu     = 0;
 static int  logging = FALSE;
+static char *progname;
+
+static char *basename(char *s)
+{
+	char *p = strrchr(s, '/');
+	return p ? p + 1 : s;
+}
 
 static void terminate(int sig)
 {
@@ -57,7 +68,7 @@ static int readconfig(char *port)
 	int n = 0;
 	
 	if ((fp = fopen(CONF_AXPORTS_FILE, "r")) == NULL) {
-		fprintf(stderr, "kissattach: cannot open axports file\n");
+		fprintf(stderr, "%s: cannot open axports file\n", progname);
 		return FALSE;
 	}
 
@@ -71,7 +82,7 @@ static int readconfig(char *port)
 			continue;
 
 		if ((s = strtok(buffer, " \t\r\n")) == NULL) {
-			fprintf(stderr, "kissattach: unable to parse line %d of the axports file\n", n);
+			fprintf(stderr, "%s: unable to parse line %d of the axports file\n", progname, n);
 			return FALSE;
 		}
 		
@@ -79,27 +90,27 @@ static int readconfig(char *port)
 			continue;
 			
 		if ((s = strtok(NULL, " \t\r\n")) == NULL) {
-			fprintf(stderr, "kissattach: unable to parse line %d of the axports file\n", n);
+			fprintf(stderr, "%s: unable to parse line %d of the axports file\n", progname, n);
 			return FALSE;
 		}
 
 		callsign = strdup(s);
 
 		if ((s = strtok(NULL, " \t\r\n")) == NULL) {
-			fprintf(stderr, "kissattach: unable to parse line %d of the axports file\n", n);
+			fprintf(stderr, "%s: unable to parse line %d of the axports file\n", progname, n);
 			return FALSE;
 		}
 
 		speed = atoi(s);
 
 		if ((s = strtok(NULL, " \t\r\n")) == NULL) {
-			fprintf(stderr, "kissattach: unable to parse line %d of the axports file\n", n);
+			fprintf(stderr, "%s: unable to parse line %d of the axports file\n", progname, n);
 			return FALSE;
 		}
 
 		if (mtu == 0) {
 			if ((mtu = atoi(s)) <= 0) {
-				fprintf(stderr, "kissattach: invalid paclen setting\n");
+				fprintf(stderr, "%s: invalid paclen setting\n", progname);
 				return FALSE;
 			}
 		}
@@ -111,7 +122,7 @@ static int readconfig(char *port)
 	
 	fclose(fp);
 
-	fprintf(stderr, "kissattach: cannot find port %s in axports\n", port);
+	fprintf(stderr, "%s: cannot find port %s in axports\n", progname, port);
 	
 	return FALSE;
 }
@@ -126,7 +137,8 @@ static int setifcall(int fd, char *name)
 	
 	if (ioctl(fd, SIOCSIFHWADDR, call) != 0) {
 		close(fd);
-		perror("kissattach: SIOCSIFHWADDR");
+		fprintf(stderr, "%s: ", progname);
+		perror("SIOCSIFHWADDR");
 		return FALSE;
 	}
 
@@ -140,7 +152,8 @@ static int startiface(char *dev, struct hostent *hp)
 	int fd;
 	
 	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-		perror("kissattach: socket");
+		fprintf(stderr, "%s: ", progname);
+		perror("socket");
 		return FALSE;
 	}
 
@@ -158,7 +171,8 @@ static int startiface(char *dev, struct hostent *hp)
 		ifr.ifr_addr.sa_data[6] = 0;
 
 		if (ioctl(fd, SIOCSIFADDR, &ifr) < 0) {
-			perror("kissattach: SIOCSIFADDR");
+			fprintf(stderr, "%s: ", progname);
+			perror("SIOCSIFADDR");
 			return FALSE;
 		}
 	}
@@ -166,12 +180,14 @@ static int startiface(char *dev, struct hostent *hp)
 	ifr.ifr_mtu = mtu;
 
 	if (ioctl(fd, SIOCSIFMTU, &ifr) < 0) {
-		perror("kissattach: SIOCSIFMTU");
+		fprintf(stderr, "%s: ", progname);
+		perror("SIOCSIFMTU");
 		return FALSE;
 	}
 
 	if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) {
-		perror("kissattach: SIOCGIFFLAGS");
+		fprintf(stderr, "%s: ", progname);
+		perror("SIOCGIFFLAGS");
 		return FALSE;
 	}
 
@@ -180,7 +196,8 @@ static int startiface(char *dev, struct hostent *hp)
 	ifr.ifr_flags |= IFF_RUNNING;
 
 	if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) {
-		perror("kissattach: SIOCSIFFLAGS");
+		fprintf(stderr, "%s: ", progname);
+		perror("SIOCSIFFLAGS");
 		return FALSE;
 	}
 	
@@ -198,11 +215,19 @@ int main(int argc, char *argv[])
 	int  v = 4;
 	struct hostent *hp = NULL;
 
-	while ((fd = getopt(argc, argv, "i:lm:v")) != -1) {
+	progname = basename(argv[0]);
+
+	if (!strcmp(progname, "spattach"))
+		disc = N_6PACK;
+
+	while ((fd = getopt(argc, argv, "6i:lm:v")) != -1) {
 		switch (fd) {
+			case '6':
+				disc = N_6PACK;
+				break;
 			case 'i':
 				if ((hp = gethostbyname(optarg)) == NULL) {
-					fprintf(stderr, "kissattach: invalid internet name/address - %s\n", optarg);
+					fprintf(stderr, "%s: invalid internet name/address - %s\n", progname, optarg);
 					return 1;
 				}
 				break;
@@ -211,27 +236,27 @@ int main(int argc, char *argv[])
 				break;
 			case 'm':
 				if ((mtu = atoi(optarg)) <= 0) {
-					fprintf(stderr, "kissattach: invalid mtu size - %s\n", optarg);
+					fprintf(stderr, "%s: invalid mtu size - %s\n", progname, optarg);
 					return 1;
 				}
 				break;
 			case 'v':
-				printf("kissattach: %s\n", VERSION);
+				printf("%s: %s\n", progname, VERSION);
 				return 0;
 			case ':':
 			case '?':
-				fprintf(stderr, "usage: kissattach [-i inetaddr] [-l] [-m mtu] [-v] ttyinterface port\n");
+				fprintf(stderr, "usage: %s [-i inetaddr] [-l] [-m mtu] [-v] ttyinterface port\n", progname);
 				return 1;
 		}
 	}
 
 	if ((argc - optind) != 2) {
-		fprintf(stderr, "usage: kissattach [-i inetaddr] [-l] [-m mtu] [-v] ttyinterface port\n");
+		fprintf(stderr, "usage: %s [-i inetaddr] [-l] [-m mtu] [-v] ttyinterface port\n", progname);
 		return 1;
 	}
 
 	if (tty_is_locked(argv[optind])) {
-		fprintf(stderr, "kissattach: device %s already in use\n", argv[optind]);
+		fprintf(stderr, "%s: device %s already in use\n", progname, argv[optind]);
 		return 1;
 	}
 
@@ -239,7 +264,8 @@ int main(int argc, char *argv[])
 		return 1;
 
 	if ((fd = open(argv[optind], O_RDONLY | O_NONBLOCK)) == -1) {
-		perror("kissattach: open");
+		fprintf(stderr, "%s: ", progname);
+		perror("open");
 		return 1;
 	}
 
@@ -247,12 +273,17 @@ int main(int argc, char *argv[])
 		return 1;
 	
 	if (ioctl(fd, TIOCSETD, &disc) == -1) {
-		perror("kissattach: TIOCSETD");
+		fprintf(stderr, "%s: Error setting line discipline: ", progname);
+		perror("TIOCSETD");
+		fprintf(stderr, "Are you sure you have enabled %s support in the kernel\n", 
+			disc == N_AX25 ? "MKISS" : "6PACK");
+		fprintf(stderr, "or, if you made it a module, that the module is loaded?\n");
 		return 1;
 	}
 	
 	if (ioctl(fd, SIOCGIFNAME, dev) == -1) {
-		perror("kissattach: SIOCGIFNAME");
+		fprintf(stderr, "%s: ", progname);
+		perror("SIOCGIFNAME");
 		return 1;
 	}
 	
@@ -261,7 +292,8 @@ int main(int argc, char *argv[])
 
 	/* Now set the encapsulation */
 	if (ioctl(fd, SIOCSIFENCAP, &v) == -1) {
-		perror("kissattach: SIOCSIFENCAP");
+		fprintf(stderr, "%s: ", progname);
+		perror("SIOCSIFENCAP");
 		return 1;
 	}
 		
@@ -271,7 +303,7 @@ int main(int argc, char *argv[])
 	printf("AX.25 port %s bound to device %s\n", argv[optind + 1], dev);
 
 	if (logging) {
-		openlog("kissattach", LOG_PID, LOG_DAEMON);
+		openlog(progname, LOG_PID, LOG_DAEMON);
 		syslog(LOG_INFO, "AX.25 port %s bound to device %s\n", argv[optind + 1], dev);
 	}
 		
@@ -282,7 +314,7 @@ int main(int argc, char *argv[])
 	 * Become a daemon if we can.
 	 */
 	if (!daemon_start(FALSE)) {
-		fprintf(stderr, "kissattach: cannot become a daemon\n");
+		fprintf(stderr, "%s: cannot become a daemon\n", progname);
 		return 1;
 	}
 

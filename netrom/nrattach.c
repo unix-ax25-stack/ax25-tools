@@ -33,6 +33,7 @@
 #include <netax25/kernel_rose.h>
 #endif
 
+#include <netax25/axlib.h>
 #include <netax25/nrconfig.h>
 
 #include "../pathnames.h"

@@ -3,15 +3,15 @@ etcfiles = ax25.profile ax25d.conf axspawn.conf rxecho.conf
 varfiles = mheard.dat
 
 installconf:
-	$(mkinstalldirs) $(DESTDIR)$(etcdir)
+	$(mkinstalldirs) $(DESTDIR)$(AX25_SYSCONFDIR)
 	@list='$(etcfiles)'; for p in $$list; do \
-	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(etcdir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(DESTDIR)$(etcdir)/$$p; \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_SYSCONFDIR)/$$p"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_SYSCONFDIR)/$$p; \
 	done
-	$(mkinstalldirs) $(DESTDIR)$(vardir)
+	$(mkinstalldirs) $(DESTDIR)$(AX25_LOCALSTATEDIR)/mheard
 	@list='$(varfiles)'; for p in $$list; do \
-	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(vardir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(DESTDIR)$(vardir)/$$p; \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_LOCALSTATEDIR)/mheard/$$p"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_LOCALSTATEDIR)/mheard/$$p; \
 	done
 
 
@@ -22,7 +22,13 @@ bin_PROGRAMS = mheard
 LDADD = $(AX25_LIB)
 axspawn_LDADD = $(AX25_LIB) $(UTIL_LIB)
 
-man_MANS = ax25.4 ax25d.conf.5 axports.5 axspawn.conf.5 rxecho.conf.5 \
+INCLUDES = -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" \
+	   -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\" 
+
+AX25_SYSCONFDIR=$(sysconfdir)/ax25/
+AX25_LOCALSTATEDIR=$(localstatedir)/ax25/
+
+man_MANS = ax25.4 ax25d.conf.5 axspawn.conf.5 rxecho.conf.5 \
 	   ax25d.8 axctl.8 axparms.8 axspawn.8 beacon.8 bpqparms.8 \
 	   mheard.1 mheardd.8 rxecho.8
 

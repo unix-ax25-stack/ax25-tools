@@ -113,7 +113,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
-#include <strings.h>
+#include <string.h>
 #include <ctype.h>
 #include <termios.h>
 #include <unistd.h>

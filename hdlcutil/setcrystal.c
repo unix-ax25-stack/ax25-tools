@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <asm/io.h>
+#include <sys/io.h>
 
 /* --------------------------------------------------------------------- */
 

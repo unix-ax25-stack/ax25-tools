@@ -1,9 +1,9 @@
 
 installconf:
 
-sbin_PROGRAMS = setcrystal sethdlc smmixer smdiag
+sbin_PROGRAMS = setcrystal sethdlc smmixer 
 
-man_MANS = sethdlc.8 smdiag.8 smmixer.8 baycom.9 hdlcdrv.9 soundmodem.9
+man_MANS = sethdlc.8 smmixer.8 baycom.9 hdlcdrv.9 soundmodem.9
 
 EXTRA_DIST = $(man_MANS)
 
@@ -22,12 +22,3 @@ smmixer_SOURCES = 	\
 	hdrvcomm.h	\
 	usersmdiag.h
 
-smdiag_SOURCES = 	\
-	smdiag.c	\
-	hdrvcomm.c	\
-	hdrvcomm.h	\
-	usersmdiag.h
-
-smdiag_LDADD =		\
-	$(X_LIBS)	\
-	-lX11

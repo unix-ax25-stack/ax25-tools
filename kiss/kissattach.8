@@ -1,13 +1,15 @@
-.TH KISSATTACH 8 "13 October 1996" Linux "Linux System Managers Manual"
+.TH KISSATTACH 8 "4 July 1999" Linux "Linux System Managers Manual"
 .SH NAME
-kissattach \- Attach a KISS interface
+kissattach, spattach \- Attach a KISS or 6PACK interface
 .SH SYNOPSIS
-.B kissattach [-i inetaddr] [-l] [-m mtu] [-v] tty port
+.B kissattach [-6] [-i inetaddr] [-l] [-m mtu] [-v] tty port
+.sp
+.B spattach [-i inetaddr] [-l] [-m mtu] [-v] tty port
 .SH DESCRIPTION
 .LP
-Attach a KISS interface to what is normally a tty line connected to a TNC in
-KISS mode. This program will turn itself into a background process. To down
-an interface send its kissattach process a SIGKILL.
+Attach a KISS or a 6PACK interface to what is normally a tty line connected
+to a TNC in KISS or 6PACK mode. This program will turn itself into a
+background process. To down an interface send its attach process a SIGTERM.
 .LP
 .B Kissattach
 takes many of the parameters for the port from the axports(5) file. If the
@@ -16,11 +18,15 @@ serial port speed, a zero value means that no speed is set. The paclen
 parameter is used for the device mtu unless overridden by a value on the
 command line.
 .LP
-The tty argument will typically be that of a serial port with a KISS TNC
-attached, although it could be a psuedo tty or a KISS port emulator such as
+The tty argument will typically be that of a serial port with a KISS or 6PACK
+TNC attached, although it could be a pseudo tty or a KISS port emulator such as
 an SCC card. The port arguments is the name of a port as given in the
 axports(5) file.
 .SH OPTIONS
+.TP 16
+.BI "\-6"
+Use the 6PACK line discipline instead of KISS. This is the default if
+the program is called as spattach.
 .TP 16
 .BI "\-i inetaddr"
 Set the internet address of the interface. This address may either be a
