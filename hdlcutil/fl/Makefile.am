@@ -1,8 +1,10 @@
 
+if HAVE_FLTK
 sbin_PROGRAMS = xfsmmixer xfhdlcchpar xfhdlcst xfsmdiag
+endif
 
 INCLUDES = $(X_CFLAGS) -I..
-LDFLAGS = $(X_LIBS) -lX11 $(FLTK_LIB)
+AM_LDFLAGS = $(X_LIBS) -lX11 $(FLTK_LIB)
 LDADD = hdrvcomm.o
 
 xfsmmixer_SOURCES = xfsmmixer.cxx xfsmmixer_main.cxx xfsmmixer.h
