@@ -40,6 +40,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include <time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -107,6 +108,10 @@ struct iface
 	unsigned long	rxbytes;	/* RX bytes count		*/
 	unsigned long	txbytes;	/* TX bytes count		*/
 };
+
+static struct iface *tty	= NULL;
+static struct iface *pty[16]	= { NULL };
+static int numptys		= 0;
 
 static void init_crc(void)
 {
@@ -339,11 +344,23 @@ static int kiss_rx(struct iface *ifp, unsigned char c, int usecrc)
 
 static void sigterm_handler(int sig)
 {
+	int i;
+
 	if (logging) {
 		syslog(LOG_INFO, "terminating on SIGTERM\n");
 		closelog();
 	}
-	
+
+	tty_unlock(tty->name);
+	close(tty->fd);
+	free(tty);
+
+	for (i = 0; i < numptys; i++) {
+		tty_unlock(pty[i]->name);
+		close(pty[i]->fd);
+		free(pty[i]);
+	}
+
 	exit(0);
 }
 
@@ -353,7 +370,7 @@ static void sigusr1_handler(int sig)
 	dump_report = TRUE;
 }
 
-static void report(struct iface *tty, struct iface **pty, int numptys)
+static void report(void)
 {
 	int i;
 	long t;
@@ -397,13 +414,11 @@ static void report(struct iface *tty, struct iface **pty, int numptys)
 
 int main(int argc, char *argv[])
 {
-	struct iface *pty[16];
-	struct iface *tty;
 	unsigned char *icp;
 	int topfd;
 	fd_set readfd;
 	struct timeval timeout, pollinterval;
-	int retval, numptys, i, size, len;
+	int retval, i, size, len;
 	int speed	= -1;
 
 	while ((size = getopt(argc, argv, "cfhlp:s:v")) != -1) {
@@ -508,13 +523,6 @@ int main(int argc, char *argv[])
 		topfd = (pty[i]->fd > topfd) ? pty[i]->fd : topfd;
 	}
 
-	/*
-	 * Now all the ports are open, lock them.
-	 */
-	tty_lock(argv[optind]);
-	for (i = 0; i < numptys; i++)
-		tty_lock(argv[optind + i + 1]);
-
 	signal(SIGHUP, SIG_IGN);
 	signal(SIGUSR1, sigusr1_handler);
 	signal(SIGTERM, sigterm_handler);
@@ -523,6 +531,13 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "mkiss: cannot become a daemon\n");
 		return 1;
 	}
+
+	/*
+	 * Now all the ports are open, lock them.
+	 */
+	tty_lock(tty->name);
+	for (i = 0; i < numptys; i++)
+		tty_lock(pty[i]->name);
 
 	if (logging) {
 		openlog("mkiss", LOG_PID, LOG_DAEMON);
@@ -547,7 +562,7 @@ int main(int argc, char *argv[])
 		if (retval == -1) {
 			if (dump_report) {
 				if (logging)
-					report(tty, pty, numptys);
+					report();
 				dump_report = FALSE;
 				continue;
 			} else {
@@ -612,10 +627,12 @@ end:
 	if (logging)
 		closelog();
 
+	tty_unlock(tty->name);
 	close(tty->fd);
 	free(tty);
 
 	for (i = 0; i < numptys; i++) {
+		tty_unlock(pty[i]->name);
 		close(pty[i]->fd);
 		free(pty[i]);
 	}

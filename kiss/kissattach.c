@@ -40,12 +40,15 @@
 #endif
 
 static char *callsign;
-static int  speed   = 0;
-static int  mtu     = 0;
-static int  logging = FALSE;
-static char *progname;
+static int  speed	= 0;
+static int  mtu		= 0;
+static int  logging	= FALSE;
+static char *progname	= NULL;
+static char *kttyname	= NULL;
+static char *portname	= NULL;
+static char *inetaddr	= NULL;
 
-static char *kiss_bname(char *s)
+static char *kiss_basename(char *s)
 {
 	char *p = strrchr(s, '/');
 	return p ? p + 1 : s;
@@ -58,6 +61,8 @@ static void terminate(int sig)
 		closelog();
 	}
 
+	tty_unlock(kttyname);
+
 	exit(0);
 }
 
@@ -68,7 +73,8 @@ static int readconfig(char *port)
 	int n = 0;
 	
 	if ((fp = fopen(CONF_AXPORTS_FILE, "r")) == NULL) {
-		fprintf(stderr, "%s: cannot open axports file\n", progname);
+		fprintf(stderr, "%s: cannot open axports file %s\n", 
+                        progname, CONF_AXPORTS_FILE);
 		return FALSE;
 	}
 
@@ -205,8 +211,8 @@ static int startiface(char *dev, struct hostent *hp)
 	
 	return TRUE;
 }
-	
-static void usage(char *progname)
+
+static void usage(void)
 {
         fprintf(stderr, "usage: %s [-l] [-m mtu] [-v] ttyinterface port inetaddr\n", progname);
 }
@@ -219,7 +225,7 @@ int main(int argc, char *argv[])
 	int  v = 4;
 	struct hostent *hp = NULL;
 
-	progname = kiss_bname(argv[0]);
+	progname = kiss_basename(argv[0]);
 
 	if (!strcmp(progname, "spattach"))
 		disc = N_6PACK;
@@ -230,11 +236,8 @@ int main(int argc, char *argv[])
 				disc = N_6PACK;
 				break;
 			case 'i':
-                                fprintf(stderr,"%s: -i flag depreciated, use new command line format instead.\n", progname);
-				if ((hp = gethostbyname(optarg)) == NULL) {
-					fprintf(stderr, "%s: invalid internet name/address - %s\n", progname, optarg);
-					return 1;
-				}
+				fprintf(stderr, "%s: -i flag depreciated, use new command line format instead.\n", progname);
+				inetaddr = optarg;
 				break;
 			case 'l':
 				logging = TRUE;
@@ -250,39 +253,48 @@ int main(int argc, char *argv[])
 				return 0;
 			case ':':
 			case '?':
-                                usage(progname);
+				usage();
 				return 1;
 		}
 	}
 
-	if ((argc - optind) != 3 && ((argc - optind) != 2 || hp == NULL)) {
-                usage(progname);
+	if ((argc - optind) != 3 && ((argc - optind) != 2 || !inetaddr)) {
+		usage();
 		return 1;
 	}
 
-	if (tty_is_locked(argv[optind])) {
-		fprintf(stderr, "%s: device %s already in use\n", progname, argv[optind]);
+	kttyname = argv[optind++];
+	portname = argv[optind++];
+
+	if (!inetaddr)
+		inetaddr = argv[optind];
+
+	if (tty_is_locked(kttyname)) {
+		fprintf(stderr, "%s: device %s already in use\n", progname, kttyname);
 		return 1;
 	}
 
-	if (!readconfig(argv[optind + 1]))
+	if (!readconfig(portname))
 		return 1;
 
-        if ((argc - optind) == 3) {
-	        if ((hp = gethostbyname(argv[optind + 2])) == NULL) {
-		        fprintf(stderr, "%s: invalid internet name/address - %s\n", progname, argv[optind+2]);
-                }
-        }
+        if ((hp = gethostbyname(inetaddr)) == NULL) {
+		fprintf(stderr, "%s: invalid internet name/address - %s\n", progname, inetaddr);
+		return 1;
+	}
 
-	if ((fd = open(argv[optind], O_RDONLY | O_NONBLOCK)) == -1) {
-		fprintf(stderr, "%s: ", progname);
-		perror("open");
+	if ((fd = open(kttyname, O_RDONLY | O_NONBLOCK)) == -1) {
+		if (errno == ENOENT) {
+			fprintf(stderr, "%s: Cannot find serial device %s, no such file or directory.\n", progname, kttyname);
+		} else {
+			fprintf(stderr, "%s: %s: ", progname, kttyname);
+			perror("open");
+		}
 		return 1;
 	}
 
 	if (speed != 0 && !tty_speed(fd, speed))
 		return 1;
-	
+
 	if (ioctl(fd, TIOCSETD, &disc) == -1) {
 		fprintf(stderr, "%s: Error setting line discipline: ", progname);
 		perror("TIOCSETD");
@@ -291,13 +303,13 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "or, if you made it a module, that the module is loaded?\n");
 		return 1;
 	}
-	
+
 	if (ioctl(fd, SIOCGIFNAME, dev) == -1) {
 		fprintf(stderr, "%s: ", progname);
 		perror("SIOCGIFNAME");
 		return 1;
 	}
-	
+
 	if (!setifcall(fd, callsign))
 		return 1;
 
@@ -307,17 +319,17 @@ int main(int argc, char *argv[])
 		perror("SIOCSIFENCAP");
 		return 1;
 	}
-		
+
 	if (!startiface(dev, hp))
 		return 1;		
 
-	printf("AX.25 port %s bound to device %s\n", argv[optind + 1], dev);
+	printf("AX.25 port %s bound to device %s\n", portname, dev);
 
 	if (logging) {
 		openlog(progname, LOG_PID, LOG_DAEMON);
-		syslog(LOG_INFO, "AX.25 port %s bound to device %s\n", argv[optind + 1], dev);
+		syslog(LOG_INFO, "AX.25 port %s bound to device %s\n", portname, dev);
 	}
-		
+
 	signal(SIGHUP, SIG_IGN);
 	signal(SIGTERM, terminate);
 
@@ -329,12 +341,12 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if (!tty_lock(argv[optind]))
+	if (!tty_lock(kttyname))
 		return 1;
 
 	while (1)
 		sleep(10000);
-		
+
 	/* NOT REACHED */
 	return 0;
 }

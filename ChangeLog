@@ -1,4 +1,5 @@
 ax25-tools (0.0.9)
+	* Fix for mkiss pid problem 
 
  -- Craig Small <csmall@small.dropbear.id.au>  
 
