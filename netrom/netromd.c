@@ -5,6 +5,7 @@
 #include <syslog.h>
 #include <signal.h>
 #include <time.h>
+#include <sys/time.h>
 
 #include <config.h>
 

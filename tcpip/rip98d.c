@@ -10,6 +10,7 @@
 #include <netdb.h>
 #include <syslog.h>
 #include <signal.h>
+#include <sys/time.h>
 #include <time.h>
 
 #include <sys/types.h>
