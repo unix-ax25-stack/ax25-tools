@@ -42,7 +42,7 @@ extern "C" {
 
 #ifdef HDRVC_KERNEL
 #include <linux/hdlcdrv.h>
-#include <linux/soundmodem.h>
+#include "soundmodem.h"
 #include <linux/baycom.h>
 #endif /* HDRVC_KERNEL */
 
