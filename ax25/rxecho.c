@@ -350,7 +350,7 @@ int main(int argc, char **argv)
 	if ((list = readconfig()) == NULL)
 		return 1;
 
-	if ((s = socket(AF_INET, SOCK_PACKET, htons(ETH_P_AX25))) == -1) {
+	if ((s = socket(PF_PACKET, SOCK_PACKET, htons(ETH_P_AX25))) == -1) {
 		perror("rxecho: socket:");
 		return 1;
 	}

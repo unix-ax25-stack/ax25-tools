@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.6 1996/08/24 22:33:05 jreuter Exp jreuter $
+ * $Id: axspawn.c,v 1.2 2002/11/03 19:51:10 mctaylor Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -125,6 +125,7 @@
 #include <errno.h>
 #include <syslog.h>
 #include <sys/time.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>

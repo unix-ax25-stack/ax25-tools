@@ -182,7 +182,7 @@ int main(int argc, char **argv)
 			fclose(fp);
 	}
 
-	if ((s = socket(AF_INET, SOCK_PACKET, htons(ETH_P_AX25))) == -1) {
+	if ((s = socket(PF_PACKET, SOCK_PACKET, htons(ETH_P_AX25))) == -1) {
 		perror("mheardd: socket");
 		return 1;
 	}
