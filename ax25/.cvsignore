@@ -1,0 +1,11 @@
+.deps
+Makefile
+ax25d
+axctl
+axparms
+axspawn
+beacon
+bpqparms
+mheard
+mheardd
+rxecho
