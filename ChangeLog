@@ -1,3 +1,7 @@
+ax25-tools (0.0.9)
+
+ -- Craig Small <csmall@small.dropbear.id.au>  
+
 ax25-tools (0.0.8)
 	* kissattach now tells you where it thinks the config file is
 	* rip98r metric patch form Jean-Paul
