@@ -104,7 +104,7 @@ static void ReopenPort(int PortNumber)
 	PortList[PortNumber]->Fd = open(PortList[PortNumber]->Name, O_RDWR | O_NONBLOCK);
 	if (PortList[PortNumber]->Fd < 0) {
 		syslog(LOG_WARNING, "kissnetd : Error opening port %s : %s\n", 
-			PortList[PortNumber]->Name, sys_errlist[errno]);
+			PortList[PortNumber]->Name, strerror(errno));
 		if (VerboseMode) {
 			sprintf(MyString, "cannot reopen %s", PortList[PortNumber]->Name);
 			perror(MyString);
@@ -160,7 +160,7 @@ static void ProcessInput(int PortNumber)
 	if (!Length) return;
 	if (Length < 0) {
 		syslog(LOG_WARNING, "kissnetd : Error reading port %s : %s\n", 
-			PortList[PortNumber]->Name, sys_errlist[errno]);
+			PortList[PortNumber]->Name, strerror(errno));
 		if (VerboseMode) perror("read");
 		close(MyPort->Fd);
 		MyPort->Fd = -1;
