@@ -1,4 +1,6 @@
 /*
+ * $Id: ax25d.c,v 1.2 2005/10/30 21:46:42 dl9sau Exp $
+ *
  *  This is my version of axl.c, written for the LBBS code to make it
  *    compatable with the kernel AX25 driver.  It appears to work, with
  *    my setup, so it'll probably not work else where :-).
@@ -91,6 +93,11 @@
  *			  based on uid.
  *			Callsign validation check.
  *			Logging of errors.
+ *			Handling of AX25.IP mode VC connections - dl9sau
+ *				recommended settings in ax25d.conf:
+ *				  parameters_extAX25 VC-wait-login VC-disc-on-linkfailure-msg VC-log-connections
+				or
+ *				  parameters_extAX25 VC-reject-login VC-send-failure-msg VC-log-connections
  *
  *
  *  TODO:
@@ -181,14 +188,20 @@ struct axlist {		/* Have used same struct for quickness */
 	unsigned long idle;	/* Set T4 to... (Link Drop timer) */
 	unsigned long n2;	/* Set N2 to... (Retries) */
 	unsigned long flags;	/* FLAG_ values ORed... */
+
+	int checkVC;		/* check for AX25.IP mode VC users? */
+	int VCdiscOnLinkfailureMsg;	/* action when mode VC user and checkVC == 1 */
+	int VCsendFailureMsg;	/* action when mode VC user and on checkVC > 1 */
+	int VCloginEnable;		/* trigger login when mode VC user and checkVC == 1 and one line is read */
+	int LoggingVC;		/* extra log stuff */
 };
 
 static struct axlist *AXL	= NULL;
 static char *ConfigFile		= CONF_AX25D_FILE;
 static char User[10];				/* Room for 'GB9ZZZ-15\0' */
 static char Node[11];				/* Room for 'GB9ZZZ-15\0' */
+static char myAX25Name[10];			/* Room for 'GB9ZZZ-15\0' */
 static char *Port;
-static sig_atomic_t Update	= TRUE;		/* Cause update on bootup */
 static int Logging		= FALSE;
 
 static void SignalHUP(int);
@@ -200,6 +213,58 @@ static unsigned long ParseFlags(const char *, int);
 static struct axlist *ClearList(struct axlist *);
 static char *stripssid(const char *);
 
+static fd_set fdread;
+static int maxfd = -1;
+
+/*--------------------------------------------------------------------------*/
+
+void update_maxfd() {
+	struct axlist *paxl;
+
+	FD_ZERO(&fdread);
+
+	for (maxfd = -1, paxl = AXL; paxl != NULL && paxl->fd >= 0; paxl = paxl->next) {
+		FD_SET(paxl->fd, &fdread);
+
+		if (paxl->fd > maxfd)
+			maxfd = paxl->fd;
+	}
+}
+
+/*--------------------------------------------------------------------------*/
+
+void err_config() {
+	if (AXL == NULL) {
+		if (Logging)
+			syslog(LOG_ERR, "config file reload error, exiting");
+		exit(1);
+	} else {
+		if (Logging)
+			syslog(LOG_INFO, "config file reload error, continuing with original");
+	}
+}		
+
+/*--------------------------------------------------------------------------*/
+
+void _ReadConfig(int dummy)
+{
+	ReadConfig();
+}
+
+/*--------------------------------------------------------------------------*/
+
+void reload_timer(int sec) {
+	struct itimerval itv;
+
+	itv.it_value.tv_sec = sec;
+	itv.it_value.tv_usec = 0;
+	itv.it_interval.tv_sec = 0;
+	itv.it_interval.tv_usec = 0;
+	setitimer(ITIMER_REAL, &itv, 0);
+	signal(SIGALRM, _ReadConfig);
+}
+
+/*--------------------------------------------------------------------------*/
 
 int main(int argc, char *argv[])
 {
@@ -209,10 +274,11 @@ int main(int argc, char *argv[])
 		struct sockaddr_rose rose;
 	} sockaddr;
 	struct sigaction act, oact;
-	int maxfd = -1;
-	fd_set fdread;
 	int addrlen;
 	int cnt;
+	char buf[1024];
+	char *p;
+	char *mesg;
    
 	while ((cnt = getopt(argc, argv, "c:lv")) != EOF) {
 		switch (cnt) {
@@ -227,7 +293,7 @@ int main(int argc, char *argv[])
 			case 'v':
 				printf("ax25d: %s\n", VERSION);
 				return 1;
-         
+
 			default:
 				fprintf(stderr, "Usage: ax25d [-v] [-c altfile] [-l]\n");
 				return 1;
@@ -263,39 +329,21 @@ int main(int argc, char *argv[])
 	act.sa_flags = 0;
 	sigaction(SIGTERM, &act, &oact);
 
+	ReadConfig();
+
 	for (;;) {
-		if (Update) {
-			if (ReadConfig() < 0) {
-				if (AXL == NULL) {
-					if (Logging)
-						syslog(LOG_ERR, "config file reload error, exiting");
-					return 1;
-				} else {
-					if (Logging)
-						syslog(LOG_INFO, "config file reload error, continuing with original");
-				}
-			} else {
-				if (Logging)
-					syslog(LOG_INFO, "new config file loaded successfuly");
-			}
-				
-			Update = FALSE;
-		}
 
-		FD_ZERO(&fdread);
-
-		for (paxl = AXL; paxl != NULL && paxl->fd >= 0; paxl = paxl->next) {
-			FD_SET(paxl->fd, &fdread);
-
-			if (paxl->fd > maxfd)
-				maxfd = paxl->fd;
+		update_maxfd();
+		if (maxfd < 0) {
+			sleep(10);
+			continue;
 		}
 
 		if (select(maxfd + 1, &fdread, NULL, NULL, NULL) <= 0)
 			continue;
 
 		for (paxl = AXL; paxl != NULL; paxl = paxl->next) {
-			if (FD_ISSET(paxl->fd, &fdread)) {
+			if (paxl->fd > 0 && FD_ISSET(paxl->fd, &fdread)) {
 				pid_t pid;
 				gid_t grps[2];
 				char *argv[MAX_ARGS];
@@ -324,7 +372,7 @@ int main(int argc, char *argv[])
 
 				i = FALSE;
 				ioctl(paxl->fd, FIONBIO, &i);
-
+ 
 				if (new < 0) {
 					if (errno == EWOULDBLOCK)
 						continue;	/* It's gone ??? */
@@ -333,6 +381,7 @@ int main(int argc, char *argv[])
 						syslog(LOG_ERR, "accept error %m, closing socket on port %s", paxl->port);
 					close(paxl->fd);
 					paxl->fd = -1;
+					reload_timer(10);
 					continue; 
 				}
 
@@ -453,6 +502,98 @@ int main(int argc, char *argv[])
 						break;			/* Oh well... */
 
 					case 0:
+
+						if (raxl->af_type == AF_AX25 && raxl->checkVC) {
+							/* to which of my own addresses has the user connected? */
+							getsockname(new, (struct sockaddr *)&sockaddr, &addrlen);
+							strcpy(myAX25Name, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
+
+							sprintf(buf, "/usr/sbin/ax25rtctl -l ip | grep -i ' %s ' | /bin/grep 'v ' >/dev/null", User);
+
+							/* he's not a VC user? */
+							if (system(buf) != 0)
+								goto login;
+
+							if (raxl->checkVC > 1) {
+								//setproctitle("ax25d [%d]: rejecting, User);
+							} else {
+								//setproctitle("ax25d [%d]: %s, User, (VCloginEnable ? "waiting" : "discarding"));
+							}
+
+							/* is a VC user. checkVC > 0? then reject now, or fork and wait for pid=textdata.. */
+							if (raxl->VCsendFailureMsg) {
+								sprintf(buf, "*** %s: NO MODE VC with %s\r", myAX25Name, myAX25Name);
+								write(new, buf, strlen(buf));
+								if (raxl->checkVC > 1)
+									sleep(1);
+							}
+
+							if (raxl->checkVC > 1) {
+								if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC))
+									syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO), "AX.25 %s (%s:%s) rejected - AX25.IP-VC entry found", User, Port, myAX25Name);
+								goto close_link;
+							}
+
+							/* checkVC == 1: wait for data */
+							if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC)) {
+								syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO), "AX.25 %s (%s:%s) AX25.IP-VC host connected. %s", 
+									User, Port, myAX25Name,
+									(raxl->VCloginEnable ? "waiting for first PID=text packet for triggered login" : "discarding PID=text packets"));
+							}
+
+							*buf = 0;
+							mesg = 0;
+							while ((i = read(new, buf, (sizeof(buf)-1))) > 0) {
+								buf[i] = 0;
+								if (Logging && raxl->LoggingVC > 1) {
+									/* debug */
+									syslog((LOG_DEBUG), "DEBUG: AX.25 %s (%s:%s) AX25.IP-VC host said: >%s<", User, Port, myAX25Name, buf); 
+								}
+							        /* skip leading mess */
+								for (p = buf; *p && (isspace(*p & 0xff) || *p == '\r'); p++) ;
+								if (raxl->VCdiscOnLinkfailureMsg && !strncmp(p, "***", 3)) {
+									/* format received line for debug purposes */
+									/* 1. skip "***" */
+									for (p += 3; *p && isspace(*p & 0xff); p++ ) ;
+									mesg = p;
+									/* 2. get rid off EOL delimiters */
+									while (*p) {
+										if (*p == '\r' || *p == '\n') {
+											*p = 0;
+											break;
+										}
+										p++;
+									}
+									/* end read loop */
+									break;
+								}
+								/* per default, we discard all messages,
+							 	 * because there's no useful combination
+							 	 * using VC and pidText togegther
+							 	 */
+								if (raxl->VCloginEnable)
+									goto login;
+							}
+
+							if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC)) {
+								syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO),
+										"AX.25 %s (%s:%s) AX25.IP-VC host disconnected%s%s",
+										User,
+										Port,
+										myAX25Name,
+										(mesg ? ": " : "."),
+										(mesg ? mesg : ""));
+							}
+							/* point of no return */
+close_link:
+							/* close link */
+							//setproctitle("ax25d [%s]: disconnecting", User);
+							close(new);
+							return 0;
+login:
+							//setproctitle("ax25d [%s]: login", User);
+						}
+
 						SetupOptions(new, raxl);
 						WorkoutArgs(raxl->af_type, raxl->shell, &argc, argv);
 
@@ -505,7 +646,7 @@ int main(int argc, char *argv[])
 
 static void SignalHUP(int code)
 {
-	Update = TRUE;		/* Schedule an update */
+	ReadConfig();
 }
 
 static void SignalTERM(int code)
@@ -682,6 +823,7 @@ static int ReadConfig(void)
 	int iamdigi = FALSE;
 	int parameters = 0;
 
+	signal(SIGALRM, SIG_IGN);
 	memset(&axl_defaults, 0, sizeof(axl_defaults));
 
 	if ((fp = fopen(ConfigFile, "r")) == NULL)
@@ -844,6 +986,7 @@ static int ReadConfig(void)
 				free(axl_port->port);
 				free(axl_port);
 				error = TRUE;
+				reload_timer(60);
 				continue;
 			}
                         /* xlz - have to nuke this as this option is gone
@@ -860,6 +1003,7 @@ static int ReadConfig(void)
 				free(axl_port->port);
 				free(axl_port);
 				error = TRUE;
+				reload_timer(60);
 				continue;
 			}
 
@@ -869,6 +1013,7 @@ static int ReadConfig(void)
 				free(axl_port->port);
 				free(axl_port);
 				error = TRUE;
+				reload_timer(60);
 				continue;
 			}
 
@@ -910,6 +1055,51 @@ static int ReadConfig(void)
 
 					if (*call == '\0')
 						call = "default";	/* @NODE means default@NODE */
+				}
+			}
+
+			if (axl_ent->af_type == AF_AX25) {
+				if ((strcasecmp("parameters_extAX25", call) == 0)) {
+					axl_defaults.checkVC = axl_defaults.VCdiscOnLinkfailureMsg = axl_defaults.VCsendFailureMsg = axl_defaults.VCloginEnable = axl_defaults.LoggingVC = 0;
+					while ((s = strtok(NULL, "  \t")) != NULL) {
+						if (strncmp(s, "VC", 2))
+							goto ignore;
+						if (!strncmp(s, "VC", 2)) {
+							if (!strcasecmp(s, "VC-reject-login"))
+								axl_defaults.checkVC += 2;
+							else if (!strcasecmp(s, "VC-wait-login"))
+								axl_defaults.checkVC += 1;
+							else if (!strcasecmp(s, "VC-disc-on-linkfailure-msg"))
+								axl_defaults.VCdiscOnLinkfailureMsg = 1;
+							else if (!strcasecmp(s, "VC-send-failure-msg"))
+								axl_defaults.VCsendFailureMsg = 1;
+							else if (!strcasecmp(s, "VC-login-ok"))
+								axl_defaults.VCloginEnable = 1;
+							else if (!strcasecmp(s, "VC-log-connections"))
+								axl_defaults.LoggingVC += 1;
+							else if (!strcasecmp(s, "VC-debug"))
+								axl_defaults.LoggingVC += 2;
+							else goto ignore;
+						}
+						continue;
+ignore:
+						fprintf(stderr, "ax25d: bad config entry on line %d: %s", line, s);
+						fprintf(stderr, "  valid parametrs for parameters_extAX25 are:\n[VC-reject-login ||\nVC-wait-login [VC-login-ok] [VC-disc-on-linkfailure-msg]||\nVC-send-failure-msg || VC-log-connections]\n");
+					}
+					if (axl_defaults.checkVC) {
+						if (axl_defaults.checkVC > 2) {
+							fprintf(stderr, "warning: line %d: VC-reject-login and VC-wait-login are exclusive. using VC-reject-login", line);
+							axl_defaults.checkVC = 2;
+						}
+					}
+					continue;
+				}
+				if (axl_defaults.checkVC != 0) {
+					axl_ent->checkVC = axl_defaults.checkVC;
+					axl_ent->VCdiscOnLinkfailureMsg = axl_defaults.VCdiscOnLinkfailureMsg;
+					axl_ent->VCsendFailureMsg = axl_defaults.VCsendFailureMsg;
+					axl_ent->VCloginEnable = axl_defaults.VCloginEnable;
+					axl_ent->LoggingVC = axl_defaults.LoggingVC;
 				}
 			}
 
@@ -1099,10 +1289,16 @@ BadArgsFree:
 	AXL = ClearList(AXL);
 	AXL = axl_build;		/* Assign our built list to AXL */
 
+	if (Logging)
+		syslog(LOG_INFO, "new config file loaded successfuly");
+
+	update_maxfd();
 	return 0;
 
 Error:
 	axl_build = ClearList(axl_build);
+	err_config();
+
 	return -1;
 }
 
