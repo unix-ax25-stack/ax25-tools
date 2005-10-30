@@ -17,19 +17,31 @@ config file can best be seen in an example:
 .br
 create    yes
 .br
+# allow empty password field (so user may login via telnet, too) [default no]
+.br
+create_empty_password       no
+.br
+#create_empty_password       yes
+.br
+# create with system utility useradd(8)? [default no]
+.br
+#create_with_useradd  no
+.br
+create_with_useradd  yes
+.br
 #
 .br
 # guest user if above is 'no' or everything else
 .br
 # fails. Disable with "no"
 .br
-guest     ax25
+guest     guest
 .br
 #
 .br
 # group id or name for autoaccount
 .br
-group     ax25
+group     hams
 .br
 #
 .br
@@ -47,7 +59,7 @@ max_uid   2000
 .br
 # where to add the home directory for the new user
 .br
-home      /home/ax25
+home      /home/hams
 .br
 #
 .br
