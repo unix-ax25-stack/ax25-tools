@@ -27,6 +27,16 @@
  *            to give up on the first matching port, even if the recipient
  *            callsign didn't match (and the frame wasn't echoed anywhere).
  *
+ * *** 20021206 dl9sau:
+ * 	      - fixed a bug preventing echo to multible ports; it may also
+ *              lead to retransmission on the interface where it came from
+ *            - fixed problem that frames via sendto(...,alen) had a wrong
+ *              protocol (because alen became larger than the size of
+ *              struct sockaddr).
+ *            - sockaddr_pkt is the right struct for recvfrom/sendto on
+ *              type SOCK_PACKET family AF_INET sockets.
+ *	      - added support for new PF_PACKET family with sockaddr_ll
+ *
  * ***
  *
  * This program is free software; you can redistribute it and/or modify
@@ -57,9 +67,38 @@
 
 #include <sys/socket.h>
 
-#ifdef __GLIBC__ 
+// dl9sau:
+// uncomment this if you have problems with sockaddr_pkt.
+// sockaddr_pkt is the right way for type SOCK_PACKET on family AF_INET sockets.
+// especially because the "sockaddr" on recvfrom is truncated (internaly
+// it's sockaddr_pkt) -- and because we use this sockaddr for retransmitting,
+// it's really better to use the sockaddr_spkt.
+// default is to use SOCKADDR_SPKT
+#define	USE_SOCKADDR_SPKT	1
+
+//dl9sau: since linux 2.2.x, SOCK_PACKET is obsolete
+#define	USE_SOCKADDR_SLL	1
+
+#ifdef	USE_SOCKADDR_SLL
+#undef	USE_SOCKADDR_SPKT
+#endif
+
+#include <features.h>    /* for the glibc version number */
+#if __GLIBC__ >= 2
+#ifdef	USE_SOCKADDR_SPKT
+#include <net/if_packet.h>
+#endif
+#ifdef	USE_SOCKADDR_SLL
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <netpacket/packet.h>
+#endif
 #include <net/ethernet.h>
 #else
+#if defined(USE_SOCKADDR_SPKT) || defined(USE_SOCKADDR_SLL)
+#include <asm/types.h>
+#include <linux/if_packet.h>
+#endif
 #include <linux/if_ether.h>
 #endif
 
@@ -86,7 +125,9 @@
 
 struct config {
 	char		from[14];	/* sockaddr.sa_data is 14 bytes	*/
+	int		from_idx;
 	char		to[14];
+	int		to_idx;
 	ax25_address	calls[MAXCALLS];/* list of calls to echo	*/
 	int		ncalls;		/* number of calls to echo	*/
 
@@ -170,6 +211,7 @@ static struct config *readconfig(void)
 		}
 
 		strcpy(p->from, dev);
+		p->from_idx = -1;
 
 		if ((cp = strtok(NULL, " \t\r\n")) == NULL) {
 			fprintf(stderr, "rxecho: config file error.\n");
@@ -182,6 +224,7 @@ static struct config *readconfig(void)
 		}
 
 		strcpy(p->to, dev);
+		p->to_idx = -1;
 
 		if (read_calls(p, strtok(NULL, " \t\r\n")) == -1) {
 			fprintf(stderr, "rxecho: config file error.\n");
@@ -321,7 +364,23 @@ static int check_calls(struct config *cfg, unsigned char *buf, int len)
 
 int main(int argc, char **argv)
 {
-	struct sockaddr sa;
+#ifdef	USE_SOCKADDR_SLL
+	struct sockaddr_ll sll;
+	struct sockaddr *psa = (struct sockaddr *)&sll;
+	const int sa_len = sizeof(struct sockaddr_ll);
+	int from_idx;
+#else
+#ifdef	USE_SOCKADDR_SPKT
+	struct sockaddr_pkt spkt;
+	struct sockaddr *psa = (struct sockaddr *)&spkt;
+	const int sa_len = sizeof(struct sockaddr_pkt);
+#else
+	struct sockaddr sa_generic;
+	struct sockaddr *psa = (struct sockaddr *)&sa_generic;
+	const int sa_len = sizeof(struct sockaddr);
+#endif
+	char from_dev_name[sizeof(psa->sa_data)];
+#endif
 	int s, size, alen;
 	unsigned char buf[1500];
 	struct config *p, *list;
@@ -350,10 +409,44 @@ int main(int argc, char **argv)
 	if ((list = readconfig()) == NULL)
 		return 1;
 
-	if ((s = socket(PF_PACKET, SOCK_PACKET, htons(ETH_P_AX25))) == -1) {
+#ifdef	USE_SOCKADDR_SLL
+	if ((s = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_AX25))) == -1) {
+#else
+	if ((s = socket(AF_INET, SOCK_PACKET, htons(ETH_P_AX25))) == -1) {
+#endif
 		perror("rxecho: socket:");
 		return 1;
 	}
+
+#ifdef	USE_SOCKADDR_SLL
+	for (p = list; p != NULL; p = p->next) {
+		int i;
+
+		for (i = 0; i < 2; i++) {
+			struct config *q;
+			struct ifreq ifr;
+			char *p_name = (i ? p->to : p->from);
+			int *p_idx = (i ? &p->to_idx : &p->from_idx);
+
+			// already set?
+			if (*p_idx >= 0)
+				continue;
+			strncpy(ifr.ifr_name, p_name, sizeof(ifr.ifr_name)-1);
+			ifr.ifr_name[sizeof(ifr.ifr_name)-1] = 0;
+			if (ioctl(s, SIOCGIFINDEX, &ifr) < 0) {
+				perror("SIOCGIFINDEX");
+				return 1;
+			}
+			*p_idx = ifr.ifr_ifindex;
+			for (q = p->next; q != NULL; q = q->next) {
+				if (q->from_idx < 0 && !strcmp(q->from, p_name))
+					q->from_idx = *p_idx;
+				if (q->to_idx < 0 && !strcmp(q->to, p_name))
+					q->to_idx = *p_idx;
+			}
+		}
+	}
+#endif
 
 	if (!daemon_start(FALSE)) {
 		fprintf(stderr, "rxecho: cannot become a daemon\n");
@@ -367,9 +460,9 @@ int main(int argc, char **argv)
 	}
 
 	for (;;) {
-		alen = sizeof(sa);
+ 		alen = sa_len;
 
-		if ((size = recvfrom(s, buf, 1500, 0, &sa, &alen)) == -1) {
+		if ((size = recvfrom(s, buf, 1500, 0, psa, &alen)) == -1) {
 			if (logging) {
 				syslog(LOG_ERR, "recvfrom: %m");
 				closelog();
@@ -377,10 +470,37 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
+#ifdef	USE_SOCKADDR_SLL
+		from_idx = sll.sll_ifindex;
+#else
+		// dl9sau: save the names of the iface the frame came from;
+		// we'll overwrite psa->sa_data it for sendto() and need the
+		// name again when multiplexing to more than one iface
+		strncpy(from_dev_name, psa->sa_data, sizeof(from_dev_name)-1);
+		from_dev_name[sizeof(from_dev_name)-1] = 0;
+#endif
+
 		for (p = list; p != NULL; p = p->next)
- 			if ((strcmp(p->from, sa.sa_data) == 0) && (check_calls(p, buf, size) == 0)) {
- 				strcpy(sa.sa_data, p->to);
-				if (sendto(s, buf, size, 0, &sa, alen) == -1) {
+#ifdef	USE_SOCKADDR_SLL
+ 			if (p->from_idx == from_idx && (check_calls(p, buf, size) == 0)) {
+ 				sll.sll_ifindex = p->to_idx;
+#else
+ 			if ((strcmp(p->from, from_dev_name) == 0) && (check_calls(p, buf, size) == 0)) {
+ 				strcpy(psa->sa_data, p->to);
+#endif
+				// cave: alen (set by recvfrom()) may > salen
+				//   which means it may point beyound of the
+				//   end of the struct. thats why we use the
+				//   correct len (sa_len). this fixes a bug
+				//   where skpt->protocol on sockaddr structs
+				//   pointed behind the struct, leading to
+				//   funny protocol IDs.
+				//   btw, the linux kernel internaly always
+				//   maps to sockaddr to sockaddr_pkt
+				//   on sockets of type SOCK_PACKET on family
+				//   AF_INET. sockaddr_pkt is len 18, sockaddr
+				//   is 16.
+				if (sendto(s, buf, size, 0, psa, sa_len) == -1) {
 					if (logging) {
 						syslog(LOG_ERR, "sendto: %m");
 						closelog();
