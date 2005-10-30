@@ -2,7 +2,7 @@
 .SH NAME
 kissparms \- Configure KISS TNCs.
 .SH SYNOPSIS
-.B kissparms -p <port> [-f y|n] [-h hw] [-l txtail] [-r pers] [-s slot] [-t txd] [-e feclevel] [-v] [-x]
+.B kissparms [-c crc-type] -p <port> [-f y|n] [-h hw] [-l txtail] [-r pers] [-s slot] [-t txd] [-e feclevel] [-v] [-x] [-X raw] 
 .SH DESCRIPTION
 .LP
 .B Kissparms
@@ -25,6 +25,9 @@ in exactly the same manner. Therefore
 .B kissparms
 functionality extends to more than KISS TNCs.
 .SH OPTIONS
+.TP 12
+.BI "\-c crc-type"
+Sets the crc-type to use. For e.g. kernel mkiss: 0 = auto, 1 = none, 2 = flexnet, 3 = smack
 .TP 12
 .BI "\-p port"
 Sets the port that is being configured.
@@ -63,6 +66,9 @@ Display the version.
 Takes the TNC out of KISS mode back into ``normal'' mode. This command is
 manufacturer specific but works in many cases. This option overrides all
 options except the port number.
+.TP 12
+.BI \-X raw
+Sends the specified raw value to the kiss driver.
 .SH "SEE ALSO"
 .BR axports (5),
 .BR kissattach (8).

@@ -37,12 +37,12 @@
 #define	PARAM_FECLEVEL	8
 #define	PARAM_RETURN	255
 
-#define USAGE "usage: kissparms -p <port> [-f y|n] [-h hw] [-l txtail] \
-	[-r pers ] [-s slot] [-t txd] [-e feclevel] [-v] [-x]\n"
+#define USAGE "usage: kissparms [-c crc-type] -p <port> [-f y|n] [-h hw] [-l txtail]\n                 [-r pers ] [-s slot] [-t txd] [-e feclevel] [-v] [-x] [-X raw]\n"
 
 int main(int argc, char *argv[])
 {
-	unsigned char buffer[2];
+	//unsigned char buffer[2];
+	unsigned char buffer[256];
 	struct sockaddr sa;
 	int proto = ETH_P_AX25;
 	int txdelay  = -1;
@@ -52,8 +52,10 @@ int main(int argc, char *argv[])
 	int fulldup  = -1;
 	int hardware = -1;
 	int feclevel = -1;
+	int crcmode = -1;
 	int kissoff  = 0;
 	int buflen, s;
+	int X = 0;
 	char *port   = NULL;
 
 	if (ax25_config_load_ports() == 0) {
@@ -61,8 +63,11 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	while ((s = getopt(argc, argv, "e:f:h:l:p:r:s:t:vx")) != -1) {
+	while ((s = getopt(argc, argv, "c:e:f:h:l:p:r:s:t:X:vx")) != -1) {
 		switch (s) {
+			case 'c':
+				crcmode  = atoi(optarg);
+				break;
 			case 'e':
 				feclevel = atoi(optarg);
 				if (feclevel < 0 || feclevel > 3) {
@@ -136,6 +141,17 @@ int main(int argc, char *argv[])
 				kissoff = 1;
 				break;
 
+			case 'X':
+				buflen = 0;
+				do {
+					buffer[buflen++] = atoi(optarg);
+					while (*optarg && isalnum(*optarg & 0xff))
+						optarg++;
+					while (*optarg && isspace(*optarg & 0xff))
+						optarg++;
+				} while (*optarg);
+				X = 1;
+				break;
 			case ':':
 			case '?':
 				fprintf(stderr, USAGE);
@@ -155,9 +171,12 @@ int main(int argc, char *argv[])
 
 	strcpy(sa.sa_data, ax25_config_get_dev(port));
 
+	if (X && buflen)
+		goto rawsend;
 	if (kissoff) {
 		buffer[0] = PARAM_RETURN;
 		buflen    = 1;
+rawsend:
 		if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
 			perror("kissparms: sendto");
 			return 1;
@@ -222,6 +241,16 @@ int main(int argc, char *argv[])
 			buffer[0] = PARAM_FECLEVEL;
 			buffer[1] = feclevel;
 
+			buflen    = 2;
+			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				return 1;
+			}
+		}
+
+		if (crcmode != -1) {
+			buffer[0] = 0x85;
+			buffer[1] = crcmode;
 			buflen    = 2;
 			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
 				perror("kissparms: sendto");
