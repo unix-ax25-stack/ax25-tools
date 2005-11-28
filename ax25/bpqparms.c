@@ -25,7 +25,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/ioctl.h>
-#include <linux/timer.h>
 
 #include <sys/socket.h>
 #include <net/if.h>
@@ -38,7 +37,7 @@
 
 #include <config.h>
 
-#define RCS_ID "$Id:$"
+#define RCS_ID "$Id: bpqparms.c,v 1.2 2005/11/28 19:29:16 dl9sau Exp $"
 
 void usage(void)
 {
@@ -48,7 +47,7 @@ void usage(void)
 		exit(1);
 }
 
-char *Version = "$Revision:$";
+char *Version = "$Revision: 1.2 $";
 
 int get_hwaddr(unsigned char *k, char *s)
 {
@@ -80,8 +79,6 @@ int main(int argc, char **argv)
 	char dev[40];
 	struct bpq_ethaddr addr;
 
-	strcpy(dev, argv[1]);
-	
 	flag = 0;
 
 	while ((cmd = getopt(argc, argv, "d:a:vVh")) != EOF) {
