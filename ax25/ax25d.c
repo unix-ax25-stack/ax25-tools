@@ -1,5 +1,5 @@
 /*
- * $Id: ax25d.c,v 1.2 2005/10/30 21:46:42 dl9sau Exp $
+ * $Id: ax25d.c,v 1.3 2005/11/28 19:09:39 dl9sau Exp $
  *
  *  This is my version of axl.c, written for the LBBS code to make it
  *    compatable with the kernel AX25 driver.  It appears to work, with
@@ -590,9 +590,9 @@ close_link:
 							//setproctitle("ax25d [%s]: disconnecting", User);
 							close(new);
 							return 0;
-login:
-							//setproctitle("ax25d [%s]: login", User);
 						}
+login:
+						//setproctitle("ax25d [%s]: login", User);
 
 						SetupOptions(new, raxl);
 						WorkoutArgs(raxl->af_type, raxl->shell, &argc, argv);
