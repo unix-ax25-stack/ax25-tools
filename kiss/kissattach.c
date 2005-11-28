@@ -47,6 +47,7 @@ static char *progname	= NULL;
 static char *kttyname	= NULL;
 static char *portname	= NULL;
 static char *inetaddr	= NULL;
+static int allow_broadcast = 0;
 
 static char *kiss_basename(char *s)
 {
@@ -200,6 +201,10 @@ static int startiface(char *dev, struct hostent *hp)
 	ifr.ifr_flags &= IFF_NOARP;
 	ifr.ifr_flags |= IFF_UP;
 	ifr.ifr_flags |= IFF_RUNNING;
+	if (allow_broadcast)
+		ifr.ifr_flags |= IFF_BROADCAST; /* samba broadcasts are a pain.. */
+	else
+		ifr.ifr_flags &= ~(IFF_BROADCAST); /* samba broadcasts are a pain.. */
 
 	if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0) {
 		fprintf(stderr, "%s: ", progname);
@@ -214,7 +219,7 @@ static int startiface(char *dev, struct hostent *hp)
 
 static void usage(void)
 {
-        fprintf(stderr, "usage: %s [-l] [-m mtu] [-v] ttyinterface port inetaddr\n", progname);
+        fprintf(stderr, "usage: %s [-b] [-l] [-m mtu] [-v] ttyinterface port [inetaddr]\n", progname);
 }
 
 int main(int argc, char *argv[])
@@ -230,10 +235,13 @@ int main(int argc, char *argv[])
 	if (!strcmp(progname, "spattach"))
 		disc = N_6PACK;
 
-	while ((fd = getopt(argc, argv, "6i:lm:v")) != -1) {
+	while ((fd = getopt(argc, argv, "b6i:lm:v")) != -1) {
 		switch (fd) {
 			case '6':
 				disc = N_6PACK;
+				break;
+			case 'b':
+				allow_broadcast = 1;
 				break;
 			case 'i':
 				fprintf(stderr, "%s: -i flag depreciated, use new command line format instead.\n", progname);
@@ -258,7 +266,11 @@ int main(int argc, char *argv[])
 		}
 	}
 
+#ifdef	notdef
 	if ((argc - optind) != 3 && ((argc - optind) != 2 || !inetaddr)) {
+#else
+	if ((argc - optind) < 2) {
+#endif
 		usage();
 		return 1;
 	}
@@ -266,7 +278,7 @@ int main(int argc, char *argv[])
 	kttyname = argv[optind++];
 	portname = argv[optind++];
 
-	if (!inetaddr)
+	if (argc-1 >= optind && !inetaddr)
 		inetaddr = argv[optind];
 
 	if (tty_is_locked(kttyname)) {
@@ -277,7 +289,7 @@ int main(int argc, char *argv[])
 	if (!readconfig(portname))
 		return 1;
 
-        if ((hp = gethostbyname(inetaddr)) == NULL) {
+        if (inetaddr && (hp = gethostbyname(inetaddr)) == NULL) {
 		fprintf(stderr, "%s: invalid internet name/address - %s\n", progname, inetaddr);
 		return 1;
 	}
@@ -320,8 +332,11 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+#ifdef	notdef
+	/* ax25 ifaces should not really need to have an IP address assigned to */
 	if (!startiface(dev, hp))
 		return 1;		
+#endif
 
 	printf("AX.25 port %s bound to device %s\n", portname, dev);
 

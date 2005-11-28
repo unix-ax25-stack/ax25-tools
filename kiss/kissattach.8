@@ -2,9 +2,9 @@
 .SH NAME
 kissattach, spattach \- Attach a KISS or 6PACK interface
 .SH SYNOPSIS
-.B kissattach [-6] [-l] [-m mtu] [-v] tty port inetaddr
+.B kissattach [-b] [-6] [-l] [-m mtu] [-v] tty port [inetaddr]
 .sp
-.B spattach [-i inetaddr] [-l] [-m mtu] [-v] tty port
+.B spattach [-b] [-l] [-m mtu] [-v] tty port [inetaddr]
 .SH DESCRIPTION
 .LP
 Attach a KISS or a 6PACK interface to what is normally a tty line connected
@@ -23,9 +23,10 @@ TNC attached, although it could be a pseudo tty or a KISS port emulator such as
 an SCC card. The port arguments is the name of a port as given in the
 axports(5) file.
 .LP
-The inetaddr argument is the IP address of the new interface.  This is now a 
-mandatory argument although due to historical reasons this restriction is
-lifted if the old -i option is used.
+The inetaddr argument is the IP address of the new interface. Some time it
+was mandatory argument (although due to historical reasons this restriction is
+lifted if the old -i option is used). But there's really not a need for
+the interface to have an IP address assigned to.
 .SH OPTIONS
 .TP 16
 .BI "\-6"
@@ -39,6 +40,10 @@ the program will complain about it, though still work.
 .TP 16
 .BI \-l
 Log messages to the system log, the default is not to.
+.TP 16
+.BI \-b
+Allow broadcasts on the interface (default no - because for e.g. samba
+broadcasts are a pain..)
 .TP 16
 .BI "\-m mtu"
 Sets the mtu of the interface. If this value is not given then the value is
