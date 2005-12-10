@@ -332,11 +332,9 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-#ifdef	notdef
 	/* ax25 ifaces should not really need to have an IP address assigned to */
 	if (!startiface(dev, hp))
 		return 1;		
-#endif
 
 	printf("AX.25 port %s bound to device %s\n", portname, dev);
 
