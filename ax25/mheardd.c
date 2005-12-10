@@ -93,7 +93,8 @@ struct mheard_list_struct {
 };
 
 static struct mheard_list_struct *mheard_list;
-static int    mheard_list_size = 40;
+#define	MHEARD_LIST_SIZE 1000
+static int    mheard_list_size = MHEARD_LIST_SIZE/10;
 static int    logging = FALSE;
 
 static int ftype(unsigned char *, int *, int);
@@ -120,8 +121,12 @@ int main(int argc, char **argv)
 	long position;
 	int ctlen, type, end, extseq, flush = FALSE;
 	FILE *fp;
+	char *p;
+	char ports[1024];
+	int ports_excl = 0;
 
-	while ((s = getopt(argc, argv, "fln:v")) != -1) {
+	*ports = 0;
+	while ((s = getopt(argc, argv, "fln:p:v")) != -1) {
 		switch (s) {
 			case 'l':
 				logging = TRUE;
@@ -131,9 +136,24 @@ int main(int argc, char **argv)
 				break;
 			case 'n':
 				mheard_list_size = atoi(optarg);
-				if (mheard_list_size < 10 || mheard_list_size > 100) {
-					fprintf(stderr, "mheardd: list size must be between 10 and 100\n");
+				if (mheard_list_size < 10 || mheard_list_size > MHEARD_LIST_SIZE) {
+					fprintf(stderr, "mheardd: list size must be between 10 and %d\n", MHEARD_LIST_SIZE);
 					return 1;
+				}
+				break;
+			case 'p':
+				if (strlen(optarg) > sizeof(ports)-4) {
+					fprintf(stderr, "mheardd: too many ports specified.");
+					return 1;
+				}
+				if (*optarg == '!') {
+					ports_excl = 1;
+					optarg++;
+				}
+				sprintf(ports, "|%s|", optarg);
+				for (p = ports; *p; p++) {
+					if (*p == ' ' || *p == ',')
+						*p = '|';
 				}
 				break;
 			case 'v':
@@ -143,7 +163,7 @@ int main(int argc, char **argv)
 				fprintf(stderr, "mheardd: option -n needs an argument\n");
 				return 1;
 			case '?':
-				fprintf(stderr, "Usage: mheardd [-f] [-l] [-n number] [-v]\n");
+				fprintf(stderr, "Usage: mheardd [-f] [-l] [-n number] [-p [!]port1[,port2,..]] [-v]\n");
 				return 1;
 		}
 	}
@@ -213,6 +233,19 @@ int main(int argc, char **argv)
 			if (logging)
 				syslog(LOG_WARNING, "unknown port '%s'\n", sa.sa_data);
 			continue;
+		}
+		if (*ports) {
+			char testport[sizeof(sa.sa_data)+2];
+			sprintf(testport, "|%s|", sa.sa_data);
+			if (ports_excl) {
+				if (strstr(ports, testport)) {
+					continue;
+				}
+			} else {
+				if (!strstr(ports, testport)) {
+					continue;
+				}
+			}
 		}
 
 		data = buffer;
@@ -450,3 +483,4 @@ static struct mheard_list_struct *findentry(ax25_address *callsign, char *port)
 
 	return oldest;
 }
+
