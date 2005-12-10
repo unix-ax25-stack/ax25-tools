@@ -31,6 +31,16 @@ create_with_useradd  yes
 .br
 #
 .br
+# pwcheck method: password or call or group. [default: password]
+.br
+#pwcheck call
+.br
+#pwcheck group
+.br
+pwcheck password
+.br
+#
+.br
 # guest user if above is 'no' or everything else
 .br
 # fails. Disable with "no"
@@ -60,6 +70,12 @@ max_uid   2000
 # where to add the home directory for the new user
 .br
 home      /home/hams
+.br
+#
+.br
+# secure homedirectories (g-rwx)
+.br
+#secure_home yes
 .br
 #
 .br

@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.3 2005/10/30 10:54:54 dl9sau Exp $
+ * $Id: axspawn.c,v 1.4 2005/12/10 12:39:57 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -57,6 +57,18 @@
  * # mail) [default no]
  * create_empty_password	no
  *
+ * # pwcheck method: password or call or group [default: password]
+ * # "password" means, that passwords with '+' force a login without
+ * #   prompting for a password (old behaviour; backward compatibility).
+ * # "call" means, that ham calls via ax25/netrom/rose/.. should be able
+ * #   to login without password, even if it's set (for e.g. to secure
+ * #   from abuse of inet connections)
+ * # "group" means, that if the gid of the user matches the configured
+ * #  default user_gid, then the login is granted without password.
+ * #pwcheck call
+ * #pwcheck group
+ * #pwcheck password
+ *
  * # create with system utility useradd(8)? [default no]
  * create_with_useradd	no
  *
@@ -74,6 +86,9 @@
  *
  * # where to add the home directory for the new user
  * home      /home/hams
+ *
+ * # secure homedirectories (g-rwx)
+ * #secure_home yes
  *
  * # user's shell
  * shell     /bin/bash
@@ -416,6 +431,8 @@ char   policy_add_empty_password = 0;
 char   policy_add_prog_useradd = 0;
 char   policy_guest = 1;
 char   policy_associate = 0;
+char   pwcheck = 1;
+char   secure_home = 0;
 
 gid_t  user_gid =  400;
 char   *user_shell = "/bin/bash";
@@ -1015,6 +1032,7 @@ void new_user(char *newuser)
 	unsigned char *p, *q;
 	struct stat fst;
 	int fd_a, fd_b, fd_l;
+	mode_t homedir_mode = S_IRUSR|S_IWUSR|S_IXUSR|S_IXOTH|(secure_home ? 0 : (S_IRGRP|S_IXGRP));
 	
 	/*
 	 * build path for home directory
@@ -1042,7 +1060,7 @@ retry:
 	}
 
 	if (uid >= 65535 || uid < start_uid)
-		return;
+		goto out;
 
 	/*
 	 * build directories for home
@@ -1074,15 +1092,15 @@ retry:
 				if (q == NULL)
 				{
 					chown(p, uid, user_gid);
-					chmod(p, S_IRUSR|S_IWUSR|S_IXUSR);
+					chmod(p, homedir_mode);
 				} 
 			}
 			else
-				return;
+				goto out;
 		}
 		
 		if (chdir(p) < 0)
-			return;
+			goto out;
 		p = q;
 	}
 
@@ -1095,11 +1113,11 @@ retry:
 			((policy_add_empty_password) ? "" : "+"),
                 	username, userdir, uid, user_gid, newuser);
         	if (system(command) != 0)
-			return;
+			goto out;
 	} else {
 		fp = fopen(PASSWDFILE, "a+");
 		if (fp == NULL)
-			return;
+			goto out;
 	
 		pw.pw_name   = newuser;
 		pw.pw_passwd = ((policy_add_empty_password) ? "" : "+");
@@ -1112,9 +1130,8 @@ retry:
 		if (getpwuid(uid) != NULL) goto retry;	/* oops?! */
 
 		if (putpwent(&pw, fp) < 0)
-			return;
+			goto out;
 	
-		flock(fd_l, LOCK_UN);
 		fclose(fp);
 	}
 
@@ -1129,7 +1146,7 @@ retry:
 		fd_b = open(USERPROFILE, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR|S_IXUSR);
 
 		if (fd_b < 0)
-			return;
+			goto out;
 		
 		while ( (cnt = read(fd_a, &buf, sizeof(buf))) > 0 )
 			write(fd_b, &buf, cnt);
@@ -1137,6 +1154,8 @@ retry:
 		close(fd_a);
 		chown(USERPROFILE, uid, user_gid);
 	}
+out:
+	flock(fd_l, LOCK_UN);
 }
 
 void read_config(void)
@@ -1169,6 +1188,14 @@ void read_config(void)
 			if (!strncmp(cmd, "create_with_useradd", 19))
 				policy_add_prog_useradd = (param[0] == 'y');
 			else
+			if (!strncmp(cmd, "pwcheck", 7)) {
+				if (!strncmp(param, "pass", 4))
+					pwcheck = 1;
+				else if (!strncmp(param, "call", 4))
+					pwcheck = 2;
+				else if (!strncmp(param, "group", 5))
+					pwcheck = 3;
+			} else
 			if (!strncmp(cmd, "guest", 5))
 			{
 				if (!strcmp(param, "no"))
@@ -1210,6 +1237,9 @@ void read_config(void)
 				start_home = (char *) malloc(strlen(param)+1);
 				strcpy(start_home, param);
 			} else
+			if (!strncmp(cmd, "secure_home", 11)) {
+				secure_home = (param[0] == 'y');
+			} else	
 			if (!strncmp(cmd, "assoc", 5))
 			{
 				if (!strcmp(param, "yes"))
@@ -1263,6 +1293,7 @@ int main(int argc, char **argv)
 		struct sockaddr_rose      rose;
 	} sockaddr;
 	char *protocol;
+	char is_guest = 0;
 
 	digits = letters = invalid = ssid = ssidcnt = 0;
 
@@ -1388,6 +1419,7 @@ int main(int argc, char **argv)
 		{
 			strcpy(real_user,guest);
 			pw = getpwnam(guest);
+			is_guest = 1;
 		
 			if (! (pw && pw->pw_uid && pw->pw_gid) )
 			{
@@ -1475,7 +1507,27 @@ int main(int argc, char **argv)
                 chargc = 0;
                 chargv[chargc++] = "/bin/login";
                 chargv[chargc++] = "-p";
-                if (!strcmp(pw->pw_passwd, "+"))
+		/* there exist several conectps:
+		 * Historicaly, the special character '+' in the password
+		 * field indicated that users may login via ax25, netrom, rose,
+		 * etc.. - but not via other protocols like telnet.
+		 * This secures the digipeater from abuse by inet access of
+		 * non-hams.
+		 * On the other hand, this leads to the problem that telent
+		 * via HF, pop3, etc.. do not work.
+		 * The "pwcheck == 2 method means, that the password is used on
+		 * every login mechanism other than this axspawn program;
+		 * here we do not rely on the password - the ax25 call of
+		 * the ham is enough. We have already checked above, that
+		 * the call of the user is valid (and not root, httpd, etc..);
+		 * thus this method is safe here.
+		 * Another mechanism (pwcheck == 3) is to check if the gid
+		 * equals to user_gid preference. I prefer this way, because
+		 * this approach gives the chance to temporary lock a user
+		 * out (abuse, ..) by changing his gid in passwd to for e.g.
+		 * 65534 (nogroup).
+		 */
+                if (pwcheck == 2 || (pwcheck == 3 && (pw->pw_gid == user_gid || is_guest)) || !strcmp(pw->pw_passwd, "+"))
 	        	chargv[chargc++] = "-f";
                 chargv[chargc++] = real_user;
                 chargv[chargc]   = NULL;
