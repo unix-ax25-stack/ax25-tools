@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <ctype.h>
 
 #include <config.h>
 
@@ -54,7 +55,8 @@ int main(int argc, char *argv[])
 	int feclevel = -1;
 	int crcmode = -1;
 	int kissoff  = 0;
-	int buflen, s;
+	int buflen = 0;
+	int s;
 	int X = 0;
 	char *port   = NULL;
 
@@ -142,7 +144,6 @@ int main(int argc, char *argv[])
 				break;
 
 			case 'X':
-				buflen = 0;
 				do {
 					buffer[buflen++] = atoi(optarg);
 					while (*optarg && isalnum(*optarg & 0xff))
