@@ -1,5 +1,5 @@
 /*
- * $Id: ax25d.c,v 1.3 2005/11/28 19:09:39 dl9sau Exp $
+ * $Id: ax25d.c,v 1.4 2006/01/08 18:26:43 dl9sau Exp $
  *
  *  This is my version of axl.c, written for the LBBS code to make it
  *    compatable with the kernel AX25 driver.  It appears to work, with
@@ -199,7 +199,7 @@ struct axlist {		/* Have used same struct for quickness */
 static struct axlist *AXL	= NULL;
 static char *ConfigFile		= CONF_AX25D_FILE;
 static char User[10];				/* Room for 'GB9ZZZ-15\0' */
-static char Node[11];				/* Room for 'GB9ZZZ-15\0' */
+static char Node[10];				/* Room for 'GB9ZZZ-15\0' */
 static char myAX25Name[10];			/* Room for 'GB9ZZZ-15\0' */
 static char *Port;
 static int Logging		= FALSE;
