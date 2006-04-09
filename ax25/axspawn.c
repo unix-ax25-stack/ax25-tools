@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.4 2005/12/10 12:39:57 dl9sau Exp $
+ * $Id: axspawn.c,v 1.5 2006/04/09 11:49:21 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -185,6 +185,8 @@
 #include <netax25/axlib.h>
 
 #include "../pathnames.h"
+#include "axspawn.h"
+#include "access.h"
 
 #define MAXLEN strlen("DB0PRA-15")
 #define MINLEN strlen("KA9Q")
@@ -459,7 +461,6 @@ long wqueue_length = 0L;
 
 int encstathuf(char *src, int srclen, char *dest, int *destlen);
 int decstathuf(char *src, char *dest, int srclen, int *destlen);
-int write_ax25(char *s, int len, int kick);
 
 /*---------------------------------------------------------------------------*/
 
@@ -1273,7 +1274,7 @@ void signal_handler(int dummy)
 			
 int main(int argc, char **argv)
 {
-	char call[20], user[20], real_user[20];
+	char call[20], user[20], as_user[20];
 	char buf[2048];
 	int  k, cnt, digits, letters, invalid, ssid, ssidcnt, addrlen;
 	pid_t pid = -1;
@@ -1284,7 +1285,6 @@ int main(int argc, char **argv)
 	char *chargv[20];
 	int envc;
 	char *envp[20];
-	char wait_for_tcp;
 	struct utmp ut_line;
 	struct winsize win = { 0, 0, 0, 0};
 	struct sockaddr_ax25 sax25;
@@ -1292,17 +1292,52 @@ int main(int argc, char **argv)
 		struct full_sockaddr_ax25 fsax25;
 		struct sockaddr_rose      rose;
 	} sockaddr;
-	char *protocol;
+	char *protocol = "";
 	char is_guest = 0;
+	char wait_for_tcp = 0;
+	char changeuser = 0;
+	char user_changed = 1;
+	char rootlogin = 0;
+	int pwtype = 0;
+	int pwtype_orig = 0;
+	char prompt[20];
+	char *pwd = 0;
+
+	*prompt = 0;
 
 	digits = letters = invalid = ssid = ssidcnt = 0;
 
-	if (argc > 1 && (!strcmp(argv[1],"-w") || !strcmp(argv[1],"--wait")))
-		wait_for_tcp = 1;
-	else
-		wait_for_tcp = 0;
-		
+	for (k = 1; k < argc; k++){
+		if (!strcmp(argv[k], "-w") || !strcmp(argv[k], "--wait"))
+			wait_for_tcp = 1;
+		if (!strcmp(argv[k], "-c") || !strcmp(argv[k], "--changeuser"))
+			changeuser = 1;
+		if (!strcmp(argv[k], "-r") || !strcmp(argv[k], "--rootlogin"))
+			rootlogin = 1;
+		if ((!strcmp(argv[k], "-p") || !strcmp(argv[k], "--pwprompt")) && k < argc-1 ) {
+			strncpy(prompt, argv[k+1], sizeof(prompt));
+			prompt[sizeof(prompt)-1] = '\0';
+			k++;
+		}
+		if (!strcmp(argv[k], "--only-md5"))
+			pwtype = PW_MD5;
+	}
 	read_config();
+
+	if (!pwtype)
+		pwtype = (PW_CLEARTEXT | PW_SYS | PW_MD5);
+	pwtype_orig = pwtype;
+	if (!*prompt) {
+		if (gethostname(buf, sizeof(buf)) < 0) {
+			strcpy(prompt, "Check");
+		} else {
+			if ((p = strchr(buf, '.')))
+				*p = 0;
+			strncpy(prompt, buf, sizeof(prompt));
+			prompt[sizeof(prompt)-1] = 0;
+		}
+	}
+	strupr(prompt);
 	
 	openlog("axspawn", LOG_PID, LOG_DAEMON);
 
@@ -1393,54 +1428,128 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	
-	strcpy(user, call);
-	strlwr(user);
-	p = strchr(user, '-');
-	if (p) *p = '\0';
-	strcpy(real_user, user);
-	
 	if (wait_for_tcp) {
 		/* incoming TCP/IP connection? */
 		if (read_ax25(buf, sizeof(buf)) < 0)
 			exit(0);
 	}
+
+	strcpy(user, call);
+	strlwr(user);
+	p = strchr(user, '-');
+	if (p) *p = '\0';
+
+	*as_user = 0;
+	if (changeuser) {
+		char *p_buf;
+		sprintf(buf, "Login (%s): ", user);
+		write_ax25(buf, strlen(buf), 1);
+		if ((cnt = read_ax25(buf, sizeof(buf)-1)) < 0)
+				exit(1);
+		buf[cnt] = 0;
+
+		/* skip leading blanks */
+		for (p_buf = buf; *p_buf && *p_buf != '\n' && !isalnum(*p_buf & 0xff); p_buf++) ;
+		/* skip trailing junk, blanks, \n, .. */
+		for (p = p_buf; *p && isalnum(*p & 0xff); p++) ;
+		*p = 0;
+
+		if (*p_buf) {
+			strncpy(as_user, p_buf, sizeof(as_user));
+			as_user[sizeof(as_user)-1] = 0;
+			user_changed = 1;
+		}
+	}
 	
-	pw = getpwnam(user);
+	if (!*as_user)
+		strcpy(as_user, user);
+	pw = getpwnam(as_user);
+	endpwent();
 
 	if (pw == NULL)
 	{
+		if (user_changed) {
+			syslog(LOG_NOTICE, "%s (callsign: %s) not found in /etc/passwd\n", as_user, call);
+			sleep(EXITDELAY);
+			return 1;
+		}
+
 		if (policy_add_user) 
 		{
-			new_user(user);
-			pw = getpwnam(user);
+			new_user(as_user);
+			pw = getpwnam(as_user);
+			endpwent();
 		}
 		
 		if (pw == NULL && policy_guest)
 		{
-			strcpy(real_user,guest);
+			strcpy(as_user,guest);
 			pw = getpwnam(guest);
+			endpwent();
 			is_guest = 1;
-		
-			if (! (pw && pw->pw_uid && pw->pw_gid) )
-			{
-				write_ax25(MSG_NOTINDBF, sizeof(MSG_NOTINDBF), 1);
-				syslog(LOG_NOTICE, "%s (callsign: %s) not found in /etc/passwd\n", user, call);
-				sleep(EXITDELAY);
-				return 1;
-			}
 		}
 	}
-	
-	endpwent();
-
-	if (pw->pw_uid == 0 || pw->pw_gid == 0)
-	{
-		write_ax25(MSG_NOCALL, sizeof(MSG_NOCALL), 1);
-		syslog(LOG_NOTICE, "root login of %s (callsign: %s) denied\n", user, call);
+	if (!pw) {
+		write_ax25(MSG_NOTINDBF, sizeof(MSG_NOTINDBF), 1);
+		syslog(LOG_NOTICE, "%s (callsign: %s) not found in /etc/passwd\n", as_user, call);
 		sleep(EXITDELAY);
 		return 1;
 	}
 	
+	if (!rootlogin && (pw->pw_uid == 0 || pw->pw_gid == 0))
+	{
+		write_ax25(MSG_NOCALL, sizeof(MSG_NOCALL), 1);
+		syslog(LOG_NOTICE, "root login of %s (callsign: %s) denied\n", as_user, call);
+		sleep(EXITDELAY);
+		return 1;
+	}
+	
+again:
+	if (!(pwd = read_pwd(pw, &pwtype))) {
+		if (!pwtype || pwtype != PW_CLEARTEXT) {
+			sleep (EXITDELAY);
+			return 1;
+		}
+	}
+
+	if (pwtype != PW_CLEARTEXT) {
+		char pass_want[PASSSIZE+1];
+		if (pwtype == PW_MD5)
+			ask_pw_md5(prompt, pass_want, pwd);
+		else
+                	ask_pw_sys(prompt, pass_want, pwd);
+
+		cnt = read_ax25(buf, sizeof(buf)-1);
+		if (cnt <= 0) {
+			sprintf(buf,"no response\n");
+			write_ax25(buf, strlen(buf),1);
+			sleep (EXITDELAY);
+			return -11;
+		}
+		buf[cnt] = 0;
+		if ((p = strchr(buf, '\n')))
+			*p = 0;
+		if ((pwtype & PW_MD5) && !strcmp(buf, "sys") && (pwtype_orig & PW_SYS)) {
+			pwtype = (pwtype_orig & ~PW_MD5);
+			goto again;
+		}
+		if (!strstr(buf, pass_want)) {
+			sprintf(buf,"authentication failed\n");
+			write_ax25(buf, strlen(buf), 1);
+			sleep (EXITDELAY);
+			return -11;
+		}
+		free(pwd);
+	} else {
+		if (pw->pw_uid == 0 || pw->pw_gid == 0) {
+			sprintf(buf, "Sorry, root logins are only allowed with md5- or baycom-password!\n");
+			write_ax25(buf, strlen(buf), 1);
+			syslog(LOG_NOTICE, "root login of %s (callsign: %s) denied (only with md5- or baycom-Login)!\n", user, call);
+			sleep(EXITDELAY);
+			return 1;
+		}
+	}
+
 	/*
 	 * associate UID with callsign (or vice versa?)
 	 */
@@ -1527,18 +1636,26 @@ int main(int argc, char **argv)
 		 * out (abuse, ..) by changing his gid in passwd to for e.g.
 		 * 65534 (nogroup).
 		 */
-                if (pwcheck == 2 || (pwcheck == 3 && (pw->pw_gid == user_gid || is_guest)) || !strcmp(pw->pw_passwd, "+"))
+                if (pwtype != PW_CLEARTEXT /* PW_SYS or PW_MD5 are already authenticated */ 
+			|| pwcheck == 2 || (pwcheck == 3 && (pw->pw_gid == user_gid || is_guest)) || !strcmp(pw->pw_passwd, "+"))
 	        	chargv[chargc++] = "-f";
-                chargv[chargc++] = real_user;
+                chargv[chargc++] = as_user;
                 chargv[chargc]   = NULL;
                 
                 envc = 0;
-                envp[envc] = (char *) malloc(30);
-                sprintf(envp[envc++], "AXCALL=%s", call);
-                envp[envc] = (char *) malloc(30);
-                sprintf(envp[envc++], "CALL=%s", user);
-                envp[envc] = (char *) malloc(30);
-                sprintf(envp[envc++], "PROTOCOL=%s", protocol);
+                if ((envp[envc] = (char *) malloc(30)))
+                	sprintf(envp[envc++], "AXCALL=%s", call);
+                if ((envp[envc] = (char *) malloc(30)))
+                	sprintf(envp[envc++], "CALL=%s", user);
+                if ((envp[envc] = (char *) malloc(30)))
+                	sprintf(envp[envc++], "PROTOCOL=%s", protocol);
+		if ((envp[envc] = (char *) malloc(30)))
+			sprintf(envp[envc++], "TERM=dumb"); /* SuSE bug (dump - tsts) */
+		/* other useful defaults */
+		if ((envp[envc] = (char *) malloc(30)))
+			sprintf(envp[envc++], "EDITOR=/usr/bin/ex");
+		if ((envp[envc] = (char *) malloc(30)))
+			sprintf(envp[envc++], "LESS=-d -E -F");
 		envp[envc] = NULL;
 
                 execve(chargv[0], chargv, envp);
