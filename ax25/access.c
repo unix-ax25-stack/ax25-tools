@@ -130,7 +130,7 @@ void ask_pw_sys(char *prompt, char *pass_want, char *pw)
 	// and terminate the string
 	pass_want[i] = 0;
 
-	sprintf(buffer, "\n%s>  %d %d %d %d %d\n", prompt, five_digits[0], five_digits[1], five_digits[2], five_digits[3], five_digits[4]);
+	sprintf(buffer, "\r%s>  %d %d %d %d %d\r", prompt, five_digits[0], five_digits[1], five_digits[2], five_digits[3], five_digits[4]);
 	write_ax25(buffer, strlen(buffer), 1);
 }
 
@@ -162,7 +162,7 @@ void ask_pw_md5(char *prompt, char *pass_want, char *pw)
 	challenge = generate_rand_pw(SALT_LEN);
 
 	// ask for proper response to this challenge:
-	sprintf(buffer, "\n%s> [%s]\n", prompt, challenge);
+	sprintf(buffer, "\r%s> [%s]\r", prompt, challenge);
 	write_ax25(buffer, strlen(buffer), 1);
 	// compute md5 challenge
 	calc_md5_pw(challenge, key, cipher);
@@ -259,39 +259,39 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 			pwfile[sizeof(pwfile)-1] = 0;
 
 			if (stat(pwfile, &statbuf)) {
-				sprintf(buf, "Notice: No .%s file found in your homedirectory (for more secure\n", PWFILE);
+				sprintf(buf, "Notice: No .%s file found in your homedirectory (for more secure\r", PWFILE);
 				write_ax25(buf, strlen(buf), 1);
-				sprintf(buf, "        password authentication than plaintext). Generating example file,\n");
+				sprintf(buf, "        password authentication than plaintext). Generating example file,\r");
 				write_ax25(buf, strlen(buf), 1);
-				sprintf(buf, "        with unique passwords (which may be changed).\n");
+				sprintf(buf, "        with unique passwords (which may be changed).\r");
 				write_ax25(buf, strlen(buf), 1);
-				sprintf(buf, "        Please edit ~/.%s, and enable your prefered authentication type;\n", PWFILE);
+				sprintf(buf, "        Please edit ~/.%s, and enable your prefered authentication type;\r", PWFILE);
 				write_ax25(buf, strlen(buf), 1);
-				sprintf(buf, "        MD5 is recommended.\n");
+				sprintf(buf, "        MD5 is recommended.\r");
 				write_ax25(buf, strlen(buf), 1);
 				write_example_passwd(pwfile, pwlocation, pw);
 				goto end;
 			}
 			if (!S_ISREG(statbuf.st_mode)) {
-				sprintf(buf, "Error: password file .%s should be a regular file. Skiping..\n", PWFILE);
+				sprintf(buf, "Error: password file .%s should be a regular file. Skiping..\r", PWFILE);
 				write_ax25(buf, strlen(buf), 1);
 				goto end;
 			}
 			if (statbuf.st_uid != 0 && statbuf.st_uid != pw->pw_uid) {
-				sprintf(buf, "Error: your password file .%s is not owned by you. Skiping..\n", PWFILE);
+				sprintf(buf, "Error: your password file .%s is not owned by you. Skiping..\r", PWFILE);
 				write_ax25(buf, strlen(buf), 1);
 				goto end;
 			}
 			if  ((statbuf.st_mode & (S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH))) {
-				sprintf(buf, "WARNING: your password file .%s has wrong permissions.\n", PWFILE);
+				sprintf(buf, "WARNING: your password file .%s has wrong permissions.\r", PWFILE);
 				write_ax25(buf, strlen(buf), 1);
-				sprintf(buf, "         Please change it with\n");
+				sprintf(buf, "         Please change it with\r");
 				write_ax25(buf, strlen(buf), 1);
-				sprintf(buf, "           chmod 600 .%s\n", PWFILE);
+				sprintf(buf, "           chmod 600 .%s\r", PWFILE);
 				write_ax25(buf, strlen(buf), 1);
-				sprintf(buf, "         and don't forget to change your password stored in .%s\n", PWFILE);
+				sprintf(buf, "         and don't forget to change your password stored in .%s\r", PWFILE);
 				write_ax25(buf, strlen(buf), 1);
-				sprintf(buf, "         because it may be compromised.\n");
+				sprintf(buf, "         because it may be compromised.\r");
 				write_ax25(buf, strlen(buf), 1);
 				/* go on.. if user takes no action, he always gets this message */
 			}
@@ -311,7 +311,7 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 				   is disabled by administrative configuration.
 				 */
 				if  (!((*pwtype) & PW_CLEARTEXT)) {
-					sprintf(buf, "Failed to find a suitable password in %s\n", pwfile);
+					sprintf(buf, "Failed to find a suitable password in %s\r", pwfile);
 					write_ax25(buf, strlen(buf), 1);
 				}
 				goto end;
@@ -363,7 +363,7 @@ found:
 	len = strlen(pass);
 
 	if ((*pwtype == PW_SYS && len < MINPWLEN_SYS) || (*pwtype == PW_MD5 && len < MINPWLEN_MD5)) {
-		sprintf(buf, "Password in in password file too short\n");
+		sprintf(buf, "Password in in password file too short\r");
 		write_ax25(buf, strlen(buf), 1);
 		goto end;
 	}

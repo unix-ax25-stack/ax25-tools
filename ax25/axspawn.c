@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.5 2006/04/09 11:49:21 dl9sau Exp $
+ * $Id: axspawn.c,v 1.6 2006/04/15 17:26:36 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1521,7 +1521,7 @@ again:
 
 		cnt = read_ax25(buf, sizeof(buf)-1);
 		if (cnt <= 0) {
-			sprintf(buf,"no response\n");
+			sprintf(buf,"no response\r");
 			write_ax25(buf, strlen(buf),1);
 			sleep (EXITDELAY);
 			return -11;
@@ -1534,7 +1534,7 @@ again:
 			goto again;
 		}
 		if (!strstr(buf, pass_want)) {
-			sprintf(buf,"authentication failed\n");
+			sprintf(buf,"authentication failed\r");
 			write_ax25(buf, strlen(buf), 1);
 			sleep (EXITDELAY);
 			return -11;
@@ -1542,7 +1542,7 @@ again:
 		free(pwd);
 	} else {
 		if (pw->pw_uid == 0 || pw->pw_gid == 0) {
-			sprintf(buf, "Sorry, root logins are only allowed with md5- or baycom-password!\n");
+			sprintf(buf, "Sorry, root logins are only allowed with md5- or baycom-password!\r");
 			write_ax25(buf, strlen(buf), 1);
 			syslog(LOG_NOTICE, "root login of %s (callsign: %s) denied (only with md5- or baycom-Login)!\n", user, call);
 			sleep(EXITDELAY);
@@ -1592,7 +1592,7 @@ again:
             	termios.c_oflag = OPOST | ONLCR;
                 termios.c_cflag = CS8 | CREAD | CLOCAL;
                 termios.c_lflag = ISIG | ICANON;
-                termios.c_cc[VINTR]  = 127;
+                termios.c_cc[VINTR]  = /* 127 */ 0x03;
                 termios.c_cc[VQUIT]  =  28;
                 termios.c_cc[VERASE] =   8;
                 termios.c_cc[VKILL]  =  24;
@@ -1757,8 +1757,8 @@ again:
         } 
         else
         {
-        	syslog(LOG_ERR, "cannot fork %m, closing connection to %s\n", call);
         	write_ax25(MSG_CANNOTFORK, sizeof(MSG_CANNOTFORK), 1);
+        	syslog(LOG_ERR, "cannot fork %m, closing connection to %s\n", call);
         	sleep(EXITDELAY);
         	return 1;
         }
