@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.7 2006/06/10 12:07:01 dl9sau Exp $
+ * $Id: axspawn.c,v 1.8 2006/06/10 19:12:46 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1296,7 +1296,7 @@ int main(int argc, char **argv)
 	char is_guest = 0;
 	char wait_for_tcp = 0;
 	char changeuser = 0;
-	char user_changed = 1;
+	char user_changed = 0;
 	char rootlogin = 0;
 	int pwtype = 0;
 	int pwtype_orig = 0;
