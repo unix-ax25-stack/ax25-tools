@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.6 2006/04/15 17:26:36 dl9sau Exp $
+ * $Id: axspawn.c,v 1.7 2006/06/10 12:07:01 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1639,6 +1639,8 @@ again:
                 if (pwtype != PW_CLEARTEXT /* PW_SYS or PW_MD5 are already authenticated */ 
 			|| pwcheck == 2 || (pwcheck == 3 && (pw->pw_gid == user_gid || is_guest)) || !strcmp(pw->pw_passwd, "+"))
 	        	chargv[chargc++] = "-f";
+		chargv[chargc++] = "-h";
+		chargv[chargc++] = protocol;
                 chargv[chargc++] = as_user;
                 chargv[chargc]   = NULL;
                 
