@@ -256,6 +256,27 @@ match the entry.
 .sp 1
 Comments may be embedded in the configuration file by placing a # in the
 first column.
+.sp 1
+ax25d can now honour AX.25 TCP/IP mode-VC connections in a special way.
+Therefore, a new port specific option "parameters_extAX25" is available, with
+the following options, which are seperated by space.
+.TP 5
+parameters_extAX25
+VC-debug
+.br
+VC-reject-login|VC-wait-login|VC-login-ok
+.br
+VC-disc-on-linkfailure-msg, VC-send-failure-msg, VC-log-connections
+.br
+Recommended settings in ax25d.conf:
+.br
+  parameters_extAX25 VC-wait-login VC-disc-on-linkfailure-msg VC-log-connections
+.br
+or
+.br
+  parameters_extAX25 VC-reject-login VC-send-failure-msg VC-log-connections
+.br
+
 .SH FILES
 .LP
 /etc/ax25/ax25d.conf
