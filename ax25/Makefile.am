@@ -1,3 +1,4 @@
+SUBDIRS = axgetput 
 
 etcfiles = ax25.profile ax25d.conf axspawn.conf rxecho.conf
 varfiles = mheard.dat

@@ -76,4 +76,4 @@ if test "x$GCC" = "xyes"; then
   fi
 fi
 
-AC_OUTPUT(netrom/Makefile tcpip/Makefile ax25/Makefile Makefile rose/Makefile user_call/Makefile kiss/Makefile 6pack/Makefile hdlcutil/Makefile hdlcutil/fl/Makefile yamdrv/Makefile dmascc/Makefile)
+AC_OUTPUT(netrom/Makefile tcpip/Makefile ax25/Makefile ax25/axgetput/Makefile Makefile rose/Makefile user_call/Makefile kiss/Makefile 6pack/Makefile hdlcutil/Makefile hdlcutil/fl/Makefile yamdrv/Makefile dmascc/Makefile)
