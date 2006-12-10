@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.8 2006/06/10 19:12:46 dl9sau Exp $
+ * $Id: axspawn.c,v 1.9 2006/12/10 16:44:39 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -204,6 +204,8 @@
 #define MSG_NOTINDBF	"Sorry, you are not in my database\n"
 
 #define EXITDELAY	10
+
+#define	USERADD_CONF	"/etc/default/useradd"
 
 struct huffencodtab {
 	unsigned short code;
@@ -1110,9 +1112,23 @@ retry:
 	 */
 
 	if (policy_add_prog_useradd) {
-        	sprintf(command,"/usr/sbin/useradd -p \"%s\" -c %s -d %s -u %d -g %d -m %s",
+		char *opt_shell = "";
+		struct stat statbuf;
+		if (stat(USERADD_CONF, &statbuf) == -1) {
+			 /* some programs need a shell explicitely specified
+			  * in /etc/passwd, although this field is not required
+			  * (and useradd does not set a shell when not
+			  * specified).
+			  * useradd has a config file. On debian for e.g.,
+			  * there is no /etc/default/useradd. Thus we
+			  * explecitely give the shell option to useradd, when
+			  * no useradd config file is present.
+			  */
+			  opt_shell = " -s \"/bin/sh\"";
+		}
+        	sprintf(command,"/usr/sbin/useradd -p \"%s\" -c %s -d %s -u %d -g %d -m %s%s",
 			((policy_add_empty_password) ? "" : "+"),
-                	username, userdir, uid, user_gid, newuser);
+                	username, userdir, uid, user_gid, newuser, opt_shell);
         	if (system(command) != 0)
 			goto out;
 	} else {
