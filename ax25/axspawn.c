@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.9 2006/12/10 16:44:39 dl9sau Exp $
+ * $Id: axspawn.c,v 1.10 2006/12/16 10:44:03 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1547,6 +1547,9 @@ again:
 			*p = 0;
 		if ((pwtype & PW_MD5) && !strcmp(buf, "sys") && (pwtype_orig & PW_SYS)) {
 			pwtype = (pwtype_orig & ~PW_MD5);
+			if (pwd)
+				free(pwd);
+			pwd = 0;
 			goto again;
 		}
 		if (!strstr(buf, pass_want)) {
@@ -1555,7 +1558,9 @@ again:
 			sleep (EXITDELAY);
 			return -11;
 		}
-		free(pwd);
+		if (pwd)
+			free(pwd);
+		pwd = 0;
 	} else {
 		if (pw->pw_uid == 0 || pw->pw_gid == 0) {
 			sprintf(buf, "Sorry, root logins are only allowed with md5- or baycom-password!\r");
@@ -1565,6 +1570,9 @@ again:
 			return 1;
 		}
 	}
+	if (pwd)
+		free(pwd);
+	pwd = 0;
 
 	/*
 	 * associate UID with callsign (or vice versa?)
