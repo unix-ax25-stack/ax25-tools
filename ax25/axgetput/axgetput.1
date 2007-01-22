@@ -1,0 +1,32 @@
+.TH AXGETPUT 1 "21 January 2007" Linux "Linux Programmer's Manual"
+.SH NAME
+axgetput \- upload files via AX.25 Linux account
+.SH SYNOPSIS
+.B axgetput
+[-b \fIblocksize\fR] [-i] [-v] [-h] [?] \fIfilename\fR
+.br
+.B axgetput
+[-b \fIblocksize\fR] [-i] -s [-v] [-h] [?] [\fIfilename\fR]
+.LP
+.SH DESCRIPTION
+.TP
+\fB-b blocksize\fR
+Set the blocksize (frame length) of transmitted data.  Defaults to 256 bytes
+which matches typical AX.25 network confurations best.
+.TP
+\fB-i\fR
+Compute CRC checksum only.
+.TP
+\fB.B -s\fR
+Indicates input from a stream.  This option is available only if STDIN is a
+pipe.  The filename argument may be omitted if -s is given.
+.TP
+\fB\-v\fR
+print version and exit.
+.TP
+\fB-h, ?\fR
+print usage and exit.
+.LP
+.SH AUTHOR
+Thomas Osterried  DL9SAU <thomas@x-berg.in-berlin.de>
+Ralf Baechle DL5RB <ralf@linux-mips.org>
