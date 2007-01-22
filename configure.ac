@@ -1,14 +1,9 @@
-dnl Process this file with autoconf to produce a configure script.
-AC_INIT(ax25/ax25d.c)
-
-dnl For automake
-VERSION=0.0.9
-PACKAGE=ax25-tools
-AM_INIT_AUTOMAKE($PACKAGE,$VERSION)
+AC_PREREQ(2.59)
+AC_INIT(ax25-tools, 0.0.9, linux-hams@vger.kernel.org)
+AC_CONFIG_SRCDIR(ax25/ax25d.c)
+AM_INIT_AUTOMAKE
 
 AM_CONFIG_HEADER(config.h)
-
-
 
 dnl Checks for programs.
 AC_PROG_AWK

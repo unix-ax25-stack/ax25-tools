@@ -1,7 +1,8 @@
-Makefile
+autom4te.cache
 config.cache
 config.h
 config.log
 config.status
-stamp-h
+Makefile
+stamp-h1
 .deps
