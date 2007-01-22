@@ -47,11 +47,11 @@ AC_CHECK_HEADERS(fcntl.h limits.h paths.h strings.h sys/file.h sys/ioctl.h sys/t
 
 dnl Checks for working glibc 2.1 headers
 AC_MSG_CHECKING(for working netax25/ax25.h header file)
-AC_EGREP_HEADER(ax25_fwd_struct, netax25/ax25.h,AC_DEFINE(HAVE_NETAX25_AX25_H) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_EGREP_HEADER(ax25_fwd_struct, netax25/ax25.h,AC_DEFINE(HAVE_NETAX25_AX25_H, 1, [Define if you have a proper netax25/ax25.h header file.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 AC_MSG_CHECKING(for working netrom/netrom.h header file)
-AC_EGREP_HEADER(unsigned int ndigis, netrom/netrom.h,AC_DEFINE(HAVE_NETROM_NETROM_H) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_EGREP_HEADER(unsigned int ndigis, netrom/netrom.h,AC_DEFINE(HAVE_NETROM_NETROM_H, 1, [Define if you have a proper netrom/netrom.h header file.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 AC_MSG_CHECKING(for working netrose/rose.h header file)
-AC_EGREP_HEADER(rose_facilities_struct, netrose/rose.h,AC_DEFINE(HAVE_NETROSE_ROSE_H) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_EGREP_HEADER(rose_facilities_struct, netrose/rose.h,AC_DEFINE(HAVE_NETROSE_ROSE_H, 1, [Define if you have a proper netrose/rose.h header file.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
