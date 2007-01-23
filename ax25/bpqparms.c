@@ -30,14 +30,14 @@
 #include <net/if.h>
 
 #ifdef __GLIBC__
-#include <net/ethernet.h> // is this really needed ??
+#include <net/ethernet.h> /* is this really needed ??  */
 #endif
 
 #include <linux/bpqether.h> /* xlz - dammit, we need this again */
 
 #include <config.h>
 
-#define RCS_ID "$Id: bpqparms.c,v 1.2 2005/11/28 19:29:16 dl9sau Exp $"
+#define RCS_ID "$Id: bpqparms.c,v 1.3 2007/01/23 13:40:01 ralf Exp $"
 
 void usage(void)
 {
@@ -47,7 +47,7 @@ void usage(void)
 		exit(1);
 }
 
-char *Version = "$Revision: 1.2 $";
+char *Version = "$Revision: 1.3 $";
 
 int get_hwaddr(unsigned char *k, char *s)
 {

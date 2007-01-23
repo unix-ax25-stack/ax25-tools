@@ -1,4 +1,4 @@
-/* @(#) $Id: proto_bin.c,v 1.1 2006/12/10 19:12:59 dl9sau Exp $ */
+/* @(#) $Id: proto_bin.c,v 1.2 2007/01/23 13:40:01 ralf Exp $ */
 
 /*
  * (c) 2002 Thomas Osterried  DL9SAU <thomas@x-berg.in-berlin.de>
@@ -102,8 +102,10 @@ int bput(void)
       return 1;
     }
     if (buf[len-1] == '\n') {
-      //p = "warning: <LF> received. not 8bit clean?\r";
-      //secure_write(fdout, p, strlen(p));
+#if 0
+      p = "warning: <LF> received. not 8bit clean?\r";
+      secure_write(fdout, p, strlen(p));
+#endif
       sprintf(err_msg, "bad EOL: <LF>\n");
       return 1;
     }
@@ -119,7 +121,7 @@ int bput(void)
       return 1;
     }
   }
-  buf[len-1] = 0; // without trailing \r. and: string termination
+  buf[len-1] = 0; /* without trailing \r. and: string termination */
 
   send_on_signal = bin_send_no_on_sig;
 
@@ -140,14 +142,14 @@ int bput(void)
   filename_given[sizeof(filename_given)-1] = 0;
 
   if (!fdout_is_pipe) {
-    // normal mode: store in given filename
+    /* normal mode: store in given filename  */
     if (!*filename) {
       p = get_fixed_filename(filename_given, len_read_expected, msg_crc, 1);
       strncpy(filename, p, sizeof(filename)-1);
       filename[sizeof(filename)-1] = 0;
     }
     if (!stat(filename, &statbuf)) {
-      // file exist
+      /* file exist  */
       if (unlink(filename)) {
         sprintf(err_msg, "error: cannot unlink %s (%s)\n", filename, strerror(errno));
         goto abort;
@@ -165,13 +167,13 @@ int bput(void)
     len_termline = strlen(term_line);
   }
 
-  // say helo
+  /* say helo  */
   send_on_signal = bin_send_abort_on_sig;
   write(fderr, "\r#OK#\r", 6);
 
   len_read_left = len_read_expected;
 
-  // #bin# chechsum initialization
+  /* #bin# chechsum initialization  */
   init_crc();
 
   for (;;) {
@@ -199,16 +201,16 @@ int bput(void)
     if (buf[len-1] == '\r') {
       if (last_line_had_CR) {
 	if (IS_BIN_ABORT(buf, len)) {
-	  // "\r#ABORT#\r" was sent
+	  /* "\r#ABORT#\r" was sent  */
           if (!fdout_is_pipe) {
 	    close(fddata);
-	    // clean up
+	    /* clean up  */
 	    unlink(filename);
 	  }
 	  return 1;
 	}
 	if (term_line && len == len_termline && !memcmp(buf, term_line, len_termline)) {
-          // sucessfully read until termination string
+          /* sucessfully read until termination string  */
           break;
 	}
       }
@@ -225,7 +227,7 @@ int bput(void)
       goto abort;
     }
 
-    // nothing left?
+    /* nothing left?  */
     if (!term_line && len_read_left == 0L)
       break;
     if (is_eof) {
@@ -238,7 +240,7 @@ int bput(void)
   }
   if (crc != msg_crc) {
     sprintf(err_msg, "Invalid crc: computed %d, expected %d.\n", crc, msg_crc);
-    // don't unlink
+    /* don't unlink  */
     save_close(fddata);
     return 1;
   }
@@ -322,7 +324,7 @@ int bget(void) {
     else
       file_time = time(0);
     
-    // compute crc
+    /* compute crc  */
     while ((len = read(fddata, buf, BLOCKSIZ)) > 0) {
       int i;
       for (i = 0; i < len; i++)
@@ -334,7 +336,7 @@ int bget(void) {
       close(fddata);
       return 1;
     }
-    // rewind
+    /* rewind  */
     if (lseek(fddata, 0L, SEEK_SET) != 0L) {
       sprintf(err_msg, "error: file io failed on lseek() (%s)\n", strerror(errno));
       close(fddata);
@@ -363,9 +365,11 @@ int bget(void) {
     } else {
       sprintf(buf, "\r#BIN###$%s#%s\r", unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, 0, 0, 1));
     }
-    // hack: check for #ABORT# from fdout (fd 1), because fddata (fd 0) is
-    // our pipe we read the data from, which we actually tx.
-    // believe me, it does work.
+    /*
+     * hack: check for #ABORT# from fdout (fd 1), because fddata (fd 0) is
+     * our pipe we read the data from, which we actually tx.
+     * believe me, it does work.
+     */
     fdin = fdout;
   }
 
@@ -382,10 +386,12 @@ int bget(void) {
     return 1;
   }
 
-    // wait for answer
+    /* wait for answer  */
   for (;;) {
-                 // . make sure we do not read from a pipe. fdout is also
-		 // | assigned to the tty
+                 /*
+		  * make sure we do not read from a pipe. fdout is also
+		  * assigned to the tty
+		  */
     len = my_read(fdout, buf, sizeof(buf), &is_eof, "\r\n");
     if (is_eof || len < 1) {
       sprintf(err_msg, "error: read failed (%s)\n", strerror(errno));
@@ -393,8 +399,10 @@ int bget(void) {
       return 1;
     }
     if (buf[len-1] == '\n') {
-      //char *p = "warning: <LF> received. not 8bit clean?\r";
-      //secure_write(fdout, p, strlen(p));
+#if 0
+      char *p = "warning: <LF> received. not 8bit clean?\r";
+      secure_write(fdout, p, strlen(p));
+#endif
       sprintf(err_msg, "bad EOL: <LF>\n");
       goto abort;
     } else if (buf[len-1] != '\r') {
@@ -421,7 +429,7 @@ int bget(void) {
   for (;;) {
     char *p_buf;
 
-    // check for user \r#ABORT#\r on tty stream
+    /* check for user \r#ABORT#\r on tty stream  */
     FD_ZERO(&readfds);
     FD_SET(fdin, &readfds);
     if (select(fdin+1, &readfds, 0, 0, &timeout) && FD_ISSET(fdin, &readfds)) {
@@ -436,7 +444,7 @@ int bget(void) {
         return 1;
       }
     }
-    // read data
+    /* read data  */
     if (!fdin_is_pipe || is_stream) {
       p_buf = buf;
       if ((len = my_read(fddata, buf, ((len_remains > BLOCKSIZ || is_stream) ? BLOCKSIZ : len_remains), &is_eof, 0)) < 1) {
@@ -452,7 +460,7 @@ int bget(void) {
       p_buf = stored_file->data;
       len = stored_file->len;
     }
-    // write to client
+    /* write to client  */
     if (secure_write(fdout, p_buf, len) == -1) {
       sprintf(err_msg, "error: write failed (%s)\n", strerror(errno));
       save_close(fddata);
@@ -471,8 +479,10 @@ int bget(void) {
       is_eof = 1;
       break;
     }
-    // need this because my_read may returned lenth != 0 (data to be written)
-    // but also has detected EOF.
+    /*
+     * need this because my_read may returned lenth != 0 (data to be written)
+     * but also has detected EOF.
+     */
     if (is_eof)
       break;
   }

@@ -122,12 +122,12 @@ void ask_pw_sys(char *prompt, char *pass_want, char *pw)
 
 	for (i = 0; i < 5; i++) {
 		j = conv_random(pwlen, 0);
-		// store generated request-numbers
-		five_digits[i] = j+1; // pos0 refers as 1
-		// store expected string in cp->passwd
+		/* store generated request-numbers  */
+		five_digits[i] = j+1; /* pos0 refers as 1  */
+		/* store expected string in cp->passwd  */
 		pass_want[i] = pw[j];
 	}
-	// and terminate the string
+	/* and terminate the string  */
 	pass_want[i] = 0;
 
 	sprintf(buffer, "\r%s>  %d %d %d %d %d\r", prompt, five_digits[0], five_digits[1], five_digits[2], five_digits[3], five_digits[4]);
@@ -142,10 +142,8 @@ void ask_pw_md5(char *prompt, char *pass_want, char *pw)
 	char buffer[2048];
 	char cipher[16];
 	char key[256];
-//	char *pass;
 	char *challenge;
 
-//	pass = pw;
 	pass_want[0]= 0;
 
 	if (!pw || !*pw)
@@ -154,19 +152,18 @@ void ask_pw_md5(char *prompt, char *pass_want, char *pw)
 	if (seed == 1L)
 		conv_randomize();
 
-	// copy password
 	strncpy(key, pw, sizeof(key));
 	key[sizeof(key)-1] = 0;
 
-	// compute random salt
+	/* compute random salt  */
 	challenge = generate_rand_pw(SALT_LEN);
 
-	// ask for proper response to this challenge:
+	/* ask for proper response to this challenge:  */
 	sprintf(buffer, "\r%s> [%s]\r", prompt, challenge);
 	write_ax25(buffer, strlen(buffer), 1);
-	// compute md5 challenge
+	/* compute md5 challenge  */
 	calc_md5_pw(challenge, key, cipher);
-	// store expected answer
+	/* store expected answer  */
 	char_to_hex(cipher, pass_want, 16);
 }
 

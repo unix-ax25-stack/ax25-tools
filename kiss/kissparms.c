@@ -42,7 +42,6 @@
 
 int main(int argc, char *argv[])
 {
-	//unsigned char buffer[2];
 	unsigned char buffer[256];
 	struct sockaddr sa;
 	int proto = ETH_P_AX25;

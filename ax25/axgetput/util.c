@@ -1,4 +1,4 @@
-/* @(#) $Id: util.c,v 1.1 2006/12/10 19:12:59 dl9sau Exp $ */
+/* @(#) $Id: util.c,v 1.2 2007/01/23 13:40:01 ralf Exp $ */
 
 /*
  * (c) 2002 Thomas Osterried  DL9SAU <thomas@x-berg.in-berlin.de>
@@ -60,13 +60,15 @@ int my_read(int fd, char *s, int len_max, int *eof, char *p_break)
         continue;
       }
       *eof = 1;
-      // len = 0: normal eof. if we're looking for a string, return -1 since
-      // we have'nt found
+      /*
+       * len = 0: normal eof. if we're looking for a string, return -1 since
+       * we have'nt found
+       */
       return (len == 0 && p_break ? -1 : (len_got ? len_got : len));
     }
     len_got += len;
 
-    // read once? or char in p_break found?
+    /* read once? or char in p_break found?  */
     if (!p_break || strchr(p_break, *s_curr))
       break;
   }
@@ -95,7 +97,7 @@ int secure_write(int fd, char *s, int len_write) {
       return -1;
     }
     if (len != len_write_left_curr) {
-      // queue busy..
+      /* queue busy..  */
       sleep(10);
     }
     s += len;

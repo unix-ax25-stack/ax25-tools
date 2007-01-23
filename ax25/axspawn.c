@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.10 2006/12/16 10:44:03 dl9sau Exp $
+ * $Id: axspawn.c,v 1.11 2007/01/23 13:40:01 ralf Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -141,7 +141,7 @@
    with new login/libc - Terry, vk2ktj. */
 
 
-//#define QUEUE_DELAY 400		/* 400 usec */
+/*#define QUEUE_DELAY 400		/ * 400 usec */
 #define QUEUE_DELAY 100000		/* 10 msec */
 #define USERPROFILE ".profile"
 #define PASSWDFILE  "/etc/passwd"
@@ -665,7 +665,7 @@ int _write_ax25(const char *s, int len)
 
 	i = write(1, s, len);
 	fflush(stdout);
-	return (i > 0 ? i : 0);	// on error, -1 is returned
+	return (i > 0 ? i : 0);	/* on error, -1 is returned  */
 }
 
 int read_ax25(unsigned char *s, int size)
@@ -766,7 +766,7 @@ void kick_wqueue(int dummy)
 			return;
 		}
 
-		// recompute waitqueue
+		/* recompute waitqueue  */
 		if (wqueue_head->len < bufsize && wqueue_head->next) {
 			int s_len;
 			if (!(s = malloc(bufsize))) {
@@ -785,7 +785,7 @@ void kick_wqueue(int dummy)
 				s_len += curr_len;
 				p += curr_len;
 				if (w_buf->len > curr_len) {
-					// rewrite current buffer, and break
+					/* rewrite current buffer, and break */
 					w_buf->len -= curr_len;
 		        		for (q = w_buf->data, r = w_buf->data+curr_len, i = 0; i < w_buf->len; i++)
 						*q++ = *r++;
@@ -812,14 +812,19 @@ void kick_wqueue(int dummy)
 			len = curr_len;
 		}
 		if (!_write_ax25(s, len) && errno == EAGAIN) {
-			// socket busy?
-			// don't block, user may want interrupt the jam
+			/*
+			 * socket busy?
+			 * don't block, user may want interrupt the jam
+			 */
 			itv.it_value.tv_sec = 1;
 			break;
 		}
 		wqueue_length -= curr_len;
 		if (w_buf->len > curr_len) {
-			// there's still data to be written - copy restbuffer to left
+			/*
+			 * there's still data to be written - copy restbuffer
+			 * to left
+			 */
 			w_buf->len -= curr_len;
 			for (q = w_buf->data, r = w_buf->data+curr_len, i = 0; i < w_buf->len; i++)
 				*q++ = *r++;
@@ -834,8 +839,10 @@ void kick_wqueue(int dummy)
 			}
 		}
 
-		// if only a few bytes are left, wait a few ms if
-		// new data is available in order to send "full packets"
+		/*
+		 * if only a few bytes are left, wait a few ms if
+		 * new data is available in order to send "full packets"
+		 */
 		if (wqueue_length < paclen)
 			break;	
 	}
@@ -898,7 +905,9 @@ int write_ax25(char *s, int len, int kick)
 	if (!bin) {
 		p = s; i = 0; j = 0;
 		if (last_ended_with_CR) {
-			// \r\n was splited. wrote already \r, now ommiting \n
+			/*
+			 * \r\n was splited. wrote already \r, now ommiting \n
+			 */
 			if (*s == '\n') {
 				s++, p++;
 				len--;

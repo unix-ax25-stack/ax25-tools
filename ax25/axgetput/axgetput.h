@@ -1,4 +1,4 @@
-/* @(#) $Id: axgetput.h,v 1.1 2006/12/10 19:12:59 dl9sau Exp $ */
+/* @(#) $Id: axgetput.h,v 1.2 2007/01/23 13:40:01 ralf Exp $ */
 
 /*
  * (c) 2002 Thomas Osterried  DL9SAU <thomas@x-berg.in-berlin.de>
@@ -27,7 +27,7 @@ extern int do_crc_only;
 extern char c_eol;
 extern char *send_on_signal;
 
-// modes
+/* modes */
 #define RECV_BIN        1	/*   #BIN# protocol: receive */
 #define SEND_BIN        2	/*   #BIN# protocol: send */
 #define RECV_YAPP       3	/*    yapp protocol: receive */
@@ -36,7 +36,7 @@ extern char *send_on_signal;
 #define SEND_DIDADIT    6	/* didadit protocol: send */
 
 
-// block sizes
+/* block sizes */
 
 extern unsigned int BLOCKSIZ;
 

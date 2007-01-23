@@ -1,5 +1,5 @@
 /*
- * $Id: ax25d.c,v 1.4 2006/01/08 18:26:43 dl9sau Exp $
+ * $Id: ax25d.c,v 1.5 2007/01/23 13:40:01 ralf Exp $
  *
  *  This is my version of axl.c, written for the LBBS code to make it
  *    compatable with the kernel AX25 driver.  It appears to work, with
@@ -515,9 +515,9 @@ int main(int argc, char *argv[])
 								goto login;
 
 							if (raxl->checkVC > 1) {
-								//setproctitle("ax25d [%d]: rejecting, User);
+								/* setproctitle("ax25d [%d]: rejecting, User);  */
 							} else {
-								//setproctitle("ax25d [%d]: %s, User, (VCloginEnable ? "waiting" : "discarding"));
+								/* setproctitle("ax25d [%d]: %s, User, (VCloginEnable ? "waiting" : "discarding")); */
 							}
 
 							/* is a VC user. checkVC > 0? then reject now, or fork and wait for pid=textdata.. */
@@ -587,12 +587,12 @@ int main(int argc, char *argv[])
 							/* point of no return */
 close_link:
 							/* close link */
-							//setproctitle("ax25d [%s]: disconnecting", User);
+							/* setproctitle("ax25d [%s]: disconnecting", User); */
 							close(new);
 							return 0;
 						}
 login:
-						//setproctitle("ax25d [%s]: login", User);
+						/* setproctitle("ax25d [%s]: login", User); */
 
 						SetupOptions(new, raxl);
 						WorkoutArgs(raxl->af_type, raxl->shell, &argc, argv);

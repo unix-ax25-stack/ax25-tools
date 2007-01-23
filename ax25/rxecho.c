@@ -67,16 +67,18 @@
 
 #include <sys/socket.h>
 
-// dl9sau:
-// uncomment this if you have problems with sockaddr_pkt.
-// sockaddr_pkt is the right way for type SOCK_PACKET on family AF_INET sockets.
-// especially because the "sockaddr" on recvfrom is truncated (internaly
-// it's sockaddr_pkt) -- and because we use this sockaddr for retransmitting,
-// it's really better to use the sockaddr_spkt.
-// default is to use SOCKADDR_SPKT
+/*
+ * dl9sau:
+ * uncomment this if you have problems with sockaddr_pkt.
+ * sockaddr_pkt is the right way for type SOCK_PACKET on family AF_INET sockets.
+ * especially because the "sockaddr" on recvfrom is truncated (internaly
+ * it's sockaddr_pkt) -- and because we use this sockaddr for retransmitting,
+ * it's really better to use the sockaddr_spkt.
+ * default is to use SOCKADDR_SPKT
+ */
 #define	USE_SOCKADDR_SPKT	1
 
-//dl9sau: since linux 2.2.x, SOCK_PACKET is obsolete
+/* dl9sau: since linux 2.2.x, SOCK_PACKET is obsolete  */
 #define	USE_SOCKADDR_SLL	1
 
 #ifdef	USE_SOCKADDR_SLL
@@ -428,7 +430,7 @@ int main(int argc, char **argv)
 			char *p_name = (i ? p->to : p->from);
 			int *p_idx = (i ? &p->to_idx : &p->from_idx);
 
-			// already set?
+			/* already set?  */
 			if (*p_idx >= 0)
 				continue;
 			strncpy(ifr.ifr_name, p_name, sizeof(ifr.ifr_name)-1);
@@ -473,9 +475,11 @@ int main(int argc, char **argv)
 #ifdef	USE_SOCKADDR_SLL
 		from_idx = sll.sll_ifindex;
 #else
-		// dl9sau: save the names of the iface the frame came from;
-		// we'll overwrite psa->sa_data it for sendto() and need the
-		// name again when multiplexing to more than one iface
+		/*
+		 * dl9sau: save the names of the iface the frame came from;
+		 * we'll overwrite psa->sa_data it for sendto() and need the
+		 * name again when multiplexing to more than one iface
+		 */
 		strncpy(from_dev_name, psa->sa_data, sizeof(from_dev_name)-1);
 		from_dev_name[sizeof(from_dev_name)-1] = 0;
 #endif
@@ -488,18 +492,20 @@ int main(int argc, char **argv)
  			if ((strcmp(p->from, from_dev_name) == 0) && (check_calls(p, buf, size) == 0)) {
  				strcpy(psa->sa_data, p->to);
 #endif
-				// cave: alen (set by recvfrom()) may > salen
-				//   which means it may point beyound of the
-				//   end of the struct. thats why we use the
-				//   correct len (sa_len). this fixes a bug
-				//   where skpt->protocol on sockaddr structs
-				//   pointed behind the struct, leading to
-				//   funny protocol IDs.
-				//   btw, the linux kernel internaly always
-				//   maps to sockaddr to sockaddr_pkt
-				//   on sockets of type SOCK_PACKET on family
-				//   AF_INET. sockaddr_pkt is len 18, sockaddr
-				//   is 16.
+				/*
+				 * cave: alen (set by recvfrom()) may > salen
+				 *   which means it may point beyound of the
+				 *   end of the struct. thats why we use the
+				 *   correct len (sa_len). this fixes a bug
+				 *   where skpt->protocol on sockaddr structs
+				 *   pointed behind the struct, leading to
+				 *   funny protocol IDs.
+				 *   btw, the linux kernel internaly always
+				 *   maps to sockaddr to sockaddr_pkt
+				 *   on sockets of type SOCK_PACKET on family
+				 *   AF_INET. sockaddr_pkt is len 18, sockaddr
+				 *   is 16.
+				 */
 				if (sendto(s, buf, size, 0, psa, sa_len) == -1) {
 					if (logging) {
 						syslog(LOG_ERR, "sendto: %m");

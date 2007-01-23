@@ -1,4 +1,4 @@
-static const char rcsid[] = "@(#) $Id: axgetput.c,v 1.1 2006/12/10 19:12:59 dl9sau Exp $";
+static const char rcsid[] = "@(#) $Id: axgetput.c,v 1.2 2007/01/23 13:40:01 ralf Exp $";
 
 /*
  * This is axgetput
@@ -70,13 +70,13 @@ static void set_tty_flags()
 
   if (fdin_is_pipe)
     return;
-  // mesg no
+  /* mesg no  */
   if (!fstat(fdin, &statbuf)) {
-    // save old mode
+    /* save old mode  */
     mode_tty = statbuf.st_mode;
     fchmod(fdin, 0600);
   }
-  // make tty 8bit clean 
+  /* make tty 8bit clean  */
   if (tcgetattr(fdin, &prev_termios) != -1)
     prev_termios_stored = 1;
   memset((char *) &termios, 0, sizeof(termios));
@@ -108,12 +108,12 @@ static void restore_tty_flags()
 
 static void eol_convention(int state_should)
 {
-  // need patched axspawn
+  /* need patched axspawn */
 #define	BIN_ON	"//BIN ON\r"
 #define	BIN_OFF	"//BIN OFF\r"
   static int state_is = 0;
 
-  // already in correct state?
+  /* already in correct state?  */
   if ((state_is && state_should) || (!state_is && !state_should))
 	return;
 
@@ -205,7 +205,7 @@ static void usage(int all) {
 
 /*---------------------------------------------------------------------------*/
 
-// not implemented
+/* not implemented */
 static int yput(void) { strcpy(err_msg, "yapp: not implementet yet\n"); return 1; }
 static int yget(void) { strcpy(err_msg, "yapp: not implementet yet\n"); return 1; }
 static int rget(void) { strcpy(err_msg, "yapp: not implementet yet\n"); return 1; }
@@ -230,9 +230,9 @@ int main(int argc, char *argv[])
     revision.author,
     revision.state);
 
-  // determine what to so in the way how we are called
+  /* determine what to so in the way how we are called  */
   if ((p = strrchr(argv[0], '/')))
-    p++; // skip '/'
+    p++; /* skip '/'  */
   else
     p = argv[0];
   len = strlen(p);
@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
   signal(SIGTERM, signal_handler);
   signal(SIGINT, signal_handler);
 
-// for difference betreen "bput -f file" and "bget file"
+/* for difference betreen "bput -f file" and "bget file"  */
 #define	get_filename(f) { \
       if (!strcmp(f, "-")) { \
 	if (mode % 2) \
