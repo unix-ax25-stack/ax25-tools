@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.11 2007/01/23 13:40:01 ralf Exp $
+ * $Id: axspawn.c,v 1.12 2007/01/23 13:45:06 ralf Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -516,11 +516,7 @@ pid_t forkpty(int *, char *, void *, struct winsize *);
    is returned
 */
 
-int encstathuf(src,srclen,dest,destlen)
-char *src;
-int srclen;
-char *dest;
-int *destlen;
+int encstathuf(char *src, int srclen, char *dest, int *destlen)
 {
 	char *srcptr;
 	char *destptr;
@@ -586,11 +582,7 @@ int *destlen;
 */
 
 
-int decstathuf(src,dest, srclen, destlen)
-char *src;
-char *dest;
-int srclen;
-int *destlen;
+int decstathuf(char *src, char *dest, int srclen, int *destlen)
 {
 	unsigned char *srcptr;
 	unsigned char *destptr;
