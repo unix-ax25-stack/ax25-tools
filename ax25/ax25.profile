@@ -1,2 +1,1 @@
-#! /bin/bash
-echo "/char ibmpc ibmpc" >.conversrc
+#echo "/char ibmpc ibmpc" >.conversrc
