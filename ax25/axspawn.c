@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.12 2007/01/23 13:45:06 ralf Exp $
+ * $Id: axspawn.c,v 1.13 2007/03/11 13:58:34 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1091,6 +1091,23 @@ retry:
 		{
 			if (errno == ENOENT)
 			{
+				if (q == NULL && policy_add_prog_useradd) {
+					/* Some useradd implementations
+					 * fail if the directory for the
+					 * new user already existss. That's
+					 * why we stop here now, just before
+					 * mkdir of ....../username/
+					 * We had to use this function,
+					 * because we decided to make
+					 * directories in the form
+					 * /home/hams/dl9.../ - and if
+					 * for e.g. dl9.../ does not exist,
+					 * then useradd will refuse to make
+					 * the needed / missing subdirs
+					 * for /home/hams/dl9.../dl9sau/
+					 */
+					goto end_mkdirs;
+				}
 				mkdir(p, S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
 
 				if (q == NULL)
@@ -1107,6 +1124,7 @@ retry:
 			goto out;
 		p = q;
 	}
+end_mkdirs:
 
 	/*
 	 * add the user now
@@ -1130,7 +1148,7 @@ retry:
         	sprintf(command,"/usr/sbin/useradd -p \"%s\" -c %s -d %s -u %d -g %d -m %s%s",
 			((policy_add_empty_password) ? "" : "+"),
                 	username, userdir, uid, user_gid, newuser, opt_shell);
-        	if (system(command) != 0)
+		if (system(command) != 0)
 			goto out;
 	} else {
 		fp = fopen(PASSWDFILE, "a+");
@@ -1161,13 +1179,32 @@ retry:
 	
 	if (fd_a > 0)
 	{
-		fd_b = open(USERPROFILE, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR|S_IXUSR);
+		int first = 1;
+		fd_b = open(USERPROFILE, O_CREAT|O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR);
 
 		if (fd_b < 0)
 			goto out;
 		
-		while ( (cnt = read(fd_a, &buf, sizeof(buf))) > 0 )
+		/* just 2b sure */
+		if (lseek(fd_b, 0L, SEEK_END) > 0L)
+			write(fd_b, "\n", 1);
+		while ( (cnt = read(fd_a, &buf, sizeof(buf))) > 0 ) {
+			if (first) {
+				/* fix: profiles never start with "#!/bin/sh",
+				 * but previous ax25.profile did. We fix this
+				 * now. We append this profile, because .profile
+				 * may came through /etc/skel. And because
+				 * its there, it's intended to be used. Then
+				 * if ax25.profile is present, it's regarded
+				 * as an optimization.
+				 * -> mark #!... as ##
+				 */
+                        	if (buf[0] == '#' && buf[1] == '!')
+					buf[1] = '#';
+				first = 0;
+			}
 			write(fd_b, &buf, cnt);
+		}
 		close(fd_b);
 		close(fd_a);
 		chown(USERPROFILE, uid, user_gid);
