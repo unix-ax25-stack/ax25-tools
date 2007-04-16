@@ -219,7 +219,7 @@ static int startiface(char *dev, struct hostent *hp)
 
 static void usage(void)
 {
-        fprintf(stderr, "usage: %s [-b] [-l] [-m mtu] [-v] ttyinterface port [inetaddr]\n", progname);
+        fprintf(stderr, "usage: %s [-b] [-l] [-m mtu] [-v] tty port [inetaddr]\n", progname);
 }
 
 int main(int argc, char *argv[])
