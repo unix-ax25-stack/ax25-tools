@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	}
 
 	if (argc < 5) {
-		fprintf(stderr, "Usage: axctl [-v] port dest src -t1|-t2|-t3|-n2|-paclen|-idle|-window|-maxq|-kill parm\n");
+		fprintf(stderr, "Usage: axctl [-v] port dest src t1|t2|t3|n2|paclen|idle|window|maxq|kill [parm]\n");
 		return 1;
 	}
 
@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if (strcmp(argv[4], "-kill") == 0) {
+	if (strcmp(argv[4], "kill") == 0 || strcmp(argv[4], "-kill") == 0) {
 		ax25_ctl.cmd = AX25_KILL;
 		ax25_ctl.arg = 0;
 	} else {
@@ -74,19 +74,19 @@ int main(int argc, char **argv)
 		}
 		ax25_ctl.arg = atoi(argv[5]);
 		
-		if (strcmp(argv[4], "-t1") == 0)
+		if (strcmp(argv[4], "t1") == 0 || strcmp(argv[4], "-t1") == 0)
 			ax25_ctl.cmd = AX25_T1;
-		else if (strcmp(argv[4], "-t2") == 0)
+		else if (strcmp(argv[4], "t2") == 0 || strcmp(argv[4], "-t2") == 0)
 			ax25_ctl.cmd = AX25_T2;
-		else if (strcmp(argv[4], "-t3") == 0)
+		else if (strcmp(argv[4], "t3") == 0 || strcmp(argv[4], "-t3") == 0)
 			ax25_ctl.cmd = AX25_T3;
-		else if (strcmp(argv[4], "-idle") == 0)
+		else if (strcmp(argv[4], "idle") == 0 || strcmp(argv[4], "-idle") == 0)
 			ax25_ctl.cmd = AX25_IDLE;
-		else if (strcmp(argv[4], "-n2") == 0)
+		else if (strcmp(argv[4], "n2") == 0 || strcmp(argv[4], "-n2") == 0)
 			ax25_ctl.cmd = AX25_N2;
-		else if (strcmp(argv[4], "-window") == 0)
+		else if (strcmp(argv[4], "window") == 0 || strcmp(argv[4], "-window") == 0)
 			ax25_ctl.cmd = AX25_WINDOW;
-		else if (strcmp(argv[4], "-paclen") == 0)
+		else if (strcmp(argv[4], "paclen") == 0 || strcmp(argv[4], "-paclen") == 0)
 			ax25_ctl.cmd = AX25_PACLEN;
 	}
 

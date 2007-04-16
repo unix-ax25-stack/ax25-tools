@@ -2,7 +2,7 @@
 .SH NAME
 axctl \- Configure/Kill running AX.25 connections.
 .SH SYNOPSIS
-.B axctl [-v] port dest src -window|-t1|-t2|-t3|-n2|-idle|-paclen|-kill [parm]
+.B axctl [-v] port dest src window|t1|t2|t3|n2|idle|paclen|kill [parm]
 .SH DESCRIPTION
 .LP
 The
@@ -23,33 +23,33 @@ invokation of
 .BI \-v
 Displays the version number.
 .TP 20
-.BI "\-window window"
+.BI "window window"
 Sets the window size for the AX.25 connection.
 .TP 20
-.BI "\-t1 t1\-timeout"
+.BI "t1 t1\-timeout"
 Sets the initial T1 timeout value for the AX.25 connection, the value is given in
 seconds.
 .TP 20
-.BI "\-t2 t2\-timeout"
+.BI "t2 t2\-timeout"
 Sets the T2 timeout value for the AX.25 connection, the value is given in
 seconds.
 .TP 20
-.BI "\-t3 t3\-timeout"
+.BI "t3 t3\-timeout"
 Sets the T3 timeout value for the AX.25 connected, the value is given in
 seconds.
 .TP 20
-.BI "\-n2 n2\-count"
+.BI "n2 n2\-count"
 Sets the maximum number of tries for the AX.25 connection.
 .TP 20
-.BI "\-idle idle-timeout"
+.BI "idle idle-timeout"
 Sets the value for the idle timer for the AX.25 connection, the value is in
 minutes.
 .TP 20
-.BI "\-paclen paclength"
+.BI "paclen paclength"
 Sets the maximum packet length that may be transmitted on the AX.25
 connection.
 .TP 20
-.BI "\-kill"
+.BI "kill"
 Will abort an existing AX.25 connection.
 .SH FILES
 .LP
