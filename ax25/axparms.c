@@ -31,33 +31,33 @@
 
 void usage(void)
 {
-	fprintf(stderr, "usage: axparms -assoc|-forward|-route|-setcall|-version ...\n");
+	fprintf(stderr, "usage: axparms --assoc|--forward|--route|--setcall|--version ...\n");
 }
 
 void usageassoc(void)
 {
-	fprintf(stderr, "usage: axparms -assoc show\n");
-	fprintf(stderr, "usage: axparms -assoc policy default|deny\n");
-	fprintf(stderr, "usage: axparms -assoc [callsign] [username]\n");
-	fprintf(stderr, "usage: axparms -assoc [callsign] delete\n");
+	fprintf(stderr, "usage: axparms --assoc show\n");
+	fprintf(stderr, "usage: axparms --assoc policy default|deny\n");
+	fprintf(stderr, "usage: axparms --assoc [callsign] [username]\n");
+	fprintf(stderr, "usage: axparms --assoc [callsign] delete\n");
 }
 
 void usageforward(void)
 {
-	fprintf(stderr, "usage: axparms -forward <portfrom> <portto>\n");
-	fprintf(stderr, "usage: axparms -forward <portfrom> delete\n");
+	fprintf(stderr, "usage: axparms --forward <portfrom> <portto>\n");
+	fprintf(stderr, "usage: axparms --forward <portfrom> delete\n");
 }
 
 void usageroute(void)
 {
-	fprintf(stderr, "usage: axparms -route add port callsign [digi ...] [-ipmode mode]\n");
-	fprintf(stderr, "usage: axparms -route del port callsign\n");
-	fprintf(stderr, "usage: axparms -route list\n");
+	fprintf(stderr, "usage: axparms --route add port callsign [digi ...] [--ipmode mode]\n");
+	fprintf(stderr, "usage: axparms --route del port callsign\n");
+	fprintf(stderr, "usage: axparms --route list\n");
 }
 
 void usagesetcall(void)
 {
-	fprintf(stderr, "usage: axparms -setcall interface callsign\n");
+	fprintf(stderr, "usage: axparms --setcall interface callsign\n");
 }
 
 int routes(int s, int argc, char *argv[], ax25_address *callsign)
@@ -81,7 +81,7 @@ int routes(int s, int argc, char *argv[], ax25_address *callsign)
 		}
 
 		for (i = 5, j = 0; i < argc && j < 6; i++) {
-			if (strncmp(argv[i], "-i", 2) == 0) {
+			if (strncmp(argv[i], "--i", 3) == 0 || strncmp(argv[i], "-i", 2) == 0) {
 				if (++i == argc) {
 					fprintf(stderr, "axparms: -i must have a parameter\n");
 					return 1;
@@ -344,12 +344,12 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if (strncmp(argv[1], "-v", 2) == 0) {
+	if (strncmp(argv[1], "--v", 3) == 0 || strncmp(argv[1], "-v", 2) == 0) {
 		printf("axparms: %s\n", VERSION);
 		return 0;
 	}
 
-	if (strncmp(argv[1], "-a", 2) == 0) {
+	if (strncmp(argv[1], "--a", 3) == 0 || strncmp(argv[1], "-a", 2) == 0) {
 
 		if (argc < 3) {
 			usageassoc();
@@ -368,7 +368,7 @@ int main(int argc, char **argv)
 		return n;
 	}
 
-	if (strncmp(argv[1], "-f", 2) == 0) {
+	if (strncmp(argv[1], "--f", 3) == 0 || strncmp(argv[1], "-f", 2) == 0) {
 		if (argc == 2) {
 			usageforward();
 			return 1;
@@ -386,7 +386,7 @@ int main(int argc, char **argv)
 		return n;
 	}
 
-	if (strncmp(argv[1], "-r", 2) == 0) {
+	if (strncmp(argv[1], "--r", 3) == 0 || strncmp(argv[1], "-r", 2) == 0) {
 		if (argc < 3 ) {
 			usageroute();
 			return 1;
@@ -427,7 +427,7 @@ int main(int argc, char **argv)
 		return n;
 	}
 
-	if (strncmp(argv[1], "-s", 2) == 0) {
+	if (strncmp(argv[1], "--s", 3) == 0 || strncmp(argv[1], "-s", 2) == 0) {
 		if (argc != 4) {
 			usagesetcall();
 			return 1;
