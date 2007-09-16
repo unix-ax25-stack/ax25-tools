@@ -42,7 +42,11 @@
 #define MD5_H
 
 /* typedef a 32-bit type */
+#ifdef  _LP64
+typedef unsigned int UINT4;
+#else
 typedef unsigned long int UINT4;
+#endif
 
 /* Data structure for MD5 (Message-Digest) computation */
 typedef struct {
