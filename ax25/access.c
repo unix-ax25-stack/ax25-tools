@@ -214,7 +214,7 @@ void write_example_passwd(char *pwfile, char pwlocation, struct passwd *pw) {
 		fprintf(f, "# systempasswordonly\n");
 	}
 	fprintf(f, "# Examples (sys and md5 passwords may differ):\n");
-	fprintf(f, "# md5 stadard (secure) - length: >= %d and <= %d characters\n", MINPWLEN_MD5, PASSSIZE); 
+	fprintf(f, "# md5 standard (secure) - length: >= %d and <= %d characters\n", MINPWLEN_MD5, PASSSIZE); 
 	fprintf(f, "# %smd5:%s\n", (pwlocation == SYSTEMPW ? "username:" : ""), generate_rand_pw(MINPWLEN_MD5));
 	fprintf(f, "# sys/baycom standard (not very secure) - length: >= %d and <= %d characters\n", MINPWLEN_SYS, PASSSIZE);
 	fprintf(f, "# %ssys:%s\n", (pwlocation == SYSTEMPW ? "username:" : ""), generate_rand_pw(MINPWLEN_SYS));
