@@ -394,4 +394,3 @@ end:
 	           /*         ^ may allow cleartext? - then cleartext, else deny */
 	return 0;
 }
-
