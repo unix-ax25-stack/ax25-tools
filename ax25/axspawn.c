@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.13 2007/03/11 13:58:34 dl9sau Exp $
+ * $Id: axspawn.c,v 1.14 2008/02/16 17:59:33 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1379,7 +1379,7 @@ int main(int argc, char **argv)
 	read_config();
 
 	if (!pwtype)
-		pwtype = (PW_CLEARTEXT | PW_SYS | PW_MD5);
+		pwtype = (PW_CLEARTEXT | PW_SYS | PW_MD5 | PW_UNIX);
 	pwtype_orig = pwtype;
 	if (!*prompt) {
 		if (gethostname(buf, sizeof(buf)) < 0) {
@@ -1560,10 +1560,14 @@ int main(int argc, char **argv)
 	
 again:
 	if (!(pwd = read_pwd(pw, &pwtype))) {
-		if (!pwtype || pwtype != PW_CLEARTEXT) {
+		if ((!pwtype || pwtype != PW_CLEARTEXT) && (pwtype != PW_UNIX)) {
 			sleep (EXITDELAY);
 			return 1;
 		}
+	}
+	if (pwtype == PW_UNIX) {
+		pwtype = PW_CLEARTEXT;
+		pwcheck = 1;
 	}
 
 	if (pwtype != PW_CLEARTEXT) {

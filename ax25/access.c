@@ -121,9 +121,16 @@ void ask_pw_sys(char *prompt, char *pass_want, char *pw)
 		conv_randomize();
 
 	for (i = 0; i < 5; i++) {
+		int k;
+again:
 		j = conv_random(pwlen, 0);
 		/* store generated request-numbers  */
 		five_digits[i] = j+1; /* pos0 refers as 1  */
+		/* same number again? */
+		for (k = 0; k < i; k++) {
+			if (five_digits[k] == five_digits[i])
+				goto again;
+		}
 		/* store expected string in cp->passwd  */
 		pass_want[i] = pw[j];
 	}
@@ -218,6 +225,9 @@ void write_example_passwd(char *pwfile, char pwlocation, struct passwd *pw) {
 	fprintf(f, "# %smd5:%s\n", (pwlocation == SYSTEMPW ? "username:" : ""), generate_rand_pw(MINPWLEN_MD5));
 	fprintf(f, "# sys/baycom standard (not very secure) - length: >= %d and <= %d characters\n", MINPWLEN_SYS, PASSSIZE);
 	fprintf(f, "# %ssys:%s\n", (pwlocation == SYSTEMPW ? "username:" : ""), generate_rand_pw(MINPWLEN_SYS));
+	fprintf(f, "# unix standard (plaintext): no password is read here. Your password is looked\n");
+	fprintf(f, "#   up during login in the system password table /etc/passwd or /etc/shadow\n");
+	fprintf(f, "# unix\n");
 	fclose(f);
 }
 
@@ -333,9 +343,14 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 			} else {
 				p_buf = buf;
 			}
-			if (!(pass = strchr(p_buf, ':')))
-				continue;
-			*pass++ = 0;
+
+			if (!Strcasecmp(p_buf, "unix")) {
+				pass = p_buf;
+			} else {
+				if (!(pass = strchr(p_buf, ':')))
+					continue;
+				*pass++ = 0;
+			}
 
 			while (*pass && isspace(*pass & 0xff))
 				pass++;
@@ -347,8 +362,13 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 				*pwtype = PW_MD5;
 				goto found;
 			} else if ( (*pwtype & PW_SYS) && (!Strcasecmp(p_buf, "sys") || !strcmp(p_buf, "baycom")) ) {
+				fclose(f);
 				*pwtype = PW_SYS;
 				goto found;
+			} else if ( (*pwtype & PW_UNIX) &&  (!Strcasecmp(p_buf, "unix") ) ) {
+				fclose(f);
+				*pwtype = PW_UNIX;
+				return 0;
 			}
 		}
 	}
@@ -360,7 +380,7 @@ found:
 	len = strlen(pass);
 
 	if ((*pwtype == PW_SYS && len < MINPWLEN_SYS) || (*pwtype == PW_MD5 && len < MINPWLEN_MD5)) {
-		sprintf(buf, "Password in in password file too short\r");
+		sprintf(buf, "Password in password file too short\r");
 		write_ax25(buf, strlen(buf), 1);
 		goto end;
 	}

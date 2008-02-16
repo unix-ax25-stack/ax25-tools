@@ -11,6 +11,7 @@
 #define PW_CLEARTEXT     1
 #define PW_SYS           2
 #define PW_MD5           4
+#define PW_UNIX		 8
 
 void ask_pw_sys(char *prompt, char *pass_want, char *pw);
 void ask_pw_md5(char *prompt, char *pass_want, char *pw);
