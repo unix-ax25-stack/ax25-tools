@@ -1,5 +1,5 @@
 /*
- * $Id: dmascc_cfg.c,v 1.2 2001/05/10 10:44:45 csmall Exp $
+ * $Id: dmascc_cfg.c,v 1.3 2008/02/17 20:49:54 ralf Exp $
  *
  * Configuration utility for dmascc driver
  * Copyright (C) 1997,2000 Klaus Kudielka
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
   memset(&param, 0, sizeof(param));
   param.txpause = -1;
 
-  if strncmp(argv[1], "dmascc", 6) {
+  if (strncmp(argv[1], "dmascc", 6)) {
     fprintf(stderr, "invalid interface name.\n");
     return 5;
   }
