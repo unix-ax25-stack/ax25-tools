@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.15 2008/04/13 23:09:31 dl9sau Exp $
+ * $Id: axspawn.c,v 1.16 2008/04/13 23:39:52 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1352,7 +1352,7 @@ int main(int argc, char **argv)
 	char changeuser = 0;
 	char user_changed = 0;
 	char rootlogin = 0;
-	char dumb_embeded_system = 0;
+	char dumb_embedded_system = 0;
 	int pwtype = 0;
 	int pwtype_orig = 0;
 	char prompt[20];
@@ -1369,8 +1369,8 @@ int main(int argc, char **argv)
 			changeuser = 1;
 		if (!strcmp(argv[k], "-r") || !strcmp(argv[k], "--rootlogin"))
 			rootlogin = 1;
-		if (!strcmp(argv[k], "-e") || !strcmp(argv[k], "--embeded"))
-			dumb_embeded_system = 1;
+		if (!strcmp(argv[k], "-e") || !strcmp(argv[k], "--embedded"))
+			dumb_embedded_system = 1;
 		if ((!strcmp(argv[k], "-p") || !strcmp(argv[k], "--pwprompt")) && k < argc-1 ) {
 			strncpy(prompt, argv[k+1], sizeof(prompt));
 			prompt[sizeof(prompt)-1] = '\0';
@@ -1688,7 +1688,7 @@ again:
                 chargc = 0;
                 envc = 0;
 
-		if (dumb_embeded_system) {
+		if (dumb_embedded_system) {
 			int ret = -1;
 			char *p = 0;
 
@@ -1784,7 +1784,7 @@ again:
 			sprintf(envp[envc++], "LESS=-d -E -F");
 		envp[envc] = NULL;
 
-		if (dumb_embeded_system) {
+		if (dumb_embedded_system) {
 			if (setgid(pw->pw_gid) == -1)
 				exit(1);
 			if (setuid(pw->pw_uid) == -1)
