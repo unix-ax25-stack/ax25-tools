@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.14 2008/02/16 17:59:33 dl9sau Exp $
+ * $Id: axspawn.c,v 1.15 2008/04/13 23:09:31 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1335,9 +1335,9 @@ int main(int argc, char **argv)
 	char *p;
 	fd_set fds_read, fds_err;
 	struct passwd *pw;
-	int  chargc;
+	int  chargc = 0;
 	char *chargv[20];
-	int envc;
+	int envc = 0;
 	char *envp[20];
 	struct utmp ut_line;
 	struct winsize win = { 0, 0, 0, 0};
@@ -1352,6 +1352,7 @@ int main(int argc, char **argv)
 	char changeuser = 0;
 	char user_changed = 0;
 	char rootlogin = 0;
+	char dumb_embeded_system = 0;
 	int pwtype = 0;
 	int pwtype_orig = 0;
 	char prompt[20];
@@ -1368,6 +1369,8 @@ int main(int argc, char **argv)
 			changeuser = 1;
 		if (!strcmp(argv[k], "-r") || !strcmp(argv[k], "--rootlogin"))
 			rootlogin = 1;
+		if (!strcmp(argv[k], "-e") || !strcmp(argv[k], "--embeded"))
+			dumb_embeded_system = 1;
 		if ((!strcmp(argv[k], "-p") || !strcmp(argv[k], "--pwprompt")) && k < argc-1 ) {
 			strncpy(prompt, argv[k+1], sizeof(prompt));
 			prompt[sizeof(prompt)-1] = '\0';
@@ -1649,6 +1652,7 @@ again:
 	if (pid == 0)
 	{
 		struct termios termios;
+		char *shell = "/bin/sh";
 
         	memset((char *) &termios, 0, sizeof(termios));
         	
@@ -1679,38 +1683,92 @@ again:
                 pututline(&ut_line);
                 endutent();
 
+		setsid();
+
                 chargc = 0;
-                chargv[chargc++] = "/bin/login";
-                chargv[chargc++] = "-p";
-		/* there exist several conectps:
-		 * Historicaly, the special character '+' in the password
-		 * field indicated that users may login via ax25, netrom, rose,
-		 * etc.. - but not via other protocols like telnet.
-		 * This secures the digipeater from abuse by inet access of
-		 * non-hams.
-		 * On the other hand, this leads to the problem that telent
-		 * via HF, pop3, etc.. do not work.
-		 * The "pwcheck == 2 method means, that the password is used on
-		 * every login mechanism other than this axspawn program;
-		 * here we do not rely on the password - the ax25 call of
-		 * the ham is enough. We have already checked above, that
-		 * the call of the user is valid (and not root, httpd, etc..);
-		 * thus this method is safe here.
-		 * Another mechanism (pwcheck == 3) is to check if the gid
-		 * equals to user_gid preference. I prefer this way, because
-		 * this approach gives the chance to temporary lock a user
-		 * out (abuse, ..) by changing his gid in passwd to for e.g.
-		 * 65534 (nogroup).
-		 */
-                if (pwtype != PW_CLEARTEXT /* PW_SYS or PW_MD5 are already authenticated */ 
-			|| pwcheck == 2 || (pwcheck == 3 && (pw->pw_gid == user_gid || is_guest)) || !strcmp(pw->pw_passwd, "+"))
-	        	chargv[chargc++] = "-f";
-		chargv[chargc++] = "-h";
-		chargv[chargc++] = protocol;
-                chargv[chargc++] = as_user;
-                chargv[chargc]   = NULL;
-                
                 envc = 0;
+
+		if (dumb_embeded_system) {
+			int ret = -1;
+			char *p = 0;
+
+			chown(ptyslave, pw->pw_uid, 0);
+			chmod(ptyslave, 0622);
+
+			ret = -1;
+			if (pw->pw_dir && *(pw->pw_dir))
+				p = pw->pw_dir;
+		  		ret = chdir(p);
+			if (ret != 0) {
+				p = "/tmp";
+		  		chdir(p);
+			}
+
+                	if ((envp[envc] = (char *) malloc(strlen(p)+6)))
+                		sprintf(envp[envc++], "HOME=%s", p);
+                	if ((envp[envc] = (char *) malloc(strlen(pw->pw_name)+6)))
+                		sprintf(envp[envc++], "USER=%s", pw->pw_name);
+                	if ((envp[envc] = (char *) malloc(strlen(pw->pw_name)+9)))
+                		sprintf(envp[envc++], "LOGNAME=%s", pw->pw_name);
+
+			if (pw->pw_shell && *(pw->pw_shell)) {
+				shell = pw->pw_shell;
+			} else {
+				shell = "/bin/sh";
+			}
+			if ((p = strrchr(shell, '/'))) {
+				if (p[1]) {
+					if ((p = strdup(p)))
+						*p = '-';
+					
+				} else p = 0;
+			}
+			if (!p)
+				p = shell;
+                	chargv[chargc++] = p;
+               		if ((envp[envc] = (char *) malloc(strlen(shell)+7)))
+               			sprintf(envp[envc++], "SHELL=%s", shell);
+
+			if (pw->pw_uid == 0)
+				p = "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin";
+			else
+				p = "/bin:/usr/bin:/usr/local/bin";
+                	if ((envp[envc] = (char *) malloc(strlen(p)+6)))
+                		sprintf(envp[envc++], "PATH=%s", p);
+
+		} else {
+
+                	chargv[chargc++] = "/bin/login";
+                	chargv[chargc++] = "-p";
+			/* there exist several conectps:
+		 	* Historicaly, the special character '+' in the password
+		 	* field indicated that users may login via ax25, netrom, rose,
+		 	* etc.. - but not via other protocols like telnet.
+		 	* This secures the digipeater from abuse by inet access of
+		 	* non-hams.
+		 	* On the other hand, this leads to the problem that telent
+		 	* via HF, pop3, etc.. do not work.
+		 	* The "pwcheck == 2 method means, that the password is used on
+		 	* every login mechanism other than this axspawn program;
+		 	* here we do not rely on the password - the ax25 call of
+		 	* the ham is enough. We have already checked above, that
+		 	* the call of the user is valid (and not root, httpd, etc..);
+		 	* thus this method is safe here.
+		 	* Another mechanism (pwcheck == 3) is to check if the gid
+		 	* equals to user_gid preference. I prefer this way, because
+		 	* this approach gives the chance to temporary lock a user
+		 	* out (abuse, ..) by changing his gid in passwd to for e.g.
+		 	* 65534 (nogroup).
+		 	*/
+                	if (pwtype != PW_CLEARTEXT /* PW_SYS or PW_MD5 are already authenticated */ 
+				|| pwcheck == 2 || (pwcheck == 3 && (pw->pw_gid == user_gid || is_guest)) || !strcmp(pw->pw_passwd, "+"))
+	        		chargv[chargc++] = "-f";
+			chargv[chargc++] = "-h";
+			chargv[chargc++] = protocol;
+                	chargv[chargc++] = as_user;
+		}
+               	chargv[chargc]   = NULL;
+
                 if ((envp[envc] = (char *) malloc(30)))
                 	sprintf(envp[envc++], "AXCALL=%s", call);
                 if ((envp[envc] = (char *) malloc(30)))
@@ -1726,7 +1784,19 @@ again:
 			sprintf(envp[envc++], "LESS=-d -E -F");
 		envp[envc] = NULL;
 
+		if (dumb_embeded_system) {
+			if (setgid(pw->pw_gid) == -1)
+				exit(1);
+			if (setuid(pw->pw_uid) == -1)
+				exit(1);
+                	execve(shell, chargv, envp);
+			/* point of no return */
+			exit(1);
+		}
+
                 execve(chargv[0], chargv, envp);
+		/* point of no return */
+		exit(1);
         }
         else if (pid > 0)
         {
