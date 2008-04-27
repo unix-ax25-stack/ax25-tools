@@ -4,7 +4,7 @@
  *    yaminit.c  -- YAM radio modem driver setup utility.
  *
  *  Copyright (C) 1998  Jean-Paul ROUBELAT (jpr@f6fbb.org)
- *  Adapted from sethdlc.c written by Thomas Sailer (sailer@ife.ee.ethz.ch)
+ *  Adapted from sethdlc.c written by Thomas Sailer (t.sailer@alumni.ethz.ch)
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

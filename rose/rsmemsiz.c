@@ -124,7 +124,7 @@ unsigned** meminfo(void) {
 
 
 /*
- * by Heikki Hannikainen <hessu@pspt.fi> 
+ * by Heikki Hannikainen <oh7lzb@sral.fi> 
  * The following was mostly learnt from the procps package and the
  * gnu sh-utils (mainly uname).
  */

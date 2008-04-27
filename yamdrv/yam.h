@@ -4,7 +4,7 @@
  *	yam.h  -- YAM radio modem driver.
  *
  *	Copyright (C) 1998 Frederic Rible F1OAT (frible@teaser.fr)
- *	Adapted from baycom.c driver written by Thomas Sailer (sailer@ife.ee.ethz.ch)
+ *	Adapted from baycom.c driver written by Thomas Sailer (t.sailer@alumni.ethz.ch)
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by

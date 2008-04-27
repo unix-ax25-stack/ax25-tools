@@ -18,9 +18,9 @@
  *            have any spaces in it. There can be up to MAXCALLS call-
  *            signs in the callsign field (see below).
  *
- * Copyright (C) 1996 by Tomi Manninen, OH2BNS, <tomi.manninen@hut.fi>.
+ * Copyright (C) 1996 by Tomi Manninen, OH2BNS, <oh2bns@sral.fi>.
  *
- * *** Modified 9/9/96 by Heikki Hannikainen, OH7LZB, <hessu@pspt.fi>:
+ * *** Modified 9/9/96 by Heikki Hannikainen, OH7LZB, <oh7lzb@sral.fi>:
  *
  *            One port can actually be echoed to multiple ports (with a
  *            different recipient callsign, of course). The old behaviour was

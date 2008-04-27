@@ -3,7 +3,7 @@
 /*
  *	hdrvcomm.h  -- HDLC driver communications.
  *
- *	Copyright (C) 1996  Thomas Sailer (sailer@ife.ee.ethz.ch)
+ *	Copyright (C) 1996  Thomas Sailer (t.sailer@alumni.ethz.ch)
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by

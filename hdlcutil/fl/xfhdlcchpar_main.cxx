@@ -3,7 +3,7 @@
 /*
  *	xfhdlcchpar_main.C  -- kernel hdlc radio modem driver channel parameter setting utility.
  *
- *	Copyright (C) 1996,1997,2000  Thomas Sailer (sailer@ife.ee.ethz.ch)
+ *	Copyright (C) 1996,1997,2000  Thomas Sailer (t.sailer@alumni.ethz.ch)
  *
  *	This program is free software; you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by

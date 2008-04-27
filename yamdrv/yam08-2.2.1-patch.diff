@@ -72,7 +72,7 @@ diff -u --recursive --new-file linux.prev/include/linux/yam.h linux/include/linu
 + *	yam.h  -- YAM radio modem driver.
 + *
 + *	Copyright (C) 1998 Frederic Rible F1OAT (frible@teaser.fr)
-+ *	Adapted from baycom.c driver written by Thomas Sailer (sailer@ife.ee.ethz.ch)
++ *	Adapted from baycom.c driver written by Thomas Sailer (t.sailer@alumni.ethz.ch)
 + *
 + *	This program is free software; you can redistribute it and/or modify
 + *	it under the terms of the GNU General Public License as published by
@@ -852,7 +852,7 @@ diff -u --recursive --new-file linux.prev/drivers/net/hamradio/yam.c linux/drive
 + *	yam.c  -- YAM radio modem driver.
 + *
 + *	Copyright (C) 1998 Frederic Rible F1OAT (frible@teaser.fr)
-+ *	Adapted from baycom.c driver written by Thomas Sailer (sailer@ife.ee.ethz.ch)
++ *	Adapted from baycom.c driver written by Thomas Sailer (t.sailer@alumni.ethz.ch)
 + *
 + *	This program is free software; you can redistribute it and/or modify
 + *	it under the terms of the GNU General Public License as published by

@@ -3,7 +3,7 @@
 /*
  *      usersmdiag.h  --  Diagnostics interface.
  *
- *      Copyright (C) 1996  Thomas Sailer (sailer@ife.ee.ethz.ch)
+ *      Copyright (C) 1996  Thomas Sailer (t.sailer@alumni.ethz.ch)
  *        Swiss Federal Institute of Technology (ETH), Electronics Lab
  *
  *      This program is free software; you can redistribute it and/or modify
