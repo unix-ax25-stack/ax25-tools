@@ -1,4 +1,5 @@
 #include <stdio.h>
+#define __USE_XOPEN
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -48,6 +49,7 @@ static char *kttyname	= NULL;
 static char *portname	= NULL;
 static char *inetaddr	= NULL;
 static int allow_broadcast = 0;
+static int i_am_unix98_pty_master = 0; /* unix98 ptmx support */
 
 static char *kiss_basename(char *s)
 {
@@ -62,7 +64,8 @@ static void terminate(int sig)
 		closelog();
 	}
 
-	tty_unlock(kttyname);
+	if (!i_am_unix98_pty_master)
+		tty_unlock(kttyname);
 
 	exit(0);
 }
@@ -228,6 +231,8 @@ int main(int argc, char *argv[])
 	int  disc = N_AX25;
 	char dev[64];
 	int  v = 4;
+	char *namepts = NULL;  /* name of the unix98 pts slave, which
+	                        * the client has to use */
 	struct hostent *hp = NULL;
 
 	progname = kiss_basename(argv[0]);
@@ -281,9 +286,14 @@ int main(int argc, char *argv[])
 	if (argc-1 >= optind && !inetaddr)
 		inetaddr = argv[optind];
 
-	if (tty_is_locked(kttyname)) {
-		fprintf(stderr, "%s: device %s already in use\n", progname, kttyname);
-		return 1;
+	if (!strcmp("/dev/ptmx", kttyname))
+		i_am_unix98_pty_master = 1;
+
+	if (!i_am_unix98_pty_master) {
+		if (tty_is_locked(kttyname)) {
+			fprintf(stderr, "%s: device %s already in use\n", progname, kttyname);
+			return 1;
+		}
 	}
 
 	if (!readconfig(portname))
@@ -302,6 +312,19 @@ int main(int argc, char *argv[])
 			perror("open");
 		}
 		return 1;
+	}
+
+	if (i_am_unix98_pty_master) {
+		/* get name of pts-device */
+		if ((namepts = ptsname(fd)) == NULL) {
+			fprintf(stderr, "%s: Cannot get name of pts-device.\n", progname);
+			return 1;
+		}
+		/* unlock pts-device */
+		if (unlockpt(fd) == -1) {
+			fprintf(stderr, "%s: Cannot unlock pts-device %s\n", progname, namepts);
+			return 1;
+		}
 	}
 
 	if (speed != 0 && !tty_speed(fd, speed))
@@ -337,10 +360,14 @@ int main(int argc, char *argv[])
 		return 1;		
 
 	printf("AX.25 port %s bound to device %s\n", portname, dev);
-
+	if (i_am_unix98_pty_master) {
+		/* Users await the slave pty to be referenced in the 3d line */
+		printf("Awaiting client connects on\n%s\n", namepts);
+	}
 	if (logging) {
 		openlog(progname, LOG_PID, LOG_DAEMON);
-		syslog(LOG_INFO, "AX.25 port %s bound to device %s\n", portname, dev);
+		syslog(LOG_INFO, "AX.25 port %s bound to device %s%s%s\n", portname, dev, (i_am_unix98_pty_master ? " with slave pty " : ""), (i_am_unix98_pty_master ? namepts : ""));
+
 	}
 
 	signal(SIGHUP, SIG_IGN);
@@ -353,9 +380,10 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "%s: cannot become a daemon\n", progname);
 		return 1;
 	}
-
-	if (!tty_lock(kttyname))
-		return 1;
+	if (!i_am_unix98_pty_master) {
+		if (!tty_lock(kttyname))
+			return 1;
+	}
 
 	while (1)
 		sleep(10000);

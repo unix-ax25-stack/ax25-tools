@@ -20,13 +20,19 @@ command line.
 .LP
 The tty argument will typically be that of a serial port with a KISS or 6PACK
 TNC attached, although it could be a pseudo tty or a KISS port emulator such as
-an SCC card. The port arguments is the name of a port as given in the
+an SCC card. Kissattach supports BSD-style pseudo-terminals as well as
+the Unix98 pty's. If the tty argument is "/dev/ptmx", then Unix98 behaviour
+will automaticaly take effekt. With Unix98 pty's, the slave tty name
+could not be forseen. That's why kissattach will print the corresponding slave
+pty name as a separate line on stdout.
+.LP
+The port argument is the name of a port as given in the
 axports(5) file.
 .LP
-The inetaddr argument is the IP address of the new interface. Some time it
-was mandatory argument (although due to historical reasons this restriction is
-lifted if the old -i option is used). But there's really not a need for
-the interface to have an IP address assigned to.
+The optional inetaddr argument is the IP address of the new interface. Some
+time it was mandatory argument (although due to historical reasons this
+restriction is lifted if the old -i option is used). But there's really not
+a need for the interface to have an IP address assigned to.
 .SH OPTIONS
 .TP 16
 .BI "\-6"
