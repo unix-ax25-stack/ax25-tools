@@ -385,6 +385,10 @@ int main(int argc, char *argv[])
 			return 1;
 	}
 
+	close(0);
+	close(1);
+	close(2);
+
 	while (1)
 		sleep(10000);
 
