@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.16 2008/04/13 23:39:52 dl9sau Exp $
+ * $Id: axspawn.c,v 1.17 2008/10/10 16:24:00 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -982,9 +982,11 @@ int get_assoc(struct sockaddr_ax25 *sax25)
 			if (sax25->sax25_uid == uid)
 			{
 				ax25_aton_entry(buf, (char *) &sax25->sax25_call);
+				fclose(fp);
 				return 0;
 			}
 	}
+	fclose(fp);
 	
 	return -1;
 }
