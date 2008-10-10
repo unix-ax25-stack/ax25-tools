@@ -385,6 +385,8 @@ int main(int argc, char *argv[])
 			return 1;
 	}
 
+	fflush(stdout);
+	fflush(stderr);
 	close(0);
 	close(1);
 	close(2);
