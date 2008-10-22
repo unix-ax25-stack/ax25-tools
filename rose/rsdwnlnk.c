@@ -247,7 +247,7 @@ int main(int argc, char **argv)
 		select(s + 1, &read_fd, NULL, NULL, NULL);
 
 		if (FD_ISSET(s, &read_fd)) {
-			if ((n = read(s, buffer + 2, 512)) == -1)
+			if ((n = read(s, buffer + 2, sizeof(buffer)-2)) == -1)
 				break;
 			if (buffer[2] == 0xF0) {
 				buffer[2] = 0;

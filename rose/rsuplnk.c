@@ -275,7 +275,7 @@ int main(int argc, char **argv)
 		}
 
 		if (FD_ISSET(STDIN_FILENO, &read_fd)) {
-			if ((n = read(STDIN_FILENO, buffer + 2, 512)) == -1) {
+			if ((n = read(STDIN_FILENO, buffer + 2, sizeof(buffer)-2)) == -1) {
 				close(s);
 				break;
 			}
