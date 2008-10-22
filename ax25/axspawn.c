@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.17 2008/10/10 16:24:00 dl9sau Exp $
+ * $Id: axspawn.c,v 1.18 2008/10/22 22:25:04 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -999,7 +999,7 @@ void cleanup(char *tty)
 
 	setutent();
 	ut.ut_type = LOGIN_PROCESS;
-	strncpy(ut.ut_id, tty + 3, sizeof(ut.ut_line));
+	strncpy(ut.ut_id, tty + 3, sizeof(ut.ut_id));
 	ut_line = getutid(&ut);
 
 	if (ut_line != NULL) {
