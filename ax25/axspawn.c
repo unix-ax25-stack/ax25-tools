@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.18 2008/10/22 22:25:04 dl9sau Exp $
+ * $Id: axspawn.c,v 1.19 2008/11/08 19:07:19 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -201,7 +201,15 @@
 #define MSG_NOCALL	"Sorry, you are not allowed to connect.\n"
 #define MSG_CANNOTFORK	"Sorry, system is overloaded.\n"
 #define MSG_NOPTY	"Sorry, all channels in use.\n"
-#define MSG_NOTINDBF	"Sorry, you are not in my database\n"
+#define MSG_NOTINDBF	"Sorry, you are not in my database.\n"
+
+#define write_ax25_static_line(s) { \
+  char *msg = strdup(s); \
+  if (msg) { \
+    write_ax25(msg, strlen(msg), 1); \
+    free(msg); \
+  } \
+}
 
 #define EXITDELAY	10
 
@@ -1481,7 +1489,7 @@ int main(int argc, char **argv)
 		
 	if ( invalid || (k < MINLEN) || (digits > 2) || (digits < 1) )
 	{
-		write_ax25(MSG_NOCALL, sizeof(MSG_NOCALL), 1);
+		write_ax25_static_line(MSG_NOCALL);
 		syslog(LOG_NOTICE, "%s is not an Amateur Radio callsign\n", call);
 		sleep(EXITDELAY);
 		return 1;
@@ -1549,7 +1557,7 @@ int main(int argc, char **argv)
 		}
 	}
 	if (!pw) {
-		write_ax25(MSG_NOTINDBF, sizeof(MSG_NOTINDBF), 1);
+		write_ax25_static_line(MSG_NOTINDBF);
 		syslog(LOG_NOTICE, "%s (callsign: %s) not found in /etc/passwd\n", as_user, call);
 		sleep(EXITDELAY);
 		return 1;
@@ -1557,7 +1565,7 @@ int main(int argc, char **argv)
 	
 	if (!rootlogin && (pw->pw_uid == 0 || pw->pw_gid == 0))
 	{
-		write_ax25(MSG_NOCALL, sizeof(MSG_NOCALL), 1);
+		write_ax25_static_line(MSG_NOCALL);
 		syslog(LOG_NOTICE, "root login of %s (callsign: %s) denied\n", as_user, call);
 		sleep(EXITDELAY);
 		return 1;
@@ -1897,7 +1905,7 @@ again:
         } 
         else
         {
-        	write_ax25(MSG_CANNOTFORK, sizeof(MSG_CANNOTFORK), 1);
+		write_ax25_static_line(MSG_CANNOTFORK);
         	syslog(LOG_ERR, "cannot fork %m, closing connection to %s\n", call);
         	sleep(EXITDELAY);
         	return 1;
