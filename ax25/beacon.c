@@ -1,10 +1,10 @@
+#include <config.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>
 #include <signal.h>
-
-#include <config.h>
+#include <string.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 	struct full_sockaddr_ax25 dest;
 	struct full_sockaddr_ax25 src;
 	int s, n, dlen, len, interval = 30;
-	char addr[20], *port, *message, *portcall;
+	char *addr, *port, *message, *portcall;
 	char *srccall = NULL, *destcall = NULL;
 	
 	while ((n = getopt(argc, argv, "c:d:lmst:v")) != -1) {
@@ -100,27 +100,36 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	addr = NULL;
 	if (mail)
-		strcpy(addr, "MAIL");
+		addr = strdup("MAIL");
 	else if (destcall != NULL)
-		strcpy(addr, destcall);
+		addr = strdup(destcall);
 	else
-		strcpy(addr, "IDENT");
+		addr = strdup("IDENT");
+	if (addr == NULL)
+	  return 1;
 
 	if ((dlen = ax25_aton(addr, &dest)) == -1) {
 		fprintf(stderr, "beacon: unable to convert callsign '%s'\n", addr);
 		return 1;
 	}
+	if (addr != NULL) free(addr); addr = NULL;
 
-	if (srccall != NULL && strcmp(srccall, portcall) != 0)
+	if (srccall != NULL && strcmp(srccall, portcall) != 0) {
+		if ((addr = (char *) malloc(strlen(srccall) + 1 + strlen(portcall) + 1)) == NULL)
+			return 1;
 		sprintf(addr, "%s %s", srccall, portcall);
-	else
-		strcpy(addr, portcall);
+	} else {
+		if ((addr = strdup(portcall)) == NULL)
+			return 1;
+	}
 
 	if ((len = ax25_aton(addr, &src)) == -1) {
 		fprintf(stderr, "beacon: unable to convert callsign '%s'\n", addr);
 		return 1;
 	}
+	if (addr != NULL) free(addr); addr = NULL;
 
 	if (!single) {
 		if (!daemon_start(FALSE)) {
