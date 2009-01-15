@@ -30,11 +30,13 @@
 
 /*****************************************************************************/
 
+#include <stdio.h>
+#define __USE_XOPEN
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#include <stdio.h>
 #include <errno.h>
+#include <syslog.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -46,6 +48,7 @@
 #include <grp.h>
 #include <string.h>
 #include <termios.h>
+#include <limits.h>
 
 #include <sys/socket.h>
 #include <net/if.h>
@@ -63,12 +66,17 @@ static int fdif, fdpty;
 static struct ifreq ifr;
 static char *progname;
 static int verbose = 0;
+static int i_am_unix98_pty_master = 0; /* unix98 ptmx support */
+static char *namepts = NULL;  /* name of the unix98 pts slave, which
+	                       * the client has to use */
 
 /* --------------------------------------------------------------------- */
 
 static void die(char *func) 
 {
 	fprintf(stderr, "%s: %s (%i)%s%s\n", progname, strerror(errno),
+		errno, func ? " in " : "", func ? func : "");
+	syslog(LOG_WARNING, "%s (%i)%s%s\n", strerror(errno),
 		errno, func ? " in " : "", func ? func : "");
 	exit(-1);
 }
@@ -234,7 +242,9 @@ static void display_packet(unsigned char *bp, unsigned int len)
 static int openpty(int *amaster, int *aslave, char *name, 
 		   struct termios *termp, struct winsize *winp)
 {
-	char line[] = "/dev/ptyXX";
+	char line[PATH_MAX];
+
+	strcpy(line, "/dev/ptyXX");
         const char *cp1, *cp2;
 	int master, slave;
 	struct group *gr = getgrnam("tty");
@@ -400,7 +410,7 @@ static int doio(int fdif, int fdpty, char *ifaddr)
 	int i;
 	fd_set rmask, wmask;
 	struct sockaddr from;
-	int from_len;
+	socklen_t from_len;
 	
 #define ADD_CHAR(c) \
 	obuf[ob_wpx] = c; \
@@ -528,7 +538,7 @@ int main(int argc, char *argv[])
 	struct sockaddr sa;
 	char *name_iface = "bc0";
 	char *name_pname = NULL;
-	char slavename[32];
+	char slavename[PATH_MAX];
 	char *master_name;
 	struct termios termios;
 	int c;
@@ -573,6 +583,7 @@ int main(int argc, char *argv[])
 			"[-z] [-v] ptyname\n", progname);
 		exit(1);
 	}
+	openlog(progname, LOG_PID, LOG_DAEMON);
 	if (symlnk) {
 		int fdtty;
 
@@ -587,6 +598,8 @@ int main(int argc, char *argv[])
 			unlink(name_pname);
 		if (symlink(slavename, name_pname))
 			perror("symlink");
+		/* Users await the slave pty to be referenced in the 2nd line */
+		printf("Awaiting client connects on\n%s\n", slavename);
 		slavename[5] = 'p';
 		master_name = slavename;
 	} else {
@@ -596,21 +609,45 @@ int main(int argc, char *argv[])
 				name_pname);
 			exit(1);
 		}
+		if (!strcmp("/dev/ptmx", name_pname))
+			i_am_unix98_pty_master = 1;
 		master_name = name_pname;
 	}
 	if ((fdif = socket(PF_INET, SOCK_PACKET, proto)) < 0) 
 		die("socket");
-	strcpy(sa.sa_data, name_iface);
+	memset(&sa, 0, sizeof(struct sockaddr));
+	memcpy(sa.sa_data, name_iface, sizeof(sa.sa_data));
 	sa.sa_family = AF_INET;
 	if (bind(fdif, &sa, sizeof(struct sockaddr)) < 0)
 		die("bind"); 
-	strcpy(ifr.ifr_name, name_iface);
+	memcpy(ifr.ifr_name, name_iface, IFNAMSIZ);
 	if (ioctl(fdif, SIOCGIFFLAGS, &ifr) < 0)
 		die("ioctl SIOCGIFFLAGS");
        	ifr_new = ifr;	
 	ifr_new.ifr_flags |= if_newflags;
 	if (ioctl(fdif, SIOCSIFFLAGS, &ifr_new) < 0)
 		die("ioctl SIOCSIFFLAGS");
+	if (i_am_unix98_pty_master) {
+		/* get name of pts-device */
+		if ((namepts = ptsname(fdpty)) == NULL) {
+			fprintf(stderr, "%s: Cannot get name of pts-device.\n", progname);
+			exit (1);
+		}
+		/* unlock pts-device */
+		if (unlockpt(fdpty) == -1) {
+			fprintf(stderr, "%s: Cannot unlock pts-device %s\n", progname, namepts);
+			exit (1);
+		}
+		/* Users await the slave pty to be referenced in the 2nd line */
+		printf("Awaiting client connects on\n%s\n", namepts);
+		if (!verbose){
+			fflush(stdout);
+			fflush(stderr);
+			close(0);
+			close(1);
+			close(2);
+		}
+	}
 	signal(SIGHUP, restore_ifflags);
 	signal(SIGINT, restore_ifflags);
 	signal(SIGTERM, restore_ifflags);
@@ -630,17 +667,24 @@ int main(int argc, char *argv[])
 			die("tsgetattr");
 		if (doio(fdif, fdpty, name_iface))
 			break;
-		/*
-		 * try to reopen master
-		 */
-		if (verbose)
-			printf("reopening master tty: %s\n", master_name);
-		close(fdpty);
-		if ((fdpty = open(master_name, 
-				  O_RDWR | O_NOCTTY | O_NONBLOCK)) < 0) {
-			fprintf(stderr, "%s: cannot reopen \"%s\"\n", progname,
-				master_name);
-			exit(1);
+		if (i_am_unix98_pty_master) {
+			if (verbose)
+				printf("%s: Trying to poll port ptmx (slave %s).\nWaiting 30s...\n", progname, namepts);
+			syslog(LOG_WARNING, "Trying to poll port ptmx (slave %s). Waiting 30s...\n", namepts);
+			sleep(30);
+		} else {
+			/*
+			 * try to reopen master
+		 	 */
+			if (verbose)
+				printf("reopening master tty: %s\n", master_name);
+			close(fdpty);
+
+			if ((fdpty = open(master_name, O_RDWR | O_NOCTTY | O_NONBLOCK)) < 0) {
+				fprintf(stderr, "%s: cannot reopen \"%s\"\n", progname,
+					master_name);
+				exit(1);
+			}
 		}
 	}
 

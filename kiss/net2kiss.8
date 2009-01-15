@@ -11,7 +11,7 @@ into a KISS data stream via a pseudo-tty.
 .SH PARAMETERS
 .TP
 .B ptyname
-specifies the path to the pseudo-tty.
+specifies the path to the pseudo-tty. If you use the special name "/dev/ptmx", then a Unix98-PTY pair is used; the pty name is written to stdout.
 .SH OPTIONS
 .TP
 .B "\-i ifname"
@@ -24,7 +24,7 @@ master side and create a symlink named by -p to the slave side.
 .TP
 .B \-f
 can be used in conjunction with -s to force the creation of the symlink
-even if the target file does already exist.
+even if the target file does already exist. *DANGEROUS*
 .TP
 .B \-v
 Verbose output. Displays error messages during operation and decoded
