@@ -2,7 +2,7 @@
 .SH NAME
 mkiss \- Attach a multi KISS interface
 .SH SYNOPSIS
-.B mkiss [-c] [-f] [-h] [-l] [-s speed] [-p pollrate] [-v] ttyinterface pty...
+.B mkiss [-c] [-f] [-h] [-l] [-s speed] [-p pollrate] [-v] ttyinterface [ -x <n> | pty ..]
 .SH DESCRIPTION
 .LP
 .B Mkiss
@@ -57,6 +57,9 @@ Set the speed of the serial port.
 Enables polling. Polled mode is used by G8BPQ KISS roms to prevent
 contention on systems where multiple TNCs share the same serial line.
 Pollrate is interval between polls (in 100ms units).
+.TP 10
+.BI "\-x number"
+This option is for Unix98 PTYs. It allocates "number" ptys; their names are written to stdout.
 .TP 10
 .BI \-v
 Display the version.

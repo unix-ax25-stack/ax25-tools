@@ -6,18 +6,21 @@
  * Fake out AX.25 code into supporting 6pack TNC rings by routing serial
  * port data to/from pseudo ttys.
  *
- * @(#)m6pack.c  $Revision: 1.1 $  $Date: 2005/12/10 16:17:28 $
+ * @(#)m6pack.c  $Revision: 1.2 $  $Date: 2009/01/20 16:18:02 $
  *
  * Author(s):
  *
- *	Iñaki Arenaza (EB2EBU) <iarenaza@escomposlinux.org>
+ *	IÃ±aki Arenaza (EB2EBU) <iarenaza@escomposlinux.org>
  *
  * History:
  *
  * $Log: m6pack.c,v $
+ * Revision 1.2  2009/01/20 16:18:02  dl9sau
+ * 	Unix98 PTY support for mkiss and m6pack.
+ *
  * Revision 1.1  2005/12/10 16:17:28  dl9sau
  *         support for 6pack tnc rings (patch found at sf.net)
- * 	from IÃ±aki Arenaza EB2EBU <iarenaza@escomposlinux.org>
+ * 	from Iñaki Arenaza EB2EBU <iarenaza@escomposlinux.org>
  *
  * Revision 0.9  2002/04/28 15:05:39  hermes-team
  * Minor fixes to make it part of ax25-tools-0.0.8
@@ -53,7 +56,7 @@
  *		Jonathan Naylor
  *		Tomi Manninen
  *
- * Copyright (C) 1999 Iñaki Arenaza
+ * Copyright (C) 1999 IÃ±aki Arenaza
  * mkiss.c was GPLed, so I guess this one is GPLed too ;-)
  *
  *********************************************************************
@@ -68,6 +71,8 @@
  */
 
 #include <stdio.h>
+#define __USE_XOPEN
+#include <string.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <time.h>
@@ -79,13 +84,14 @@
 #include <signal.h>
 #include <ctype.h>
 #include <syslog.h>
+#include <limits.h>
 
 #include <netax25/ttyutils.h>
 #include <netax25/daemon.h>
 
 #include <config.h>
 
-static char *version ="$Id: m6pack.c,v 1.1 2005/12/10 16:17:28 dl9sau Exp $";
+static char *version ="$Id: m6pack.c,v 1.2 2009/01/20 16:18:02 dl9sau Exp $";
 
 typedef unsigned char __u8;
 typedef enum {data, command} frame_t;
@@ -102,8 +108,7 @@ static __u8 obuf[SIZE];	/* buffer for sixpack_tx() */
 
 static int invalid_ports = 0;
 
-static char *usage_string = "usage: m6pack [-l] [-s speed] [-v] "
-			    "ttyinterface pty ...\n";
+static char *usage_string = "usage: m6pack [-l] [-s speed] [-v] tyinterface [-x <num_ptmx_devices> | pty ..]\n";
 
 static int dump_report = FALSE;
 static int logging = FALSE;
@@ -128,6 +133,8 @@ struct iface
 	unsigned int	txpackets;	/* TX frames count		*/
 	unsigned long	rxbytes;	/* RX bytes count		*/
 	unsigned long	txbytes;	/* TX bytes count		*/
+	char		namepts[PATH_MAX];  /* name of the unix98 pts slaves, which
+				       * the client has to use */
 };
 
 #define PTY_ID_TTY (-1)
@@ -395,13 +402,11 @@ static void sigterm_handler(int sig)
 	}
 	
 	tty_unlock(tty->name);
-	for (i=0; i < numptys; i++) {
-		tty_unlock(pty[i]->name);
-	}
-	
 	close(tty->fd);
 	free(tty);
+	
 	for (i = 0; i < numptys; i++) {
+		tty_unlock(pty[i]->name);
 		close(pty[i]->fd);
 		free(pty[i]);
 	}
@@ -452,16 +457,26 @@ int main(int argc, char *argv[])
 	fd_set readfd;
 	int retval, i, size, len;
 	int speed	= -1;
+	int ptmxdevices = 0;
+	char *npts;
+	int wrote_info = 0;
 	frame_t type;
 
 	head = tail = 0;
-	while ((size = getopt(argc, argv, "ls:v")) != -1) {
+	while ((size = getopt(argc, argv, "ls:vx:")) != -1) {
 		switch (size) {
 		case 'l':
 			logging = TRUE;
 			break;
 		case 's':
 			speed = atoi(optarg);
+			break;
+		case 'x':
+			ptmxdevices = atoi(optarg);
+			if (ptmxdevices < 1 || ptmxdevices > MAX_PTYS) {
+				fprintf(stderr, "m6pack: too %s devices\n", ptmxdevices < 1 ? "few" : "many");
+				return 1;
+			}
 			break;
 		case 'v':
 			printf("m6pack: %s\n", VERSION);
@@ -473,11 +488,19 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if ((argc - optind) < 2) {
+	if ((argc - optind) < 2 && ptmxdevices == 0) {
 		fprintf(stderr, usage_string);
 		return 1;
 	}
-	if ((numptys = argc - optind - 1) > MAX_PTYS) {
+
+	if ((argc - optind) < 1 && ptmxdevices > 0) {
+		fprintf(stderr, usage_string);
+		return 1;
+	}
+
+        numptys = argc - optind - 1;
+
+	if (numptys + ptmxdevices > MAX_PTYS) {
 		fprintf(stderr, "m6pack: max %d pty interfaces allowed.\n",
 			MAX_PTYS);
 		return 1;
@@ -487,14 +510,14 @@ int main(int argc, char *argv[])
 	 * Check for lock files before opening any TTYs
 	 */
 	if (tty_is_locked(argv[optind])) {
-		fprintf(stderr, "m6pack: tty %s is locked by another "
-			"process\n", argv[optind]);
+		fprintf(stderr, "m6pack: tty %s is locked by another process\n", argv[optind]);
 		return 1;
 	}
 	for (i = 0; i < numptys; i++) {
+		if (!strcmp("/dev/ptmx", argv[optind + i + 1]))
+			continue;
 		if (tty_is_locked(argv[optind + i + 1])) {
-			fprintf(stderr, "m6pack: tty %s is locked by "
-				"another process\n", argv[optind + i + 1]);
+			fprintf(stderr, "m6pack: pty %s is locked by another process\n", argv[optind + i + 1]);
 			return 1;
 		}
 	}
@@ -520,6 +543,8 @@ int main(int argc, char *argv[])
 	tty->pty_id = PTY_ID_TTY;
 	tty->optr = tty->databuf;
 	topfd = tty->fd;
+	tty->namepts[0] = '\0';
+
 	/*
 	 * Make it block again...
 	 */
@@ -528,28 +553,73 @@ int main(int argc, char *argv[])
 	/*
 	 * Open and configure the pty interfaces
 	 */
-	for (i = 0; i < numptys; i++) {
+	for (i = 0; i < numptys+ptmxdevices; i++) {
+		static char name_ptmx[] = "/dev/ptmx";
+		char *pty_name = (i < numptys ? argv[optind+i+1] : name_ptmx);
+
 		if ((pty[i] = calloc(1, sizeof(struct iface))) == NULL) {
 			perror("m6pack: malloc");
 			return 1;
 		}
-		if ((pty[i]->fd = open(argv[optind + i + 1], O_RDWR)) == -1) {
+		if ((pty[i]->fd = open(pty_name, O_RDWR)) == -1) {
 			perror("m6pack: open");
 			return 1;
 		}
-		pty[i]->name = argv[optind + i + 1];
+		pty[i]->name = pty_name;
 		tty_raw(pty[i]->fd, FALSE);
 		pty[i]->pty_id = i;
 		pty[i]->optr = pty[i]->databuf;
 		topfd = (pty[i]->fd > topfd) ? pty[i]->fd : topfd;
+		pty[i]->namepts[0] = '\0';
+		if (!strcmp(pty[i]->name, "/dev/ptmx")) {
+			/* get name of pts-device */
+			if ((npts = ptsname(pty[i]->fd)) == NULL) {
+				fprintf(stderr, "m6pack: Cannot get name of pts-device.\n");
+				return 1;
+			}
+			strncpy(pty[i]->namepts, npts, PATH_MAX-1);
+			pty[i]->namepts[PATH_MAX-1] = '\0';
+
+			/* unlock pts-device */
+			if (unlockpt(pty[i]->fd) == -1) {
+				fprintf(stderr, "m6pack: Cannot unlock pts-device %s\n", pty[i]->namepts);
+				return 1;
+			}
+			if (wrote_info == 0)
+				printf("\nAwaiting client connects on:\n");
+			else
+				printf(" ");
+			printf("%s", pty[i]->namepts);
+			wrote_info = 1;
+		}
 	}
+
+	if (wrote_info > 0)
+		printf("\n");
+
+	numptys=numptys+ptmxdevices;
 
 	/*
 	 * Now all the ports are open, lock them.
 	 */
-	tty_lock(argv[optind]);
-	for (i = 0; i < numptys; i++)
-		tty_lock(argv[optind + i + 1]);
+	tty_lock(tty->name);
+	for (i = 0; i < numptys; i++) {
+		if (pty[i]->namepts[0] == '\0')
+			tty_lock(pty[i]->name);
+	}
+
+	if (logging) {
+		openlog("m6pack", LOG_PID, LOG_DAEMON);
+		syslog(LOG_INFO, "starting");
+	}
+
+	if (wrote_info > 0) {
+		fflush(stdout);
+		fflush(stderr);
+		close(0);
+		close(1);
+		close(2);
+	}
 
 	signal(SIGHUP, SIG_IGN);
 	signal(SIGUSR1, sigusr1_handler);
@@ -558,11 +628,6 @@ int main(int argc, char *argv[])
 	if (!daemon_start(FALSE)) {
 		fprintf(stderr, "m6pack: cannot become a daemon\n");
 		return 1;
-	}
-
-	if (logging) {
-		openlog("m6pack", LOG_PID, LOG_DAEMON);
-		syslog(LOG_INFO, "starting");
 	}
 
 	/*
@@ -651,16 +716,19 @@ int main(int argc, char *argv[])
 		}
 	}
 
-      end:
+end:
 	if (logging)
 		closelog();
 
+	tty_unlock(tty->name);
 	close(tty->fd);
 	free(tty);
 
 	for (i = 0; i < numptys; i++) {
+		tty_unlock(pty[i]->name);
 		close(pty[i]->fd);
 		free(pty[i]);
 	}
+
 	return 1;
 }

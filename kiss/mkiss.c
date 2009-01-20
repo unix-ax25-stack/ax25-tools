@@ -38,6 +38,7 @@
  */
 
 #include <stdio.h>
+#define __USE_XOPEN
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -51,6 +52,7 @@
 #include <signal.h>
 #include <ctype.h>
 #include <syslog.h>
+#include <limits.h>
 
 #include <netax25/ttyutils.h>
 #include <netax25/daemon.h>
@@ -80,7 +82,7 @@ static int crc_errors		= 0;
 static int invalid_ports	= 0;
 static int return_polls		= 0;
 
-static char *usage_string	= "usage: mkiss [-p interval] [-c] [-f] [-h] [-l] [-s speed] [-v] ttyinterface pty ...\n";
+static char *usage_string	= "usage: mkiss [-p interval] [-c] [-f] [-h] [-l] [-s speed] [-v] ttyinterface [-x <num_ptmx_devices> | pty ..]\n";
 
 static int dump_report		= FALSE;
 
@@ -108,6 +110,8 @@ struct iface
 	unsigned int	txpackets;	/* TX frames count		*/
 	unsigned long	rxbytes;	/* RX bytes count		*/
 	unsigned long	txbytes;	/* TX bytes count		*/
+	char		namepts[PATH_MAX];  /* name of the unix98 pts slaves, which
+				       * the client has to use */
 };
 
 static struct iface *tty	= NULL;
@@ -421,8 +425,11 @@ int main(int argc, char *argv[])
 	struct timeval timeout, pollinterval;
 	int retval, i, size, len;
 	int speed	= -1;
+	int ptmxdevices = 0;
+	char *npts;
+	int wrote_info = 0;
 
-	while ((size = getopt(argc, argv, "cfhlp:s:v")) != -1) {
+	while ((size = getopt(argc, argv, "cfhlp:s:vx:")) != -1) {
 		switch (size) {
 		case 'c':
 			crcflag = G8BPQ_CRC;
@@ -444,6 +451,13 @@ int main(int argc, char *argv[])
 		case 's':
 			speed = atoi(optarg);
 			break;
+		case 'x':
+			ptmxdevices = atoi(optarg);
+			if (ptmxdevices < 1 || ptmxdevices > 16) {
+				fprintf(stderr, "mkiss: too %s devices\n", ptmxdevices < 1 ? "few" : "many");
+				return 1;
+			}
+			break;
 		case 'v':
 			printf("mkiss: %s\n", VERSION);
 			return 1;
@@ -454,11 +468,18 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if ((argc - optind) < 2) {
+	if ((argc - optind) < 2 && ptmxdevices == 0) {
 		fprintf(stderr, usage_string);
 		return 1;
 	}
-	if ((numptys = argc - optind - 1) > 16) {
+
+	if ((argc - optind) < 1 && ptmxdevices > 0) {
+		fprintf(stderr, usage_string);
+		return 1;
+	}
+
+        numptys = argc - optind - 1;
+	if ((numptys + ptmxdevices) > 16) {
 		fprintf(stderr, "mkiss: max 16 pty interfaces allowed.\n");
 		return 1;
 	}
@@ -471,8 +492,10 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	for (i = 0; i < numptys; i++) {
+		if (!strcmp("/dev/ptmx", argv[optind + i + 1]))
+			continue;
 		if (tty_is_locked(argv[optind + i + 1])) {
-			fprintf(stderr, "mkiss: tty %s is locked by another process\n", argv[optind + i + 1]);
+			fprintf(stderr, "mkiss: pty %s is locked by another process\n", argv[optind + i + 1]);
 			return 1;
 		}
 	}
@@ -500,6 +523,7 @@ int main(int argc, char *argv[])
 	}
 	tty->optr = tty->obuf;
 	topfd = tty->fd;
+	tty->namepts[0] = '\0';
 
 	/*
 	 * Make it block again...
@@ -509,19 +533,71 @@ int main(int argc, char *argv[])
 	/*
 	 * Open and configure the pty interfaces
 	 */
-	for (i = 0; i < numptys; i++) {
+	for (i = 0; i < numptys+ptmxdevices; i++) {
+		static char name_ptmx[] = "/dev/ptmx";
+		char *pty_name = (i < numptys ? argv[optind+i+1] : name_ptmx);
+
 		if ((pty[i] = calloc(1, sizeof(struct iface))) == NULL) {
 			perror("mkiss: malloc");
 			return 1;
 		}
-		if ((pty[i]->fd = open(argv[optind + i + 1], O_RDWR)) == -1) {
+		if ((pty[i]->fd = open(pty_name, O_RDWR)) == -1) {
 			perror("mkiss: open");
 			return 1;
 		}
-		pty[i]->name = argv[optind + i + 1];
+		pty[i]->name = pty_name;
 		tty_raw(pty[i]->fd, FALSE);
 		pty[i]->optr = pty[i]->obuf;
 		topfd = (pty[i]->fd > topfd) ? pty[i]->fd : topfd;
+		pty[i]->namepts[0] = '\0';
+		if (!strcmp(pty[i]->name, "/dev/ptmx")) {
+			/* get name of pts-device */
+			if ((npts = ptsname(pty[i]->fd)) == NULL) {
+				fprintf(stderr, "mkiss: Cannot get name of pts-device.\n");
+				return 1;
+			}
+			strncpy(pty[i]->namepts, npts, PATH_MAX-1);
+			pty[i]->namepts[PATH_MAX-1] = '\0';
+
+			/* unlock pts-device */
+			if (unlockpt(pty[i]->fd) == -1) {
+				fprintf(stderr, "mkiss: Cannot unlock pts-device %s\n", pty[i]->namepts);
+				return 1;
+			}
+			if (wrote_info == 0)
+				printf("\nAwaiting client connects on:\n");
+			else
+				printf(" ");
+			printf("%s", pty[i]->namepts);
+			wrote_info = 1;
+		}
+	}
+
+	if (wrote_info > 0)
+		printf("\n");
+
+	numptys=numptys+ptmxdevices;
+
+	/*
+	 * Now all the ports are open, lock them.
+	 */
+	tty_lock(tty->name);
+	for (i = 0; i < numptys; i++) {
+		if (pty[i]->namepts[0] == '\0')
+			tty_lock(pty[i]->name);
+	}
+
+	if (logging) {
+		openlog("mkiss", LOG_PID, LOG_DAEMON);
+		syslog(LOG_INFO, "starting");
+	}
+
+	if (wrote_info > 0) {
+		fflush(stdout);
+		fflush(stderr);
+		close(0);
+		close(1);
+		close(2);
 	}
 
 	signal(SIGHUP, SIG_IGN);
@@ -533,17 +609,6 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	/*
-	 * Now all the ports are open, lock them.
-	 */
-	tty_lock(tty->name);
-	for (i = 0; i < numptys; i++)
-		tty_lock(pty[i]->name);
-
-	if (logging) {
-		openlog("mkiss", LOG_PID, LOG_DAEMON);
-		syslog(LOG_INFO, "starting");
-	}
 	init_crc();
 	/*
 	 * Loop until an error occurs on a read.
