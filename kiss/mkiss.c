@@ -82,7 +82,7 @@ static int crc_errors		= 0;
 static int invalid_ports	= 0;
 static int return_polls		= 0;
 
-static char *usage_string	= "usage: mkiss [-p interval] [-c] [-f] [-h] [-l] [-s speed] [-v] ttyinterface [-x <num_ptmx_devices> | pty ..]\n";
+static char *usage_string	= "usage: mkiss [-p interval] [-c] [-f] [-h] [-l] [-s speed] [-v] [-x <num_ptmx_devices>] ttyinterface pty ..\n";
 
 static int dump_report		= FALSE;
 

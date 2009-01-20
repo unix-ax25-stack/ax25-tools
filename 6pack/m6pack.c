@@ -6,7 +6,7 @@
  * Fake out AX.25 code into supporting 6pack TNC rings by routing serial
  * port data to/from pseudo ttys.
  *
- * @(#)m6pack.c  $Revision: 1.2 $  $Date: 2009/01/20 16:18:02 $
+ * @(#)m6pack.c  $Revision: 1.3 $  $Date: 2009/01/20 18:31:25 $
  *
  * Author(s):
  *
@@ -15,6 +15,10 @@
  * History:
  *
  * $Log: m6pack.c,v $
+ * Revision 1.3  2009/01/20 18:31:25  dl9sau
+ * 	Unix98 support.
+ * 	Thanks to dk2crn.
+ *
  * Revision 1.2  2009/01/20 16:18:02  dl9sau
  * 	Unix98 PTY support for mkiss and m6pack.
  *
@@ -91,7 +95,7 @@
 
 #include <config.h>
 
-static char *version ="$Id: m6pack.c,v 1.2 2009/01/20 16:18:02 dl9sau Exp $";
+static char *version ="$Id: m6pack.c,v 1.3 2009/01/20 18:31:25 dl9sau Exp $";
 
 typedef unsigned char __u8;
 typedef enum {data, command} frame_t;
@@ -108,7 +112,7 @@ static __u8 obuf[SIZE];	/* buffer for sixpack_tx() */
 
 static int invalid_ports = 0;
 
-static char *usage_string = "usage: m6pack [-l] [-s speed] [-v] tyinterface [-x <num_ptmx_devices> | pty ..]\n";
+static char *usage_string = "usage: m6pack [-l] [-s speed] [-x num_ptmx_devices] [-v] tyinterface pty ..\n";
 
 static int dump_report = FALSE;
 static int logging = FALSE;

@@ -2,7 +2,7 @@
 .SH NAME
 m6pack \- Attach multiples 6PACK interfaces
 .SH SYNOPSIS
-.B m6pack [-l] [-s speed] [-v] ttyinterface [-x <n> | pty ..]
+.B m6pack [-l] [-s speed] [-x n_ptmx] [-v] ttyinterface pty ..
 .SH DESCRIPTION
 .LP
 .B m6pack
@@ -38,11 +38,11 @@ Enables system logging, the default is off.
 .BI "\-s speed"
 Set the speed of the serial port.
 .TP 10
-.BI "\-x number"
-This option is for Unix98 PTYs. It allocates "number" ptys; their names are written to stdout.
-.TP 10
 .BI \-v
 Display the version.
+.TP 10
+.BI "\-x number"
+This option is for Unix98 PTYs. It allocates "number" ptys; their names are written to stdout. When -x is used, the pty arguments are optional.
 .SH "SEE ALSO"
 .BR spattach (8),
 .BR ifconfig (8),
