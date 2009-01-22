@@ -1,4 +1,4 @@
-/* @(#) $Id: proto_bin.c,v 1.3 2009/01/22 10:46:10 dl9sau Exp $ */
+/* @(#) $Id: proto_bin.c,v 1.4 2009/01/22 11:08:50 dl9sau Exp $ */
 
 /*
  * (c) 2002 Thomas Osterried  DL9SAU <thomas@x-berg.in-berlin.de>
@@ -298,7 +298,7 @@ int bget(void) {
   unsigned long file_size = 0;
   unsigned long len_remains;
   int is_eof;
-  int file_time = 0L;
+  time_t file_time = 0L;
 
 #define save_close(x) { \
       if (!fdin_is_pipe) \
@@ -385,7 +385,7 @@ int bget(void) {
 
   if (do_crc_only) {
     printf("File information for %s:\n", get_fixed_filename(filename, file_size, crc, 1));
-    printf("  size %ld bytes, crc %d, date %s (%d)\n", file_size, crc, unix_to_sfbin_date_string(file_time), file_time);
+    printf("  size %ld bytes, crc %d, date %s (%ld)\n", file_size, crc, unix_to_sfbin_date_string(file_time), file_time);
     return 0;
   }
 
