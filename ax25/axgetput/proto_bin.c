@@ -1,4 +1,4 @@
-/* @(#) $Id: proto_bin.c,v 1.2 2007/01/23 13:40:01 ralf Exp $ */
+/* @(#) $Id: proto_bin.c,v 1.3 2009/01/22 10:46:10 dl9sau Exp $ */
 
 /*
  * (c) 2002 Thomas Osterried  DL9SAU <thomas@x-berg.in-berlin.de>
@@ -74,9 +74,8 @@ int bput(void)
 {
   struct stat statbuf;
   char buf[1024];  /* < signed int */
-  char tmpbuf[1024];
   char filename_given[PATH_MAX];
-  unsigned long len_read_expected = 0;
+  unsigned long len_read_expected = 0L;
   unsigned long len_read_left;
   time_t file_time = 0L;
   unsigned int msg_crc = 0;
@@ -87,7 +86,9 @@ int bput(void)
   int len = 0;
   int fddata = fdout;
   int is_eof;
-  char *p, *q;
+  int i;
+  char *p;
+  char *p_buf;
 
 #define save_close(x) { \
       if (!fdout_is_pipe) \
@@ -127,19 +128,28 @@ int bput(void)
 
   /* parse #BIN arguments */
   *filename_given = 0;
-  *tmpbuf = 0;
-  sscanf(buf, "#BIN#%ld#|%d#%s", &len_read_expected, &msg_crc, tmpbuf);
-  p = tmpbuf;
-  if (*tmpbuf == '$') {
-    p++;
-    if ((q = strchr(tmpbuf, '#'))) {
-      *q++ = 0;
-      p = q;
+
+  p_buf = buf;
+  for (i = 0; (p = strsep(&p_buf, "#")); i++) {
+    switch(i) {
+    case 0:
+    case 1:
+      break;
+    case 2:
+      if (*p)
+	len_read_expected = (unsigned long ) atol(p);
+      break;
+    default:
+      if (*p == '|') {
+        msg_crc = (unsigned int ) atoi(p+1);
+      } else if (*p == '$') {
+        file_time = parse_sfbin_date_to_unix(p+1);
+      } else {
+        strncpy(filename_given, p, sizeof(filename_given)-1);
+        filename_given[sizeof(filename_given)-1] = 0;
+      }
     }
-    file_time = parse_sfbin_date_to_unix(tmpbuf+1);
   }
-  strncpy(filename_given, p, sizeof(filename_given)-1);
-  filename_given[sizeof(filename_given)-1] = 0;
 
   if (!fdout_is_pipe) {
     /* normal mode: store in given filename  */
