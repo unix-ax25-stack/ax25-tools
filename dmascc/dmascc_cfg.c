@@ -1,5 +1,5 @@
 /*
- * $Id: dmascc_cfg.c,v 1.3 2008/02/17 20:49:54 ralf Exp $
+ * $Id: dmascc_cfg.c,v 1.4 2009/05/27 14:26:06 dl9sau Exp $
  *
  * Configuration utility for dmascc driver
  * Copyright (C) 1997,2000 Klaus Kudielka
@@ -27,7 +27,13 @@
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <linux/if.h>
+#ifndef _SC_CLK_TCK
+#include <sys/param.h>
+#endif
+#ifndef _SC_CLK_TCK
 #include <asm/param.h>
+#endif
+
 
 /* Ioctls */
 #define SIOCGSCCPARAM SIOCDEVPRIVATE
@@ -85,6 +91,7 @@ int main(int argc, char *argv[])
   struct ifreq ifr;
   struct scc_param param;
   char **option, *end, *error = NULL;
+  long hz = -1L;
 
   if (argc < 2) {
     usage();
@@ -115,6 +122,21 @@ int main(int argc, char *argv[])
   if (param.txpause == -1) {
     param.txpause = 0;
     old = 1;
+  }
+
+#ifdef	_SC_CLK_TCKxx
+  hz = sysconf(_SC_CLK_TCK);
+  if (hz == -1)
+	perror("sysconf(_SC_CLK_TCK)");
+#endif
+  if (hz == -1) {
+#ifdef	HZ
+	hz = HZ;
+#else
+	hz = 100;
+#endif
+	fprintf(stderr, "warning: cannot dermine the clock rate HZ on which this system is running.\n");
+	fprintf(stderr, "         Assuming %ld, what may be wrong.\n", hz);
   }
 
   secondary = argv[1][strlen(argv[1])-1]%2;
@@ -181,7 +203,7 @@ int main(int argc, char *argv[])
       option++;
       if (*option != NULL) {
 	set = 1;
-	param.txtimeout = HZ * strtod(*option++, &end) / 1000.0;
+	param.txtimeout = hz * strtod(*option++, &end) / 1000.0;
 	if (*end) error = "txtimeout not a number";
 	else if (param.txtimeout < 0) error = "txtimeout < 0";
       } else error = "--txtimeout requires parameter";
@@ -305,7 +327,7 @@ int main(int argc, char *argv[])
 	   param.clocks,
 	   param.txdelay * 1000.0 / TMR_0_HZ,
 	   param.txpause * 1000.0 / TMR_0_HZ,
-	   param.txtimeout * 1000.0 / HZ,
+	   param.txtimeout * 1000.0 / hz,
 	   param.txtail * 1000.0 / TMR_0_HZ,
 	   param.rtsoff * 1000.0 / TMR_0_HZ,
 	   param.dcdon * 1000.0 / TMR_0_HZ,
