@@ -1,3 +1,17 @@
+ax25-tools (0.0.10)
+	* Version number 0.0.10 was used for several years in CVS.  To avoid
+	  confusion we decieded to not make a 0.0.9 tarball release.
+	* Fixed numerous build warnings and errors with modern distributions
+	  and compilers and other functional errors.
+	* Support for UNIX98 pseudo terminals.
+	* Support UNIX authentication for axspawn logins.
+	* Axspawn now support Hufman compression.
+	* An IP address is no longer mandatory for nrattach, kissattach.
+	* kissparms now allows to send a raw value to the driver and to set
+	  the CRC mode by command line option.
+
+ -- Ralf Baechle DL5RB <ralf@linux-mips.org>  Sat, 6 Jun 2009 17:36:01 +0100
+
 ax25-tools (0.0.9)
 	* Fix for mkiss pid problem 
 	* Removed inline statesment in hdrvcomm.c
