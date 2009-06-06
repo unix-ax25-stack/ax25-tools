@@ -243,12 +243,11 @@ static int openpty(int *amaster, int *aslave, char *name,
 		   struct termios *termp, struct winsize *winp)
 {
 	char line[PATH_MAX];
-
-	strcpy(line, "/dev/ptyXX");
         const char *cp1, *cp2;
 	int master, slave;
 	struct group *gr = getgrnam("tty");
 
+	strcpy(line, "/dev/ptyXX");
 	for (cp1 = "pqrstuvwxyzPQRST"; *cp1; cp1++) {
 		line[8] = *cp1;
 		for (cp2 = "0123456789abcdef"; *cp2; cp2++) {
