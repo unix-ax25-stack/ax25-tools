@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.19 2008/11/08 19:07:19 dl9sau Exp $
+ * $Id: axspawn.c,v 1.20 2009/06/14 13:27:51 ralf Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1003,7 +1003,9 @@ int get_assoc(struct sockaddr_ax25 *sax25)
 void cleanup(char *tty)
 {
 	struct utmp ut, *ut_line;
+	struct timeval tv;
 	FILE *fp;
+
 
 	setutent();
 	ut.ut_type = LOGIN_PROCESS;
@@ -1014,8 +1016,9 @@ void cleanup(char *tty)
 		ut_line->ut_type = DEAD_PROCESS;
 		ut_line->ut_host[0] = '\0';
 		ut_line->ut_user[0] = '\0';
-		time(&ut_line->ut_time);
-		pututline(ut_line);
+		gettimeofday(&tv, NULL);
+		ut_line->ut_tv.tv_sec = tv.tv_sec;
+		ut_line->ut_tv.tv_usec = tv.tv_usec;
 		if ((fp = fopen(_PATH_WTMP, "r+")) != NULL) {
 			fseek(fp, 0L, SEEK_END);
 			if (fwrite(ut_line, sizeof(ut), 1, fp) != 1)
@@ -1341,6 +1344,7 @@ int main(int argc, char **argv)
 	char call[20], user[20], as_user[20];
 	char buf[2048];
 	int  k, cnt, digits, letters, invalid, ssid, ssidcnt, addrlen;
+	struct timeval tv;
 	pid_t pid = -1;
 	char *p;
 	fd_set fds_read, fds_err;
@@ -1688,7 +1692,9 @@ again:
                 strncpy(ut_line.ut_id,   ptyslave + 8, sizeof(ut_line.ut_id));
                 strncpy(ut_line.ut_user, "LOGIN",      sizeof(ut_line.ut_user));
                 strncpy(ut_line.ut_host, protocol,     sizeof(ut_line.ut_host));
-                time(&ut_line.ut_time);
+		gettimeofday(&tv, NULL);
+		ut_line.ut_tv.tv_sec = tv.tv_sec;
+		ut_line.ut_tv.tv_usec = tv.tv_usec;
                 ut_line.ut_addr = 0;                
                 pututline(&ut_line);
                 endutent();

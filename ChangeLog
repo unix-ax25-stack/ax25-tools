@@ -9,6 +9,7 @@ ax25-tools (0.0.10)
 	* An IP address is no longer mandatory for nrattach, kissattach.
 	* kissparms now allows to send a raw value to the driver and to set
 	  the CRC mode by command line option.
+	* axspawn now records the time at microsecond accuracy in utmp.
 
  -- Ralf Baechle DL5RB <ralf@linux-mips.org>  Sat, 6 Jun 2009 17:36:01 +0100
 
