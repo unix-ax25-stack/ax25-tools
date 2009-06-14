@@ -1,4 +1,4 @@
-static const char rcsid[] = "@(#) $Id: axgetput.c,v 1.2 2007/01/23 13:40:01 ralf Exp $";
+static const char rcsid[] = "@(#) $Id: axgetput.c,v 1.3 2009/06/14 08:06:06 ralf Exp $";
 
 /*
  * This is axgetput
@@ -63,7 +63,7 @@ static struct revision revision;
 
 /*---------------------------------------------------------------------------*/
 
-static void set_tty_flags()
+static void set_tty_flags(void)
 {
   struct termios termios;
   struct stat statbuf;
@@ -94,7 +94,7 @@ static void set_tty_flags()
 
 /*---------------------------------------------------------------------------*/
 
-static void restore_tty_flags()
+static void restore_tty_flags(void)
 {
   if (fdin_is_pipe)
     return;
@@ -133,7 +133,7 @@ static void eol_convention(int state_should)
 
 /*---------------------------------------------------------------------------*/
 
-static void restore_defaults()
+static void restore_defaults(void)
 {
   eol_convention(0);
   restore_tty_flags();

@@ -1,5 +1,5 @@
 /*
- * $Id: ax25d.c,v 1.5 2007/01/23 13:40:01 ralf Exp $
+ * $Id: ax25d.c,v 1.6 2009/06/14 08:06:06 ralf Exp $
  *
  *  This is my version of axl.c, written for the LBBS code to make it
  *    compatable with the kernel AX25 driver.  It appears to work, with
@@ -218,7 +218,7 @@ static int maxfd = -1;
 
 /*--------------------------------------------------------------------------*/
 
-void update_maxfd() {
+void update_maxfd(void) {
 	struct axlist *paxl;
 
 	FD_ZERO(&fdread);
@@ -233,7 +233,7 @@ void update_maxfd() {
 
 /*--------------------------------------------------------------------------*/
 
-void err_config() {
+void err_config(void) {
 	if (AXL == NULL) {
 		if (Logging)
 			syslog(LOG_ERR, "config file reload error, exiting");
