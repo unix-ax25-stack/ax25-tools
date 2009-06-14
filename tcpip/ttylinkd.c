@@ -106,7 +106,6 @@ int main(int argc, char *argv[])
 	struct sockaddr_in ctl_sin;
 	struct in_addr my_addr, rem_addr;
 	int ctl_skt, skt, new_skt;
-	int length;
 	CTL_RESPONSE resp;
 	CTL_MSG msg;
 	struct protoent *ppe;
@@ -116,10 +115,11 @@ int main(int argc, char *argv[])
 	char buf[256];
 	char user[NAME_SIZE];
 	struct sockaddr sa, msg_sa;
-	int sa_len, i;
 	struct sockaddr_in *peer_sin=NULL, *msg_sin;
 	struct sockaddr_ax25 *peer_sax;
 	struct sockaddr_rose *peer_srose;
+	socklen_t sa_len, length;
+	int i;
 		
 	/* Open up the system logger */
 	openlog(argv[0], LOG_PID, LOG_DAEMON);

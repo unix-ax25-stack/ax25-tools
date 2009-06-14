@@ -35,9 +35,10 @@ int main(int argc, char **argv)
 {
 	unsigned char buffer[512], *addr;
 	fd_set read_fd;
-	int n = 0, s, addrlen, yes = 1;
+	int n = 0, s, yes = 1;
 	struct full_sockaddr_ax25 axbind, axconnect;
 	struct sockaddr_rose rosesock, rosepeer;
+	socklen_t addrlen;
 
 	openlog("rsdwnlnk", LOG_PID, LOG_DAEMON);
 

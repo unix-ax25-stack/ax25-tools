@@ -369,7 +369,7 @@ int main(int argc, char **argv)
 #ifdef	USE_SOCKADDR_SLL
 	struct sockaddr_ll sll;
 	struct sockaddr *psa = (struct sockaddr *)&sll;
-	const int sa_len = sizeof(struct sockaddr_ll);
+	const socklen_t sa_len = sizeof(struct sockaddr_ll);
 	int from_idx;
 #else
 #ifdef	USE_SOCKADDR_SPKT
@@ -383,7 +383,8 @@ int main(int argc, char **argv)
 #endif
 	char from_dev_name[sizeof(psa->sa_data)];
 #endif
-	int s, size, alen;
+	int s, size;
+	socklen_t alen;
 	unsigned char buf[1500];
 	struct config *p, *list;
 

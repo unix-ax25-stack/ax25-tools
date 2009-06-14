@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.20 2009/06/14 13:27:51 ralf Exp $
+ * $Id: axspawn.c,v 1.21 2009/06/14 16:25:26 ralf Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1046,7 +1046,8 @@ void new_user(char *newuser)
 	char buf[4096];
 	char subdir[4];
 	int cnt;
-	unsigned char *p, *q;
+	unsigned char *q;
+	char *p;
 	struct stat fst;
 	int fd_a, fd_b, fd_l;
 	mode_t homedir_mode = S_IRUSR|S_IWUSR|S_IXUSR|S_IXOTH|(secure_home ? 0 : (S_IRGRP|S_IXGRP));
@@ -1343,7 +1344,8 @@ int main(int argc, char **argv)
 {
 	char call[20], user[20], as_user[20];
 	char buf[2048];
-	int  k, cnt, digits, letters, invalid, ssid, ssidcnt, addrlen;
+	int  k, cnt, digits, letters, invalid, ssid, ssidcnt;
+	socklen_t addrlen;
 	struct timeval tv;
 	pid_t pid = -1;
 	char *p;

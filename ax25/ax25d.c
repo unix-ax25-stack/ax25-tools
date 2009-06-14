@@ -1,5 +1,5 @@
 /*
- * $Id: ax25d.c,v 1.6 2009/06/14 08:06:06 ralf Exp $
+ * $Id: ax25d.c,v 1.7 2009/06/14 16:25:26 ralf Exp $
  *
  *  This is my version of axl.c, written for the LBBS code to make it
  *    compatable with the kernel AX25 driver.  It appears to work, with
@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
 		struct sockaddr_rose rose;
 	} sockaddr;
 	struct sigaction act, oact;
-	int addrlen;
+	socklen_t addrlen;
 	int cnt;
 	char buf[1024];
 	char *p;
@@ -816,7 +816,7 @@ static int ReadConfig(void)
 	char buffer[2048];
 	char *s, *port, *call, *node, *addr = NULL;
 	unsigned long val;
-	int addrlen;
+	socklen_t addrlen;
 	int af_type = 0;	/* Keep GCC happy */
 	int line = 0;
 	int hunt = TRUE, error = FALSE;

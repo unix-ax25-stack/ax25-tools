@@ -117,7 +117,7 @@ int main(int argc, char **argv)
 	int size, s;
 	char *port = NULL;
 	struct sockaddr sa;
-	int asize;
+	socklen_t asize;
 	long position;
 	int ctlen, type, end, extseq, flush = FALSE;
 	FILE *fp;
