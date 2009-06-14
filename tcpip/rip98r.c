@@ -82,7 +82,8 @@ void receive_routes(int s)
 	unsigned long int netmask;
 	unsigned long int network;
 	int bits, metric;
-	int size, found, matched;
+	int found, matched;
+	socklen_t size;
 	int mess_len;
 	int i;
 

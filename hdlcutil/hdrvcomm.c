@@ -102,7 +102,7 @@ int hdrvc_recvpacket(char *pkt, int maxlen)
 {
 	struct ifreq ifr_new;
 	struct sockaddr_ll from;
-	int from_len = sizeof(from);
+	socklen_t from_len = sizeof(from);
 
 #ifdef HDRVC_KERNEL
 	if (kernel_mode) {

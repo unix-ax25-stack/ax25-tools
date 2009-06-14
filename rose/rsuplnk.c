@@ -36,7 +36,8 @@ int main(int argc, char **argv)
 	char rose_address[11];
 	fd_set read_fd;
 	int n, s, dnicindex = -1, addrindex = -1;
-	int addrlen, yes = 1, verbose = 1;
+	int yes = 1, verbose = 1;
+	socklen_t addrlen;
 	struct sockaddr_rose rosebind, roseconnect;
 	struct full_sockaddr_ax25 ax25sock, ax25peer;
 

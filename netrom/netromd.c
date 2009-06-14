@@ -138,7 +138,7 @@ int main(int argc, char **argv)
 	unsigned char buffer[512];
 	int size, s, i;
 	struct sockaddr sa;
-	int asize;
+	socklen_t asize;
 	struct timeval timeout;
 	time_t timenow, timelast;
 	int interval = 3600;
