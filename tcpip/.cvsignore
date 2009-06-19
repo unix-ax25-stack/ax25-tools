@@ -1,4 +1,5 @@
 Makefile
+Makefile.in
 ttylinkd
 rip98d
 .deps
