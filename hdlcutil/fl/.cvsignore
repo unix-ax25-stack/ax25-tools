@@ -1,6 +1,7 @@
+.deps
 Makefile
 Makefile.in
-xfhdlcpar
+xfhdlcchpar
 xfhdlcst
+xfsmdiag
 xfsmmixer
-.deps
