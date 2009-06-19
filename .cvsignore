@@ -3,6 +3,11 @@ config.cache
 config.h
 config.log
 config.status
+depcomp
+install-sh
+missing
+INSTALL
 Makefile
+Makefile.in
 stamp-h1
 .deps
