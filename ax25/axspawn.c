@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.21 2009/06/14 16:25:26 ralf Exp $
+ * $Id: axspawn.c,v 1.22 2009/06/21 18:01:55 ralf Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -171,16 +171,8 @@
 
 #include <sys/socket.h>
 
-#ifdef HAVE_NETAX25_AX25_H
 #include <netax25/ax25.h>
-#else
-#include <netax25/kernel_ax25.h>
-#endif
-#ifdef HAVE_NETROSE_ROSE_H
 #include <netrose/rose.h>
-#else
-#include <netax25/kernel_rose.h>
-#endif
 
 #include <netax25/axlib.h>
 

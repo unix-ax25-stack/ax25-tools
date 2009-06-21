@@ -23,7 +23,7 @@ AC_SUBST(NCURSES_LIB)
 AC_SUBST(UTIL_LIB)
 AC_SUBST(FLTK_LIB)
 AC_CHECK_LIB(z, zlibVersion,Z_LIB="-lz",Z_LIB=)
-AC_CHECK_LIB(ax25, ax25_config_load_ports, AX25_LIB="-lax25", AC_MSG_ERROR(Could not find the libax25 libraries; aborting))
+AC_CHECK_LIB(ax25, ax25_config_load_ports, AX25_LIB="-lax25", AC_MSG_ERROR([Could not find the libax25 libraries; aborting]))
 AC_CHECK_LIB(ncurses, initscr,NCURSES_LIB="-lncurses",NCURSES_LIB=)
 AC_CHECK_LIB(util, openpty, UTIL_LIB="-lutil",UTIL_LIB=)
 AC_CHECK_LIB(GL, main, GL_LIB="-lGL",
@@ -38,15 +38,20 @@ dnl Checks for header files.
 dnl AC_PATH_X
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(fcntl.h limits.h paths.h strings.h sys/file.h sys/ioctl.h sys/time.h syslog.h unistd.h zlib.h )
+AC_CHECK_HEADERS(fcntl.h limits.h paths.h strings.h sys/file.h sys/ioctl.h sys/time.h syslog.h unistd.h zlib.h)
 
 dnl Checks for working glibc 2.1 headers
-AC_MSG_CHECKING(for working netax25/ax25.h header file)
-AC_EGREP_HEADER(ax25_fwd_struct, netax25/ax25.h,AC_DEFINE(HAVE_NETAX25_AX25_H, 1, [Define if you have a proper netax25/ax25.h header file.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for working netrom/netrom.h header file)
-AC_EGREP_HEADER(unsigned int ndigis, netrom/netrom.h,AC_DEFINE(HAVE_NETROM_NETROM_H, 1, [Define if you have a proper netrom/netrom.h header file.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
-AC_MSG_CHECKING(for working netrose/rose.h header file)
-AC_EGREP_HEADER(rose_facilities_struct, netrose/rose.h,AC_DEFINE(HAVE_NETROSE_ROSE_H, 1, [Define if you have a proper netrose/rose.h header file.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_CHECK_TYPES([struct ax25_fwd_struct], [],
+	[AC_MSG_ERROR([Both glibc and libax25 are too old or both installed])],
+	[[#include <netax25/ax25.h>]])
+AC_CHECK_MEMBER([struct nr_route_struct.ndigis], [],
+	[AC_MSG_ERROR([Both glibc and libax25 are too old or both installed])],
+	[[#include <netrom/netrom.h>]])
+AC_CHECK_TYPES([struct rose_facilities_struct], [],
+	[AC_MSG_ERROR([Both glibc and libax25 are too old or both installed])],
+	[[#include <netax25/ax25.h>	/* Or <netrose/rose.h> will blow up */
+	#include <netrose/rose.h>
+	]])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
