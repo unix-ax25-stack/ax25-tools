@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(ax25-tools, 0.0.10-rc1, linux-hams@vger.kernel.org)
+AC_INIT(ax25-tools, 0.0.10-rc2, linux-hams@vger.kernel.org)
 AC_CONFIG_SRCDIR(ax25/ax25d.c)
 AM_INIT_AUTOMAKE
 
