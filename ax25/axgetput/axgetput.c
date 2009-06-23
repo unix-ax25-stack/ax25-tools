@@ -1,4 +1,4 @@
-static const char rcsid[] = "@(#) $Id: axgetput.c,v 1.3 2009/06/14 08:06:06 ralf Exp $";
+static const char rcsid[] = "@(#) $Id: axgetput.c,v 1.4 2009/06/23 21:58:23 ralf Exp $";
 
 /*
  * This is axgetput
@@ -25,7 +25,6 @@ static const char rcsid[] = "@(#) $Id: axgetput.c,v 1.3 2009/06/14 08:06:06 ralf
 
 extern char *optarg;
 extern int optind;
-extern int errno;
 
 int fdin = 0;
 int fdout = 1;
