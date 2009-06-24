@@ -5,10 +5,8 @@ yamcfg_SOURCES =  yamcfg.c yam.h
 
 mcs2h_SOURCES = mcs2h.c
 
-docdir=${prefix}/doc/ax25-tools
-doc_DATA = README.yamdrv \
-	yam08-2.0.36-patch.diff \
-	yam08-2.2.1-patch.diff 
+docdir=${datadir}/doc/ax25-tools
+doc_DATA = README.yamdrv
 
 EXTRA_DIST = $(doc_DATA)
 
