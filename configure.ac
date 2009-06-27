@@ -76,5 +76,10 @@ if test "x$GCC" = "xyes"; then
   fi
 fi
 
-AC_CONFIG_FILES([netrom/Makefile tcpip/Makefile ax25/Makefile ax25/axgetput/Makefile Makefile rose/Makefile user_call/Makefile kiss/Makefile 6pack/Makefile hdlcutil/Makefile hdlcutil/fl/Makefile yamdrv/Makefile dmascc/Makefile])
+basever=$(echo $PACKAGE_VERSION | sed -e 's@-.*$@@')
+AC_SUBST(BASEVERSION, [$basever])
+extraver=$(echo $PACKAGE_VERSION | sed -e 's@@<:@^-@:>@*-@@' -e 's@-@_@')
+AC_SUBST(EXTRAVERSION, [$extraver])
+
+AC_CONFIG_FILES([netrom/Makefile tcpip/Makefile ax25/Makefile ax25/axgetput/Makefile Makefile rose/Makefile user_call/Makefile kiss/Makefile 6pack/Makefile hdlcutil/Makefile hdlcutil/fl/Makefile yamdrv/Makefile dmascc/Makefile ax25-tools.spec])
 AC_OUTPUT
