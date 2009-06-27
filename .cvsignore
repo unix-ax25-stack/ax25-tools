@@ -1,4 +1,5 @@
 aclocal.m4
+ax25-tools.spec
 autom4te.cache
 config.cache
 config.h
