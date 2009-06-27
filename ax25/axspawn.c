@@ -1,10 +1,10 @@
 /*
  *
- * $Id: axspawn.c,v 1.22 2009/06/21 18:01:55 ralf Exp $
+ * $Id: axspawn.c,v 1.23 2009/06/27 22:30:20 ralf Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
- * Copyright (c) 1996 Jörg Reuter DL1BKE (jreuter@poboxes.com)
+ * Copyright (c) 1996 Joerg Reuter DL1BKE (jreuter@poboxes.com)
  *
  * This program is a hack.
  * 
