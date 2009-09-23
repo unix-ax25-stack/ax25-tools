@@ -15,6 +15,6 @@ INCLUDES = -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" \
 AX25_SYSCONFDIR=${sysconfdir}/ax25/
 AX25_LOCALSTATEDIR=${localstatedir}/ax25/
 
-install-exec-local:
+install-exec-hook:
 	(cd $(DESTDIR)$(sbindir))
 
