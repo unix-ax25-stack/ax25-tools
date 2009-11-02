@@ -235,10 +235,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	
-#ifdef	notdef
 	if (!startiface(dev, hp))
 		return 1;		
-#endif
 
 	printf("NET/ROM port %s bound to device %s\n", argv[optind], dev);
 		
