@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.23 2009/06/27 22:30:20 ralf Exp $
+ * $Id: axspawn.c,v 1.24 2010/03/31 08:06:59 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1770,11 +1770,11 @@ again:
 		 	* out (abuse, ..) by changing his gid in passwd to for e.g.
 		 	* 65534 (nogroup).
 		 	*/
+			chargv[chargc++] = "-h";
+			chargv[chargc++] = protocol;
                 	if (pwtype != PW_CLEARTEXT /* PW_SYS or PW_MD5 are already authenticated */ 
 				|| pwcheck == 2 || (pwcheck == 3 && (pw->pw_gid == user_gid || is_guest)) || !strcmp(pw->pw_passwd, "+"))
 	        		chargv[chargc++] = "-f";
-			chargv[chargc++] = "-h";
-			chargv[chargc++] = protocol;
                 	chargv[chargc++] = as_user;
 		}
                	chargv[chargc]   = NULL;
