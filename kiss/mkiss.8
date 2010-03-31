@@ -62,7 +62,7 @@ Pollrate is interval between polls (in 100ms units).
 Display the version.
 .TP 10
 .BI "\-x number"
-This option is for Unix98 PTYs. It allocates "number" ptys; their names are written to stdout. When -x is used, the pty arguments are optional.
+This option is for Unix98 PTYs. It allocates "number" ptys; their names are written to stdout. When -x is used, the pty arguments are optional. "mkiss -x 3 ttyname" is an comfortable alternative to "mkiss ttyname /dev/ptmx /dev/ptmx /dev/ptmx".
 .SH "SEE ALSO"
 .BR kissattach (8),
 .BR ifconfig (8),
