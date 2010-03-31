@@ -15,6 +15,7 @@ systems to share the same packets.
 .BI "\-p num"
 Automaticaly allocate num Unix98 slave pty's via /dev/ptmx.
 These are written to stdout and could be parsed by your startup scripts.
+"kissnetd -p 3" is an comfortable alternative to "kissnetd /dev/ptmx /dev/ptmx /dev/ptmx".
 .TP 10
 .BI "\-f size"
 This sets the maximum KISS frame size that the program will handle. The
