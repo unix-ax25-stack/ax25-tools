@@ -361,6 +361,10 @@ static void sigterm_handler(int sig)
 	free(tty);
 
 	for (i = 0; i < numptys; i++) {
+		if (pty[i]->fd == -1)
+			continue;
+		if (pty[i]->namepts[0] != '\0')
+			continue;
 		tty_unlock(pty[i]->name);
 		close(pty[i]->fd);
 		free(pty[i]);
@@ -494,6 +498,8 @@ int main(int argc, char *argv[])
 	for (i = 0; i < numptys; i++) {
 		if (!strcmp("/dev/ptmx", argv[optind + i + 1]))
 			continue;
+		if (!strcmp("none", argv[optind + i + 1]))
+			continue;
 		if (tty_is_locked(argv[optind + i + 1])) {
 			fprintf(stderr, "mkiss: pty %s is locked by another process\n", argv[optind + i + 1]);
 			return 1;
@@ -541,19 +547,28 @@ int main(int argc, char *argv[])
 			perror("mkiss: malloc");
 			return 1;
 		}
-		if ((pty[i]->fd = open(pty_name, O_RDWR)) == -1) {
-			perror("mkiss: open");
-			return 1;
+		if (!strcmp(pty_name, "none")) {
+			pty[i]->fd = -1;
+			strcpy(pty[i]->namepts, "none");
+		} else {
+			if ((pty[i]->fd = open(pty_name, O_RDWR)) == -1) {
+				perror("mkiss: open");
+				free(pty[i]);
+				pty[i] = 0;
+				return 1;
+			}
+			tty_raw(pty[i]->fd, FALSE);
+			topfd = (pty[i]->fd > topfd) ? pty[i]->fd : topfd;
+			pty[i]->namepts[0] = '\0';
 		}
 		pty[i]->name = pty_name;
-		tty_raw(pty[i]->fd, FALSE);
 		pty[i]->optr = pty[i]->obuf;
-		topfd = (pty[i]->fd > topfd) ? pty[i]->fd : topfd;
-		pty[i]->namepts[0] = '\0';
 		if (!strcmp(pty[i]->name, "/dev/ptmx")) {
 			/* get name of pts-device */
 			if ((npts = ptsname(pty[i]->fd)) == NULL) {
 				fprintf(stderr, "mkiss: Cannot get name of pts-device.\n");
+				free(pty[i]);
+				pty[i] = 0;
 				return 1;
 			}
 			strncpy(pty[i]->namepts, npts, PATH_MAX-1);
@@ -562,6 +577,8 @@ int main(int argc, char *argv[])
 			/* unlock pts-device */
 			if (unlockpt(pty[i]->fd) == -1) {
 				fprintf(stderr, "mkiss: Cannot unlock pts-device %s\n", pty[i]->namepts);
+				free(pty[i]);
+				pty[i] = 0;
 				return 1;
 			}
 			if (wrote_info == 0)
@@ -617,7 +634,8 @@ int main(int argc, char *argv[])
 		FD_ZERO(&readfd);
 		FD_SET(tty->fd, &readfd);
 		for (i = 0; i < numptys; i++)
-			FD_SET(pty[i]->fd, &readfd);
+			if (pty[i]->fd != -1)
+				FD_SET(pty[i]->fd, &readfd);
 
 		if (pollspeed)
 			timeout = pollinterval;
@@ -648,7 +666,7 @@ int main(int argc, char *argv[])
 		/*
 		 * A character has arrived on the ttyinterface.
 		 */
-		if (FD_ISSET(tty->fd, &readfd)) {
+		if (tty->fd > -1 && FD_ISSET(tty->fd, &readfd)) {
 			if ((size = read(tty->fd, ibuf, SIZE)) < 0 && errno != EINTR) {
 				if (logging)
 					syslog(LOG_ERR, "tty->fd: %m");
@@ -657,9 +675,11 @@ int main(int argc, char *argv[])
 			for (icp = ibuf; size > 0; size--, icp++) {
 				if ((len = kiss_rx(tty, *icp, crcflag)) != 0) {
 					if ((i = (*tty->obuf & 0xF0) >> 4) < numptys) {
-						kiss_tx(pty[i]->fd, 0, tty->obuf, len, FALSE);
-						pty[i]->txpackets++;
-						pty[i]->txbytes += len;
+						if (pty[i]->fd != -1) {
+							kiss_tx(pty[i]->fd, 0, tty->obuf, len, FALSE);
+							pty[i]->txpackets++;
+							pty[i]->txbytes += len;
+						}
 					} else
 						invalid_ports++;
 					if (pollspeed)
@@ -672,7 +692,7 @@ int main(int argc, char *argv[])
 			/*
 			 * A character has arrived on pty[i].
 			 */
-			if (FD_ISSET(pty[i]->fd, &readfd)) {
+			if (pty[i]->fd > -1 && FD_ISSET(pty[i]->fd, &readfd)) {
 				if ((size = read(pty[i]->fd, ibuf, SIZE)) < 0 && errno != EINTR) {
 					if (logging)
 						syslog(LOG_ERR, "pty[%d]->fd: %m\n", i);
@@ -698,6 +718,10 @@ end:
 	free(tty);
 
 	for (i = 0; i < numptys; i++) {
+		if (pty[i]->fd == -1)
+			continue;
+		if (pty[i]->namepts[0] != '\0')
+			continue;
 		tty_unlock(pty[i]->name);
 		close(pty[i]->fd);
 		free(pty[i]);

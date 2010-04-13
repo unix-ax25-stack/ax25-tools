@@ -30,6 +30,13 @@ these devices may be normal serial ports. However
 .B mkiss
 provides no way in which to set their speed, the speed must therefore be set
 by some other method.
+.sp 1
+If the pty argument is "/dev/ptmx", then Unix98 behaviour
+will automaticaly take effekt. With Unix98 pty's, the slave pty name
+could not be forseen. That's why mkiss will print the corresponding slave
+pty name as a separate line on stdout.
+.sp 1
+If the pty name is the special name "none", no pty is opened. This is useful if you have multiport tnc like the KPC-9612 on i.e. /dev/ttyUSB0 and you only like to handle packets for the second port. The KPC has no option to configure the second tnc to listen on kiss port number 0. Thus, if you like to send all frames from the pty to the kiss port number 1, we need to tell mkiss to tag them for port number 1. This is done by "mkiss /dev/ttyUSB0 none /dev/ptmx". Frames received with port number 0 are discarded.
 .SH OPTIONS
 .TP 10
 .BI \-c
