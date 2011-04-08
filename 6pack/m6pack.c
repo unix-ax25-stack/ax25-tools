@@ -6,7 +6,7 @@
  * Fake out AX.25 code into supporting 6pack TNC rings by routing serial
  * port data to/from pseudo ttys.
  *
- * @(#)m6pack.c  $Revision: 1.3 $  $Date: 2009/01/20 18:31:25 $
+ * @(#)m6pack.c  $Revision: 1.4 $  $Date: 2011/04/08 10:36:44 $
  *
  * Author(s):
  *
@@ -15,6 +15,9 @@
  * History:
  *
  * $Log: m6pack.c,v $
+ * Revision 1.4  2011/04/08 10:36:44  ralf
+ * Fix incorrectly encoded ñ in Iñaki Arenaza's name.
+ *
  * Revision 1.3  2009/01/20 18:31:25  dl9sau
  * 	Unix98 support.
  * 	Thanks to dk2crn.
@@ -24,7 +27,7 @@
  *
  * Revision 1.1  2005/12/10 16:17:28  dl9sau
  *         support for 6pack tnc rings (patch found at sf.net)
- * 	from I�aki Arenaza EB2EBU <iarenaza@escomposlinux.org>
+ * 	from Iñaki Arenaza EB2EBU <iarenaza@escomposlinux.org>
  *
  * Revision 0.9  2002/04/28 15:05:39  hermes-team
  * Minor fixes to make it part of ax25-tools-0.0.8
@@ -95,7 +98,7 @@
 
 #include <config.h>
 
-static char *version ="$Id: m6pack.c,v 1.3 2009/01/20 18:31:25 dl9sau Exp $";
+static char *version ="$Id: m6pack.c,v 1.4 2011/04/08 10:36:44 ralf Exp $";
 
 typedef unsigned char __u8;
 typedef enum {data, command} frame_t;
