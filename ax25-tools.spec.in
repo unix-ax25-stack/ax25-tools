@@ -1,6 +1,6 @@
 Name:           ax25-tools
 Version:        @BASEVERSION@@EXTRAVERSION@
-Release:        1
+Release:        2
 Summary:        Tools used to configure an ax.25 enabled computer
 
 Group:          Applications/Communications
@@ -8,6 +8,7 @@ License:        GPLv2+
 URL:            http://www.linux-ax25.org/
 Source0:        http://www.linux-ax25.org/pub/%{name}/%{name}-@VERSION@.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-@VERSION@-%{release}-root-%(%{__id_u} -n)
+BuildRequires:	libXi-devel, fltk-devel
 
 %description
 ax25-tools is a collection of tools that are used to configure an ax.25 enabled
@@ -78,5 +79,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man?/*
 
 %changelog
+* Fri Jun 24 2011 Ralf Baechle <ralf@linux-mips.org>
+- Add BuildRequires to libXi-devel and fltk-devel
+- Bump Release to 2.
+
 * Sat Jun 27 2009 Ralf Baechle <ralf@linux-mips.org>
 - Initial version
