@@ -1,6 +1,6 @@
 Name:           ax25-tools
 Version:        @BASEVERSION@@EXTRAVERSION@
-Release:        3
+Release:        4
 Summary:        Non-GUI tools used to configure an AX.25 enabled computer
 
 Group:          Applications/Communications
@@ -30,7 +30,6 @@ line programs; the GUI programs are contained in ax25-tools-x package.
  * dmascc_cfg - configure dmascc devices
  * sethdlc - get/set Linux HDLC packet radio modem driver port information
  * smmixer - get/set Linux soundcard packet radio modem driver mixer
- * smdiag - Linux soundcard packet radio modem driver diagnostics utility
  * kissattach - Attach a KISS or 6PACK interface
  * kissnetd - create a virtual network
  * kissparms - configure KISS TNCs
@@ -66,6 +65,7 @@ ax25-tools is a collection of tools that are used to configure an ax.25 enabled
 computer.  This package contains the GUI programs to configure Baycom modem
 and sound modem.
 
+ * smdiag - Linux soundcard packet radio modem driver diagnostics utility
  * xfhdlcchpar - kernel HDLC radio modem driver channel parameter utility
  * xfhdlcst - kernel HDLC radio modem driver status display utility
  * xfsmdiag - kernel soundcard radio modem driver diagnostics utility
@@ -92,7 +92,12 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc AUTHORS ChangeLog COPYING README
 %doc yamdrv/README.yamdrv user_call/README.user_call tcpip/ttylinkd.README dmascc/README.dmascc
-%{_bindir}/*
+%{_bindir}/axgetput
+%{_bindir}/bget
+%{_bindir}/bput
+%{_bindir}/mheard
+%{_bindir}/sethdlc
+%{_bindir}/smmixer
 %{_sbindir}/ax25_call
 %{_sbindir}/ax25d
 %{_sbindir}/axctl
@@ -128,21 +133,61 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/tcp_call
 %{_sbindir}/ttylinkd
 %{_sbindir}/yamcfg
-%{_mandir}/man?/*
+%{_mandir}/man1/*
+%{_mandir}/man4/*
+%{_mandir}/man5/*
+%{_mandir}/man8/ax25_call.8.gz
+%{_mandir}/man8/ax25d.8.gz
+%{_mandir}/man8/axctl.8.gz
+%{_mandir}/man8/axparms.8.gz
+%{_mandir}/man8/axspawn.8.gz
+%{_mandir}/man8/beacon.8.gz
+%{_mandir}/man8/bpqparms.8.gz
+%{_mandir}/man8/kissattach.8.gz
+%{_mandir}/man8/kissnetd.8.gz
+%{_mandir}/man8/kissparms.8.gz
+%{_mandir}/man8/m6pack.8.gz
+%{_mandir}/man8/mheardd.8.gz
+%{_mandir}/man8/mkiss.8.gz
+%{_mandir}/man8/net2kiss.8.gz
+%{_mandir}/man8/netrom_call.8.gz
+%{_mandir}/man8/netromd.8.gz
+%{_mandir}/man8/nodesave.8.gz
+%{_mandir}/man8/nrattach.8.gz
+%{_mandir}/man8/nrparms.8.gz
+%{_mandir}/man8/nrsdrv.8.gz
+%{_mandir}/man8/rip98d.8.gz
+%{_mandir}/man8/rose_call.8.gz
+%{_mandir}/man8/rsattach.8.gz
+%{_mandir}/man8/rsdwnlnk.8.gz
+%{_mandir}/man8/rsparms.8.gz
+%{_mandir}/man8/rsuplnk.8.gz
+%{_mandir}/man8/rxecho.8.gz
+%{_mandir}/man8/sethdlc.8.gz
+%{_mandir}/man8/smmixer.8.gz
+%{_mandir}/man8/spattach.8.gz
+%{_mandir}/man8/tcp_call.8.gz
+%{_mandir}/man8/ttylinkd.8.gz
+%{_mandir}/man9/baycom.9.gz
+%{_mandir}/man9/hdlcdrv.9.gz
+%{_mandir}/man9/soundmodem.9.gz
 
 %files x
 %defattr(-,root,root,-)
 %doc AUTHORS ChangeLog COPYING
+%{_bindir}/smdiag
 %{_sbindir}/xfhdlcchpar
 %{_sbindir}/xfhdlcst
 %{_sbindir}/xfsmdiag
 %{_sbindir}/xfsmmixer
+%{_mandir}/man8/smdiag.8.gz
 
 %changelog
 * Sat Jun 25 2011 Ralf Baechle <ralf@linux-mips.org>
 - Add BuildRequires to libax25-devel, libXext-devel and libX11-devel.
-- Move xfhdlcchpar, xfhdlcst, xfsmdiag and xfsmmixer into a separate package.
-- Bump Release to 3.
+- Move smdiag, xfhdlcchpar, xfhdlcst, xfsmdiag and xfsmmixer into a separate
+  package.
+- Bump Release to 4.
 
 * Fri Jun 24 2011 Ralf Baechle <ralf@linux-mips.org>
 - Add BuildRequires to libXi-devel and fltk-devel
