@@ -1,19 +1,21 @@
 Name:           ax25-tools
 Version:        @BASEVERSION@@EXTRAVERSION@
-Release:        2
-Summary:        Tools used to configure an ax.25 enabled computer
+Release:        3
+Summary:        Non-GUI tools used to configure an AX.25 enabled computer
 
 Group:          Applications/Communications
 License:        GPLv2+
 URL:            http://www.linux-ax25.org/
 Source0:        http://www.linux-ax25.org/pub/%{name}/%{name}-@VERSION@.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-@VERSION@-%{release}-root-%(%{__id_u} -n)
-BuildRequires:	libXi-devel, fltk-devel
+BuildRequires:	libax25-devel
+BuildRequires:	libXext-devel, libX11-devel, libXi-devel, fltk-devel
 
 %description
 ax25-tools is a collection of tools that are used to configure an ax.25 enabled
 computer. They will configure interfaces and assign callsigns to ports as well
-as Net/ROM and ROSE configuration.
+as Net/ROM and ROSE configuration.  This package only contains the command
+line programs; the GUI programs are contained in ax25-tools-x package.
 
  * m6pack - handle multiple 6pack TNCs on a single interface
  * ax25d - general purpose AX.25, NET/ROM and Rose daemon
@@ -53,6 +55,22 @@ as Net/ROM and ROSE configuration.
  * tcp_call - Make a TCP connection
  * yamcfg - configure a YAM interface
 
+%package x
+
+Summary:	Tools used to configure an AX.25 enabled computer
+Group:		Development/Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description x
+ax25-tools is a collection of tools that are used to configure an ax.25 enabled
+computer.  This package contains the GUI programs to configure Baycom modem
+and sound modem.
+
+ * xfhdlcchpar - kernel HDLC radio modem driver channel parameter utility
+ * xfhdlcst - kernel HDLC radio modem driver status display utility
+ * xfsmdiag - kernel soundcard radio modem driver diagnostics utility
+ * xfsmmixer - kernel soundcard radio modem driver mixer utility
+
 %prep
 %setup -q -n %{name}-@VERSION@
 
@@ -75,10 +93,57 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS ChangeLog COPYING README
 %doc yamdrv/README.yamdrv user_call/README.user_call tcpip/ttylinkd.README dmascc/README.dmascc
 %{_bindir}/*
-%{_sbindir}/*
+%{_sbindir}/ax25_call
+%{_sbindir}/ax25d
+%{_sbindir}/axctl
+%{_sbindir}/axparms
+%{_sbindir}/axspawn
+%{_sbindir}/beacon
+%{_sbindir}/bpqparms
+%{_sbindir}/dmascc_cfg
+%{_sbindir}/kissattach
+%{_sbindir}/kissnetd
+%{_sbindir}/kissparms
+%{_sbindir}/m6pack
+%{_sbindir}/mcs2h
+%{_sbindir}/mheardd
+%{_sbindir}/mkiss
+%{_sbindir}/net2kiss
+%{_sbindir}/netrom_call
+%{_sbindir}/netromd
+%{_sbindir}/nodesave
+%{_sbindir}/nrattach
+%{_sbindir}/nrparms
+%{_sbindir}/nrsdrv
+%{_sbindir}/rip98d
+%{_sbindir}/rose_call
+%{_sbindir}/rsattach
+%{_sbindir}/rsdwnlnk
+%{_sbindir}/rsmemsiz
+%{_sbindir}/rsparms
+%{_sbindir}/rsuplnk
+%{_sbindir}/rsusers.sh
+%{_sbindir}/rxecho
+%{_sbindir}/spattach
+%{_sbindir}/tcp_call
+%{_sbindir}/ttylinkd
+%{_sbindir}/yamcfg
 %{_mandir}/man?/*
 
+%files x
+%defattr(-,root,root,-)
+%doc AUTHORS ChangeLog COPYING
+%{_sbindir}/xfhdlcchpar
+%{_sbindir}/xfhdlcst
+%{_sbindir}/xfsmdiag
+%{_sbindir}/xfsmmixer
+
 %changelog
+* Sat Jun 25 2011 Ralf Baechle <ralf@linux-mips.org>
+- Add BuildRequires to libax25-devel, libXext-devel and libX11-devel.
+- Move xfhdlcchpar, xfhdlcst, xfsmdiag and xfsmmixer into a separate package.
+- Bump Release to 3.
+
 * Fri Jun 24 2011 Ralf Baechle <ralf@linux-mips.org>
 - Add BuildRequires to libXi-devel and fltk-devel
 - Bump Release to 2.
