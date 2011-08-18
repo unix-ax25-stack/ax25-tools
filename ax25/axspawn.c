@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.26 2011/08/18 10:21:27 dl9sau Exp $
+ * $Id: axspawn.c,v 1.27 2011/08/18 10:43:49 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1693,7 +1693,11 @@ again:
                 pututline(&ut_line);
                 endutent();
 
-		setsid();
+		/* become process group leader, if we not already are */
+		if (getpid() != getsid(0)) {
+			if (setsid() == -1)
+				exit(1);
+		}
 
                 chargc = 0;
                 envc = 0;
