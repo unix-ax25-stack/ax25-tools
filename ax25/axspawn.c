@@ -1,6 +1,6 @@
 /*
  *
- * $Id: axspawn.c,v 1.25 2011/08/18 09:51:08 dl9sau Exp $
+ * $Id: axspawn.c,v 1.26 2011/08/18 10:21:27 dl9sau Exp $
  *
  * axspawn.c - run a program from ax25d.
  *
@@ -1693,8 +1693,7 @@ again:
                 pututline(&ut_line);
                 endutent();
 
-		if (setsid() == -1)
-			exit(1);
+		setsid();
 
                 chargc = 0;
                 envc = 0;
