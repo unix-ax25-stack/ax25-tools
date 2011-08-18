@@ -1,5 +1,5 @@
 /*
- * $Id: ax25d.c,v 1.8 2009/06/21 18:01:55 ralf Exp $
+ * $Id: ax25d.c,v 1.9 2011/08/18 09:51:08 dl9sau Exp $
  *
  *  This is my version of axl.c, written for the LBBS code to make it
  *    compatable with the kernel AX25 driver.  It appears to work, with
@@ -577,7 +577,7 @@ close_link:
 							/* close link */
 							/* setproctitle("ax25d [%s]: disconnecting", User); */
 							close(new);
-							return 0;
+							exit(0);
 						}
 login:
 						/* setproctitle("ax25d [%s]: login", User); */
@@ -614,11 +614,15 @@ login:
 							closelog();
 
 						/* Make root secure, before we exec() */
-						setgroups(0, grps);	/* Strip any supplementary gid's */
-						setgid(raxl->gid);
-						setuid(raxl->uid);
+						/* Strip any supplementary gid's */
+						if (setgroups(0, grps) == -1)
+							exit(1);
+						if (setgid(raxl->gid) == -1)
+							exit(1);
+						if (setuid(raxl->uid) == -1)
+							exit(1);
 						execve(raxl->exec, argv, NULL);
-						return 1;
+						exit(1);
 
 					default:
 						close(new);
