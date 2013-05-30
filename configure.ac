@@ -1,9 +1,9 @@
 AC_PREREQ(2.59)
 AC_INIT(ax25-tools, 0.0.10-rc2, linux-hams@vger.kernel.org)
 AC_CONFIG_SRCDIR(ax25/ax25d.c)
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([1.7])
 
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS(config.h)
 
 dnl Checks for programs.
 AC_PROG_AWK
