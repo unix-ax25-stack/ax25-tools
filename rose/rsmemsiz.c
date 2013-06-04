@@ -163,7 +163,7 @@ int main(int argc, char **argv)
 	upminutes = upminutes % 60;
 	fprintf(stdout, "Uptime:            ");
 
-  	if (updays)
+	if (updays)
 		fprintf(stdout, "%d day%s, ", updays, (updays != 1) ? "s" : "");
 
 	if (uphours)
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
 	fprintf(stdout, "%d minute%s\r", upminutes, (upminutes != 1) ? "s" : "");
 
 	loadavg(&av[0], &av[1], &av[2]);
-  	fprintf(stdout, "Load average:      %.2f, %.2f, %.2f\r", av[0], av[1], av[2]);
+	fprintf(stdout, "Load average:      %.2f, %.2f, %.2f\r", av[0], av[1], av[2]);
 
 	if (!(mem = meminfo()) || mem[meminfo_main][meminfo_total] == 0) {
 		/* cannot normalize mem usage */
@@ -180,10 +180,10 @@ int main(int argc, char **argv)
 		fprintf(stdout, "Memory:            %5d KB available, %5d KB used, %5d KB free\r",
 			mem[meminfo_main][meminfo_total]    >> 10,
 			(mem[meminfo_main][meminfo_used] -
-		 	mem[meminfo_main][meminfo_buffers] -
+			mem[meminfo_main][meminfo_buffers] -
 			mem[meminfo_total][meminfo_cached]) >> 10,
 			(mem[meminfo_main][meminfo_free] +
-		 	mem[meminfo_main][meminfo_buffers] +
+			mem[meminfo_main][meminfo_buffers] +
 			mem[meminfo_total][meminfo_cached]) >> 10);
 
 		fprintf(stdout, "Swap:              %5d KB available, %5d KB used, %5d KB free\r",

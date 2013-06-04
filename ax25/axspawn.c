@@ -776,7 +776,7 @@ void kick_wqueue(int dummy)
 				if (w_buf->len > curr_len) {
 					/* rewrite current buffer, and break */
 					w_buf->len -= curr_len;
-		        		for (q = w_buf->data, r = w_buf->data+curr_len, i = 0; i < w_buf->len; i++)
+					for (q = w_buf->data, r = w_buf->data+curr_len, i = 0; i < w_buf->len; i++)
 						*q++ = *r++;
 					break;
 				}
@@ -910,7 +910,7 @@ int write_ax25(char *s, int len, int kick)
 		}
 		while (j < len) {
 			if ((j + 1 < len) && *(p + j) == '\r' && *(p + j + 1) == '\n') {
-		  		*(p + i) = '\r';
+				*(p + i) = '\r';
 				j++;
 			}
 			else
@@ -1148,9 +1148,9 @@ end_mkdirs:
 			  */
 			  opt_shell = " -s \"/bin/sh\"";
 		}
-        	sprintf(command,"/usr/sbin/useradd -p \"%s\" -c %s -d %s -u %d -g %d -m %s%s",
+		sprintf(command,"/usr/sbin/useradd -p \"%s\" -c %s -d %s -u %d -g %d -m %s%s",
 			((policy_add_empty_password) ? "" : "+"),
-                	username, userdir, uid, user_gid, newuser, opt_shell);
+			username, userdir, uid, user_gid, newuser, opt_shell);
 		if (system(command) != 0)
 			goto out;
 	} else {
@@ -1202,7 +1202,7 @@ end_mkdirs:
 				 * as an optimization.
 				 * -> mark #!... as ##
 				 */
-                        	if (buf[0] == '#' && buf[1] == '!')
+				if (buf[0] == '#' && buf[1] == '!')
 					buf[1] = '#';
 				first = 0;
 			}
@@ -1583,7 +1583,7 @@ again:
 		if (pwtype == PW_MD5)
 			ask_pw_md5(prompt, pass_want, pwd);
 		else
-                	ask_pw_sys(prompt, pass_want, pwd);
+			ask_pw_sys(prompt, pass_want, pwd);
 
 		cnt = read_ax25(buf, sizeof(buf)-1);
 		if (cnt <= 0) {
@@ -1643,7 +1643,7 @@ again:
 					break;
 				case AF_ROSE:
 					sax25.sax25_call = sockaddr.rose.srose_call;
-                                        break;
+					break;
 			}
 			ioctl(fds, SIOCAX25ADDUID, &sax25);
 			close(fds);
@@ -1659,36 +1659,36 @@ again:
 		struct termios termios;
 		char *shell = "/bin/sh";
 
-        	memset((char *) &termios, 0, sizeof(termios));
+		memset((char *) &termios, 0, sizeof(termios));
 
-        	ioctl(0, TIOCSCTTY, (char *) 0);
+		ioctl(0, TIOCSCTTY, (char *) 0);
 
 		termios.c_iflag = ICRNL | IXOFF;
-            	termios.c_oflag = OPOST | ONLCR;
-                termios.c_cflag = CS8 | CREAD | CLOCAL;
-                termios.c_lflag = ISIG | ICANON;
-                termios.c_cc[VINTR]  = /* 127 */ 0x03;
-                termios.c_cc[VQUIT]  =  28;
-                termios.c_cc[VERASE] =   8;
-                termios.c_cc[VKILL]  =  24;
-                termios.c_cc[VEOF]   =   4;
-                cfsetispeed(&termios, B19200);
-                cfsetospeed(&termios, B19200);
-                tcsetattr(0, TCSANOW, &termios);
+		termios.c_oflag = OPOST | ONLCR;
+		termios.c_cflag = CS8 | CREAD | CLOCAL;
+		termios.c_lflag = ISIG | ICANON;
+		termios.c_cc[VINTR]  = /* 127 */ 0x03;
+		termios.c_cc[VQUIT]  =  28;
+		termios.c_cc[VERASE] =   8;
+		termios.c_cc[VKILL]  =  24;
+		termios.c_cc[VEOF]   =   4;
+		cfsetispeed(&termios, B19200);
+		cfsetospeed(&termios, B19200);
+		tcsetattr(0, TCSANOW, &termios);
 
 		setutent();
-                ut_line.ut_type = LOGIN_PROCESS;
-                ut_line.ut_pid  = getpid();
-                strncpy(ut_line.ut_line, ptyslave + 5, sizeof(ut_line.ut_line));
-                strncpy(ut_line.ut_id,   ptyslave + 8, sizeof(ut_line.ut_id));
-                strncpy(ut_line.ut_user, "LOGIN",      sizeof(ut_line.ut_user));
-                strncpy(ut_line.ut_host, protocol,     sizeof(ut_line.ut_host));
+		ut_line.ut_type = LOGIN_PROCESS;
+		ut_line.ut_pid  = getpid();
+		strncpy(ut_line.ut_line, ptyslave + 5, sizeof(ut_line.ut_line));
+		strncpy(ut_line.ut_id,   ptyslave + 8, sizeof(ut_line.ut_id));
+		strncpy(ut_line.ut_user, "LOGIN",      sizeof(ut_line.ut_user));
+		strncpy(ut_line.ut_host, protocol,     sizeof(ut_line.ut_host));
 		gettimeofday(&tv, NULL);
 		ut_line.ut_tv.tv_sec = tv.tv_sec;
 		ut_line.ut_tv.tv_usec = tv.tv_usec;
-                ut_line.ut_addr = 0;
-                pututline(&ut_line);
-                endutent();
+		ut_line.ut_addr = 0;
+		pututline(&ut_line);
+		endutent();
 
 		/* become process group leader, if we not already are */
 		if (getpid() != getsid(0)) {
@@ -1696,8 +1696,8 @@ again:
 				exit(1);
 		}
 
-                chargc = 0;
-                envc = 0;
+		chargc = 0;
+		envc = 0;
 
 		if (dumb_embedded_system) {
 			int ret = -1;
@@ -1709,18 +1709,18 @@ again:
 			ret = -1;
 			if (pw->pw_dir && *(pw->pw_dir))
 				p = pw->pw_dir;
-		  		ret = chdir(p);
+				ret = chdir(p);
 			if (ret != 0) {
 				p = "/tmp";
-		  		chdir(p);
+				chdir(p);
 			}
 
-                	if ((envp[envc] = (char *) malloc(strlen(p)+6)))
-                		sprintf(envp[envc++], "HOME=%s", p);
-                	if ((envp[envc] = (char *) malloc(strlen(pw->pw_name)+6)))
-                		sprintf(envp[envc++], "USER=%s", pw->pw_name);
-                	if ((envp[envc] = (char *) malloc(strlen(pw->pw_name)+9)))
-                		sprintf(envp[envc++], "LOGNAME=%s", pw->pw_name);
+			if ((envp[envc] = (char *) malloc(strlen(p)+6)))
+				sprintf(envp[envc++], "HOME=%s", p);
+			if ((envp[envc] = (char *) malloc(strlen(pw->pw_name)+6)))
+				sprintf(envp[envc++], "USER=%s", pw->pw_name);
+			if ((envp[envc] = (char *) malloc(strlen(pw->pw_name)+9)))
+				sprintf(envp[envc++], "LOGNAME=%s", pw->pw_name);
 
 			if (pw->pw_shell && *(pw->pw_shell)) {
 				shell = pw->pw_shell;
@@ -1736,56 +1736,56 @@ again:
 			}
 			if (!p)
 				p = shell;
-                	chargv[chargc++] = p;
-               		if ((envp[envc] = (char *) malloc(strlen(shell)+7)))
-               			sprintf(envp[envc++], "SHELL=%s", shell);
+			chargv[chargc++] = p;
+			if ((envp[envc] = (char *) malloc(strlen(shell)+7)))
+				sprintf(envp[envc++], "SHELL=%s", shell);
 
 			if (pw->pw_uid == 0)
 				p = "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin";
 			else
 				p = "/bin:/usr/bin:/usr/local/bin";
-                	if ((envp[envc] = (char *) malloc(strlen(p)+6)))
-                		sprintf(envp[envc++], "PATH=%s", p);
+			if ((envp[envc] = (char *) malloc(strlen(p)+6)))
+				sprintf(envp[envc++], "PATH=%s", p);
 
 		} else {
 
-                	chargv[chargc++] = "/bin/login";
-                	chargv[chargc++] = "-p";
+			chargv[chargc++] = "/bin/login";
+			chargv[chargc++] = "-p";
 			/* there exist several conectps:
-		 	* Historicaly, the special character '+' in the password
-		 	* field indicated that users may login via ax25, netrom, rose,
-		 	* etc.. - but not via other protocols like telnet.
-		 	* This secures the digipeater from abuse by inet access of
-		 	* non-hams.
-		 	* On the other hand, this leads to the problem that telent
-		 	* via HF, pop3, etc.. do not work.
-		 	* The "pwcheck == 2 method means, that the password is used on
-		 	* every login mechanism other than this axspawn program;
-		 	* here we do not rely on the password - the ax25 call of
-		 	* the ham is enough. We have already checked above, that
-		 	* the call of the user is valid (and not root, httpd, etc..);
-		 	* thus this method is safe here.
-		 	* Another mechanism (pwcheck == 3) is to check if the gid
-		 	* equals to user_gid preference. I prefer this way, because
-		 	* this approach gives the chance to temporary lock a user
-		 	* out (abuse, ..) by changing his gid in passwd to for e.g.
-		 	* 65534 (nogroup).
-		 	*/
+			* Historicaly, the special character '+' in the password
+			* field indicated that users may login via ax25, netrom, rose,
+			* etc.. - but not via other protocols like telnet.
+			* This secures the digipeater from abuse by inet access of
+			* non-hams.
+			* On the other hand, this leads to the problem that telent
+			* via HF, pop3, etc.. do not work.
+			* The "pwcheck == 2 method means, that the password is used on
+			* every login mechanism other than this axspawn program;
+			* here we do not rely on the password - the ax25 call of
+			* the ham is enough. We have already checked above, that
+			* the call of the user is valid (and not root, httpd, etc..);
+			* thus this method is safe here.
+			* Another mechanism (pwcheck == 3) is to check if the gid
+			* equals to user_gid preference. I prefer this way, because
+			* this approach gives the chance to temporary lock a user
+			* out (abuse, ..) by changing his gid in passwd to for e.g.
+			* 65534 (nogroup).
+			*/
 			chargv[chargc++] = "-h";
 			chargv[chargc++] = protocol;
-                	if (pwtype != PW_CLEARTEXT /* PW_SYS or PW_MD5 are already authenticated */
+			if (pwtype != PW_CLEARTEXT /* PW_SYS or PW_MD5 are already authenticated */
 				|| pwcheck == 2 || (pwcheck == 3 && (pw->pw_gid == user_gid || is_guest)) || !strcmp(pw->pw_passwd, "+"))
-	        		chargv[chargc++] = "-f";
-                	chargv[chargc++] = as_user;
+				chargv[chargc++] = "-f";
+			chargv[chargc++] = as_user;
 		}
-               	chargv[chargc]   = NULL;
+		chargv[chargc]   = NULL;
 
-                if ((envp[envc] = (char *) malloc(30)))
-                	sprintf(envp[envc++], "AXCALL=%s", call);
-                if ((envp[envc] = (char *) malloc(30)))
-                	sprintf(envp[envc++], "CALL=%s", user);
-                if ((envp[envc] = (char *) malloc(30)))
-                	sprintf(envp[envc++], "PROTOCOL=%s", protocol);
+		if ((envp[envc] = (char *) malloc(30)))
+			sprintf(envp[envc++], "AXCALL=%s", call);
+		if ((envp[envc] = (char *) malloc(30)))
+			sprintf(envp[envc++], "CALL=%s", user);
+		if ((envp[envc] = (char *) malloc(30)))
+			sprintf(envp[envc++], "PROTOCOL=%s", protocol);
 		if ((envp[envc] = (char *) malloc(30)))
 			sprintf(envp[envc++], "TERM=dumb"); /* SuSE bug (dump - tsts) */
 		/* other useful defaults */
@@ -1800,51 +1800,51 @@ again:
 				exit(1);
 			if (setuid(pw->pw_uid) == -1)
 				exit(1);
-                	execve(shell, chargv, envp);
+			execve(shell, chargv, envp);
 			/* point of no return */
 			exit(1);
 		}
 
-                execve(chargv[0], chargv, envp);
+		execve(chargv[0], chargv, envp);
 		/* point of no return */
 		exit(1);
-        }
-        else if (pid > 0)
-        {
-        	child_pid = 0;
-        	signal(SIGHUP, signal_handler);
-        	signal(SIGTERM, signal_handler);
-        	signal(SIGINT, signal_handler);
-        	signal(SIGQUIT, signal_handler);
+	}
+	else if (pid > 0)
+	{
+		child_pid = 0;
+		signal(SIGHUP, signal_handler);
+		signal(SIGTERM, signal_handler);
+		signal(SIGINT, signal_handler);
+		signal(SIGQUIT, signal_handler);
 
-        	while(1)
-        	{
-       			FD_ZERO(&fds_read);
-       			FD_ZERO(&fds_err);
-        		FD_SET(0, &fds_read);
-        		FD_SET(0, &fds_err);
-        		if (wqueue_length <= paclen*7)
+		while(1)
+		{
+			FD_ZERO(&fds_read);
+			FD_ZERO(&fds_err);
+			FD_SET(0, &fds_read);
+			FD_SET(0, &fds_err);
+			if (wqueue_length <= paclen*7)
 				FD_SET(fdmaster, &fds_read);
-        		FD_SET(fdmaster, &fds_err);
+			FD_SET(fdmaster, &fds_err);
 
-        		k = select(fdmaster+1, &fds_read, NULL, &fds_err, NULL);
+			k = select(fdmaster+1, &fds_read, NULL, &fds_err, NULL);
 
-        		if (k > 0)
-        		{
-        			if (FD_ISSET(0, &fds_err))
-        			{
+			if (k > 0)
+			{
+				if (FD_ISSET(0, &fds_err))
+				{
 					if (huffman) {
 							sprintf(buf,"\r//COMP 0\r");
 							write_ax25(buf, strlen(buf), 1);
 							sleep(EXITDELAY);
-        				}
-        				kill(pid, SIGHUP);
-        				cleanup(ptyslave+5);
-        				return 1;
-        			}
+					}
+					kill(pid, SIGHUP);
+					cleanup(ptyslave+5);
+					return 1;
+				}
 
-        			if (FD_ISSET(fdmaster, &fds_err))
-        			{
+				if (FD_ISSET(fdmaster, &fds_err))
+				{
 					/* give the last packet in the timer controlled sendqueue a chance.. */
 					if (wqueue_length) {
 						continue;
@@ -1853,28 +1853,28 @@ again:
 							sprintf(buf,"\r//COMP 0\r");
 							write_ax25(buf, strlen(buf), 1);
 							sleep(EXITDELAY);
-        				}
-        				cleanup(ptyslave+5);
-        				return 1;
-        			}
+					}
+					cleanup(ptyslave+5);
+					return 1;
+				}
 
-        			if (FD_ISSET(0, &fds_read))
-        			{
-        				cnt = read_ax25(buf, sizeof(buf));
-        				if (cnt < 0)	/* Connection died */
-        				{
-        					kill(pid, SIGHUP);
-        					cleanup(ptyslave+5);
-        					return 1;
-        				} else
-        					write(fdmaster, buf, cnt);
-        			}
+				if (FD_ISSET(0, &fds_read))
+				{
+					cnt = read_ax25(buf, sizeof(buf));
+					if (cnt < 0)	/* Connection died */
+					{
+						kill(pid, SIGHUP);
+						cleanup(ptyslave+5);
+						return 1;
+					} else
+						write(fdmaster, buf, cnt);
+				}
 
-        			if (FD_ISSET(fdmaster, &fds_read))
-        			{
-        				cnt = read(fdmaster, buf, (huffman ? 254 : sizeof(buf)));
-        				if (cnt < 0)
-        				{
+				if (FD_ISSET(fdmaster, &fds_read))
+				{
+					cnt = read(fdmaster, buf, (huffman ? 254 : sizeof(buf)));
+					if (cnt < 0)
+					{
 						/* give the last packet in the timer controlled sendqueue a chance.. */
 						if (wqueue_length) {
 							continue;
@@ -1883,36 +1883,36 @@ again:
 								sprintf(buf,"\r//COMP 0\r");
 								write_ax25(buf, strlen(buf), 1);
 								sleep(EXITDELAY);
-        					}
-	        				cleanup(ptyslave+5);
-        					return 1;	/* Child died */
-        				}
-        				write_ax25(buf, cnt, 0);
-        			}
-        		} else
-        		if (k < 0 && errno != EINTR)
-        		{
+						}
+						cleanup(ptyslave+5);
+						return 1;	/* Child died */
+					}
+					write_ax25(buf, cnt, 0);
+				}
+			} else
+			if (k < 0 && errno != EINTR)
+			{
 				if (huffman) {
 						sprintf(buf,"\r//COMP 0\r");
 						write_ax25(buf, strlen(buf), 1);
 						sleep(EXITDELAY);
-        			}
+				}
 
-        			kill(pid, SIGHUP);	/* just in case... */
-        			cleanup(ptyslave+5);
-        			return 0;
-        		}
-        	}
-        }
-        else
-        {
+				kill(pid, SIGHUP);	/* just in case... */
+				cleanup(ptyslave+5);
+				return 0;
+			}
+		}
+	}
+	else
+	{
 		write_ax25_static_line(MSG_CANNOTFORK);
-        	syslog(LOG_ERR, "cannot fork %m, closing connection to %s\n", call);
-        	sleep(EXITDELAY);
-        	return 1;
-        }
+		syslog(LOG_ERR, "cannot fork %m, closing connection to %s\n", call);
+		sleep(EXITDELAY);
+		return 1;
+	}
 
-        sleep(EXITDELAY);
+	sleep(EXITDELAY);
 
 	return 0;
 }

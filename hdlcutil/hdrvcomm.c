@@ -244,7 +244,7 @@ void hdrvc_init(void)
 			fprintf(stderr, "%s: Error %s (%i), cannot ioctl SIOCGIFHWADDR %s\n", prg_name,
 				strerror(errno), errno, if_name);
 			exit(-1);
-                }
+		}
 		if (ifr.ifr_hwaddr.sa_family != ARPHRD_AX25) {
 			fprintf(stderr, "%s: Error, interface %s not AX25 (%i)\n", prg_name,
 				if_name, ifr.ifr_hwaddr.sa_family);

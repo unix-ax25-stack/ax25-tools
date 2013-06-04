@@ -79,7 +79,7 @@ static const char *usage_str =
 
 int main(int argc, char *argv[])
 {
-        int c, i;
+	int c, i;
 	int ret;
 	struct hdrvc_channel_params cp;
 

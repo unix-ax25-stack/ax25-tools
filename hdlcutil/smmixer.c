@@ -159,7 +159,7 @@ static void display_mixer_cs423x(void)
 	       (data & 0x40) ? "output muted, " : "",
 	       (data & 0x20) ? "bypass, " : "",
 	       (int)(data & 0xf) * (-3));
-       	data = get_mixer_reg(27);
+	data = get_mixer_reg(27);
 	if (data & 0x80)
 		printf("Left output:  muted\n");
 	else
@@ -314,15 +314,15 @@ static void display_mixer_ct1745(void)
 
 static int parse_ad_src(const char *cp)
 {
-        if (!strcasecmp(cp, "line"))
-                return 0;
-        if (!strcasecmp(cp, "aux1"))
-                return 1;
-        if (!strcasecmp(cp, "mic"))
-                return 2;
-        if (!strcasecmp(cp, "dac"))
-                return 3;
-        return -1;
+	if (!strcasecmp(cp, "line"))
+		return 0;
+	if (!strcasecmp(cp, "aux1"))
+		return 1;
+	if (!strcasecmp(cp, "mic"))
+		return 2;
+	if (!strcasecmp(cp, "dac"))
+		return 3;
+	return -1;
 }
 
 /* ---------------------------------------------------------------------- */

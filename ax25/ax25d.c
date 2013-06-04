@@ -535,7 +535,7 @@ int main(int argc, char *argv[])
 									/* debug */
 									syslog((LOG_DEBUG), "DEBUG: AX.25 %s (%s:%s) AX25.IP-VC host said: >%s<", User, Port, myAX25Name, buf);
 								}
-							        /* skip leading mess */
+								/* skip leading mess */
 								for (p = buf; *p && (isspace(*p & 0xff) || *p == '\r'); p++) ;
 								if (raxl->VCdiscOnLinkfailureMsg && !strncmp(p, "***", 3)) {
 									/* format received line for debug purposes */
@@ -554,9 +554,9 @@ int main(int argc, char *argv[])
 									break;
 								}
 								/* per default, we discard all messages,
-							 	 * because there's no useful combination
-							 	 * using VC and pidText togegther
-							 	 */
+								 * because there's no useful combination
+								 * using VC and pidText togegther
+								 */
 								if (raxl->VCloginEnable)
 									goto login;
 							}
@@ -979,13 +979,13 @@ static int ReadConfig(void)
 				reload_timer(60);
 				continue;
 			}
-                        /* xlz - have to nuke this as this option is gone
-                         * what should be here?
+			/* xlz - have to nuke this as this option is gone
+			 * what should be here?
 			if (iamdigi) {
 				yes = 1;
 				setsockopt(axl_port->fd, SOL_AX25, AX25_IAMDIGI, &yes, sizeof(yes));
 			}
-                        */
+			*/
 
 			if (bind(axl_port->fd, (struct sockaddr *)&sockaddr, addrlen) < 0) {
 				fprintf(stderr, "ax25d: bind: %s on port %s\n", strerror(errno), axl_port->port);

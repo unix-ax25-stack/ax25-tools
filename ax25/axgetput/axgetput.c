@@ -264,17 +264,17 @@ int main(int argc, char *argv[])
 #define	get_filename(f) { \
       if (!strcmp(f, "-")) { \
 	if (mode % 2) \
-          fdin_is_pipe = 1; \
-        else \
-          fdout_is_pipe = 1; \
+	  fdin_is_pipe = 1; \
+	else \
+	  fdout_is_pipe = 1; \
       } else { \
-        strncpy(filename, f, sizeof(filename)-1); \
-        filename[sizeof(filename)-1] = 0; \
+	strncpy(filename, f, sizeof(filename)-1); \
+	filename[sizeof(filename)-1] = 0; \
 	if (mode % 2) { \
 	  if (fdin_is_pipe) \
 	    fdin_is_pipe = 0; \
 	} else { \
-          if (fdout_is_pipe) \
+	  if (fdout_is_pipe) \
 	    fdout_is_pipe = 0; \
 	} \
       } \

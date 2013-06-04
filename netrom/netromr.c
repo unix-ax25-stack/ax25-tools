@@ -48,7 +48,7 @@ static int validcallsign(ax25_address *a)
 		}
 
 		return FALSE;
-        }
+	}
 
 	return TRUE;
 }

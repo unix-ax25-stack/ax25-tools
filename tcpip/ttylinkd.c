@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
 	memset((char*)&msg_sa, 0, sizeof(msg_sa));
 
 	msg_sa.sa_family = AF_INET;
-        msg_sin = (struct sockaddr_in*)&msg_sa;
+	msg_sin = (struct sockaddr_in*)&msg_sa;
 	msg_sin->sin_port = htons(0);
 	memcpy((char*)&(msg_sin->sin_addr), phe->h_addr, phe->h_length);
 
@@ -323,7 +323,7 @@ int main(int argc, char *argv[])
 	msg.vers = TALK_VERSION;
 	msg.id_num = htonl(0);
 	msg.addr.sa_family = ntohs(AF_INET);
-        memcpy(&(msg.ctl_addr), &msg_sa, sizeof(struct osockaddr));
+	memcpy(&(msg.ctl_addr), &msg_sa, sizeof(struct osockaddr));
 	/*msg.ctl_addr = *(struct sockaddr*)&ctl_sin;
 	msg.ctl_addr = *(struct sockaddr*)&ctl_sin;*/
 	msg.ctl_addr.sa_family = ntohs(AF_INET);

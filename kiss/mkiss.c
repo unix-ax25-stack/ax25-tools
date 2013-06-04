@@ -159,13 +159,13 @@ static int poll(int fd, int ports)
 
 static int put_ubyte(unsigned char* s, u16* crc, unsigned char c, int usecrc)
 {
-  	int len = 1;
+	int len = 1;
 
-  	if (c == FEND) {
+	if (c == FEND) {
 		*s++ = FESC;
 		*s++ = TFEND;
 		len++;
-  	} else {
+	} else {
 		*s++ = c;
 		if (c == FESC) {
 			*s++ = TFESC;
@@ -205,7 +205,7 @@ static int kiss_tx(int fd, int port, unsigned char *s, int len, int usecrc)
 	 */
 	*ptr++ = FEND;
 
-    	if (usecrc == FLEX_CRC) {
+	if (usecrc == FLEX_CRC) {
 		crc = 0xffff;
 		ptr += put_ubyte(ptr, &crc, CRCTYP, usecrc);
 		c = *s++;
@@ -445,13 +445,13 @@ int main(int argc, char *argv[])
 			hwflag = TRUE;
 			break;
 		case 'l':
-		        logging = TRUE;
-		        break;
+			logging = TRUE;
+			break;
 		case 'p':
 			pollspeed = atoi(optarg);
 			pollinterval.tv_sec = pollspeed / 10;
 			pollinterval.tv_usec = (pollspeed % 10) * 100000L;
-		        break;
+			break;
 		case 's':
 			speed = atoi(optarg);
 			break;
@@ -482,7 +482,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-        numptys = argc - optind - 1;
+	numptys = argc - optind - 1;
 	if ((numptys + ptmxdevices) > 16) {
 		fprintf(stderr, "mkiss: max 16 pty interfaces allowed.\n");
 		return 1;

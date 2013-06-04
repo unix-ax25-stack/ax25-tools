@@ -70,7 +70,7 @@ static int readconfig(char *port)
 
 	if ((fp = fopen(CONF_AXPORTS_FILE, "r")) == NULL) {
 		fprintf(stderr, "%s: cannot open axports file %s\n",
-                        progname, CONF_AXPORTS_FILE);
+			progname, CONF_AXPORTS_FILE);
 		return FALSE;
 	}
 
@@ -214,7 +214,7 @@ static int startiface(char *dev, struct hostent *hp)
 
 static void usage(void)
 {
-        fprintf(stderr, "usage: %s [-b] [-l] [-m mtu] [-v] tty port [inetaddr]\n", progname);
+	fprintf(stderr, "usage: %s [-b] [-l] [-m mtu] [-v] tty port [inetaddr]\n", progname);
 }
 
 int main(int argc, char *argv[])
@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
 	char dev[64];
 	int  v = 4;
 	char *namepts = NULL;  /* name of the unix98 pts slave, which
-	                        * the client has to use */
+				* the client has to use */
 	struct hostent *hp = NULL;
 
 	progname = kiss_basename(argv[0]);
@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
 	if (!readconfig(portname))
 		return 1;
 
-        if (inetaddr && (hp = gethostbyname(inetaddr)) == NULL) {
+	if (inetaddr && (hp = gethostbyname(inetaddr)) == NULL) {
 		fprintf(stderr, "%s: invalid internet name/address - %s\n", progname, inetaddr);
 		return 1;
 	}

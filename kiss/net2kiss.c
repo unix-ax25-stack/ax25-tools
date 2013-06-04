@@ -243,7 +243,7 @@ static int openpty(int *amaster, int *aslave, char *name,
 		   struct termios *termp, struct winsize *winp)
 {
 	char line[PATH_MAX];
-        const char *cp1, *cp2;
+	const char *cp1, *cp2;
 	int master, slave;
 	struct group *gr = getgrnam("tty");
 
@@ -404,7 +404,7 @@ static int doio(int fdif, int fdpty, char *ifaddr)
 	unsigned char pktbuf[2048];
 	unsigned char *pktptr = pktbuf;
 	unsigned char pktstate = KISS_HUNT;
-      	unsigned char obuf[16384];
+	unsigned char obuf[16384];
 	unsigned int ob_wp = 0, ob_rp = 0, ob_wpx;
 	int i;
 	fd_set rmask, wmask;
@@ -418,9 +418,9 @@ static int doio(int fdif, int fdpty, char *ifaddr)
 
 #define ADD_KISSCHAR(c) \
 	if (((c) & 0xff) == KISS_FEND) \
-                { ADD_CHAR(KISS_FESC); ADD_CHAR(KISS_TFEND); } \
+		{ ADD_CHAR(KISS_FESC); ADD_CHAR(KISS_TFEND); } \
 	else if (((c) & 0xff) == KISS_FESC) \
-                { ADD_CHAR(KISS_FESC); ADD_CHAR(KISS_TFESC); } \
+		{ ADD_CHAR(KISS_FESC); ADD_CHAR(KISS_TFESC); } \
 	else { ADD_CHAR(c); }
 
 	for (;;) {
@@ -622,7 +622,7 @@ int main(int argc, char *argv[])
 	memcpy(ifr.ifr_name, name_iface, IFNAMSIZ);
 	if (ioctl(fdif, SIOCGIFFLAGS, &ifr) < 0)
 		die("ioctl SIOCGIFFLAGS");
-       	ifr_new = ifr;
+	ifr_new = ifr;
 	ifr_new.ifr_flags |= if_newflags;
 	if (ioctl(fdif, SIOCSIFFLAGS, &ifr_new) < 0)
 		die("ioctl SIOCSIFFLAGS");
@@ -674,7 +674,7 @@ int main(int argc, char *argv[])
 		} else {
 			/*
 			 * try to reopen master
-		 	 */
+			 */
 			if (verbose)
 				printf("reopening master tty: %s\n", master_name);
 			close(fdpty);

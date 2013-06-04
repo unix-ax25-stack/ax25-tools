@@ -145,7 +145,7 @@ static void ReopenPort(int PortNumber)
 	} else {
 		if (PortList[PortNumber]->Fd == -1) {
 			syslog(LOG_WARNING, "kissnetd : Cannot reopen port ptmx (slave %s) : not supported by ptmx-device\n",
-		       	PortList[PortNumber]->namepts);
+			PortList[PortNumber]->namepts);
 			if (VerboseMode) {
 				sprintf(MyString, "cannot reopen ptmx (slave %s).", PortList[PortNumber]->namepts);
 				perror(MyString);
@@ -153,7 +153,7 @@ static void ReopenPort(int PortNumber)
 			return;
 		}
 		syslog(LOG_WARNING, "kissnetd : Trying to poll port ptmx (slave %s).\n",
-		       	PortList[PortNumber]->namepts);
+			PortList[PortNumber]->namepts);
 		PortList[PortNumber]->is_active = 1;
 	}
 }
