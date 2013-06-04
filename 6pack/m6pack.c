@@ -459,7 +459,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-        numptys = argc - optind - 1;
+	numptys = argc - optind - 1;
 
 	if (numptys + ptmxdevices > MAX_PTYS) {
 		fprintf(stderr, "m6pack: max %d pty interfaces allowed.\n",

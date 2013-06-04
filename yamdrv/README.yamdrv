@@ -12,7 +12,7 @@ yam3 default to COM4 0x3e8 irq3
 
 Added : bitrate/baudrate configuration.
 Added : mcs file may be loaded from yamcfg.
-        One mcs file is affected to each bitrate.
+	One mcs file is affected to each bitrate.
 
 		mcs data for 1200 and 9600 bds are preloaded in the driver
 		but may be changed by yamcfg.

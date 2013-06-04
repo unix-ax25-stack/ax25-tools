@@ -222,7 +222,7 @@ static void print_bits(int (*bitproc)(void))
 			if (errno == EAGAIN)
 				return;
 			fprintf(stderr, "%s: Error %s (%i), cannot ioctl\n",
-			        progname, strerror(errno), errno);
+				progname, strerror(errno), errno);
 			return;
 		}
 		strcpy(cp = str, "00000000");

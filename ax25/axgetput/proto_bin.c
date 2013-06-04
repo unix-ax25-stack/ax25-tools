@@ -26,7 +26,7 @@ static int init_crc(void)
     crctab[i] = 0;
     for (j = 0; j < 8; j++) {
       if ((bittab[j] & i) != 0) {
-        crctab[i] = crctab[i] ^ crcbit[j];
+	crctab[i] = crctab[i] ^ crcbit[j];
       }
     }
   }
@@ -113,7 +113,7 @@ int bput(void)
       return 1;
     }
     if (buf[len-1] == '\r' && len > 5 && !memcmp(buf, "#BIN#", 5)) {
-        break;
+	break;
     }
     if (len == sizeof(buf)) {
       sprintf(err_msg, "line to long\n");
@@ -139,12 +139,12 @@ int bput(void)
       break;
     default:
       if (*p == '|') {
-        msg_crc = (unsigned int ) atoi(p+1);
+	msg_crc = (unsigned int ) atoi(p+1);
       } else if (*p == '$') {
-        file_time = parse_sfbin_date_to_unix(p+1);
+	file_time = parse_sfbin_date_to_unix(p+1);
       } else {
-        strncpy(filename_given, p, sizeof(filename_given)-1);
-        filename_given[sizeof(filename_given)-1] = 0;
+	strncpy(filename_given, p, sizeof(filename_given)-1);
+	filename_given[sizeof(filename_given)-1] = 0;
       }
     }
   }
@@ -159,8 +159,8 @@ int bput(void)
     if (!stat(filename, &statbuf)) {
       /* file exist  */
       if (unlink(filename)) {
-        sprintf(err_msg, "error: cannot unlink %s (%s)\n", filename, strerror(errno));
-        goto abort;
+	sprintf(err_msg, "error: cannot unlink %s (%s)\n", filename, strerror(errno));
+	goto abort;
       }
     }
     if ((fddata = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0640)) < 0) {
@@ -194,7 +194,7 @@ int bput(void)
     if (!len) {
       save_close(fddata);
       if (!term_line) {
-        sprintf(err_msg, "error: unexpected end of file during read: %s\n", strerror(errno));
+	sprintf(err_msg, "error: unexpected end of file during read: %s\n", strerror(errno));
 	return 1;
       }
       return 0;
@@ -203,14 +203,14 @@ int bput(void)
     if (msg_crc) {
       int i;
       for (i = 0; i < len; i++)
-        crc = do_crc((int ) buf[i], 1, crc);
+	crc = do_crc((int ) buf[i], 1, crc);
     }
 
     if (buf[len-1] == '\r') {
       if (last_line_had_CR) {
 	if (IS_BIN_ABORT(buf, len)) {
 	  /* "\r#ABORT#\r" was sent  */
-          if (!fdout_is_pipe) {
+	  if (!fdout_is_pipe) {
 	    close(fddata);
 	    /* clean up  */
 	    unlink(filename);
@@ -218,8 +218,8 @@ int bput(void)
 	  return 1;
 	}
 	if (term_line && len == len_termline && !memcmp(buf, term_line, len_termline)) {
-          /* sucessfully read until termination string  */
-          break;
+	  /* sucessfully read until termination string  */
+	  break;
 	}
       }
       last_line_had_CR = 1;
@@ -241,7 +241,7 @@ int bput(void)
     if (is_eof) {
       if (!term_line && len_read_left) {
 	save_close(fddata);
-        goto abort;
+	goto abort;
       }
       break;
     }
@@ -304,13 +304,13 @@ int bget(void) {
 }
 
 #define	store_line(s, len) { \
-        if (!(sl = (struct strlist *) malloc(sizeof(struct strlist *) + sizeof(size_t) + len))) \
+	if (!(sl = (struct strlist *) malloc(sizeof(struct strlist *) + sizeof(size_t) + len))) \
 	  return 1; \
 	sl->next = 0; \
 	sl->len = len; \
 	memcpy(sl->data, s, len); \
 	if (!stored_file) { \
-          stored_file = sl; \
+	  stored_file = sl; \
 	} else { \
 	  sl_tail->next = sl; \
 	} \
@@ -336,7 +336,7 @@ int bget(void) {
     while ((len = read(fddata, buf, BLOCKSIZ)) > 0) {
       int i;
       for (i = 0; i < len; i++)
-        crc = do_crc((int ) buf[i], 1, crc);
+	crc = do_crc((int ) buf[i], 1, crc);
       file_size += len;
     }
     if (len < 0) {
@@ -356,17 +356,17 @@ int bget(void) {
     if (!is_stream || do_crc_only) {
       sprintf(err_msg, "error: not enough memory\n");
       while ((len = read(fddata, buf, sizeof(buf))) > 0) {
-        int i;
-        for (i = 0; i < len; i++)
-          crc = do_crc((int ) buf[i], 1, crc);
-        file_size += len;
+	int i;
+	for (i = 0; i < len; i++)
+	  crc = do_crc((int ) buf[i], 1, crc);
+	file_size += len;
 	if (!do_crc_only)
 	  store_line(buf, len);
       }
       if (len < 0) {
-        sprintf(err_msg, "error: read failed (%s)\n", strerror(errno));
-        close(fddata);
-        return 1;
+	sprintf(err_msg, "error: read failed (%s)\n", strerror(errno));
+	close(fddata);
+	return 1;
       }
       *err_msg = 0;
       sprintf(buf, "\r#BIN#%ld#|%d#$%s#%s\r", file_size, crc, unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, file_size, crc, 1));
@@ -396,7 +396,7 @@ int bget(void) {
 
     /* wait for answer  */
   for (;;) {
-                 /*
+		 /*
 		  * make sure we do not read from a pipe. fdout is also
 		  * assigned to the tty
 		  */
@@ -442,26 +442,26 @@ int bget(void) {
     FD_SET(fdin, &readfds);
     if (select(fdin+1, &readfds, 0, 0, &timeout) && FD_ISSET(fdin, &readfds)) {
       if ((len = read(fdin, buf, sizeof(buf))) < 0) {
-        sprintf(err_msg, "read from tty failed (%s)\n", strerror(errno));
-          save_close(fddata);
-          goto abort;
+	sprintf(err_msg, "read from tty failed (%s)\n", strerror(errno));
+	  save_close(fddata);
+	  goto abort;
       }
       if (IS_BIN_ABORT(buf, len)) {
-        sprintf(err_msg, "Aborted by user request\n");
-        save_close(fddata);
-        return 1;
+	sprintf(err_msg, "Aborted by user request\n");
+	save_close(fddata);
+	return 1;
       }
     }
     /* read data  */
     if (!fdin_is_pipe || is_stream) {
       p_buf = buf;
       if ((len = my_read(fddata, buf, ((len_remains > BLOCKSIZ || is_stream) ? BLOCKSIZ : len_remains), &is_eof, 0)) < 1) {
-        save_close(fddata);
-        if (len < 0) {
-          sprintf(err_msg, "error: read failed (%s)\n", strerror(errno));
+	save_close(fddata);
+	if (len < 0) {
+	  sprintf(err_msg, "error: read failed (%s)\n", strerror(errno));
 	  goto abort;
-        }
-        break;
+	}
+	break;
       }
       len_remains -= len;
     } else {

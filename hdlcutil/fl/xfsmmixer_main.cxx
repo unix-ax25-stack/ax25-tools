@@ -50,7 +50,7 @@ static unsigned int mixdevice;
 
 static int do_mix_ioctl(int cmd, struct sm_mixer_data *mixdat)
 {
-        struct sm_ioctl par;
+	struct sm_ioctl par;
 	int i;
 
 	par.cmd = cmd;
@@ -309,7 +309,7 @@ static const char *usage_str =
 
 int main(int argc, char *argv[])
 {
-        int c, i;
+	int c, i;
 	struct sm_mixer_data mixdat;
 	unsigned char mdata;
 

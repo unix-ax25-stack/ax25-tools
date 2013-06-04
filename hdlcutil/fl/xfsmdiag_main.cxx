@@ -94,7 +94,7 @@ void scope::resize(int xx, int yy, int ww, int hh)
 void scope::draw()
 {
 	GC gc;
-        XGCValues gcv;
+	XGCValues gcv;
 
 	/* cannot use draw_box(); as it clears the whole window -> flicker */
 	/* from fl_boxtype.C, fl_down_frame */
@@ -178,17 +178,17 @@ void scope::mode(int dmode)
 void scope::clear(void)
 {
 	GC gc;
-        XGCValues gcv;
+	XGCValues gcv;
 
 	if (!pixmalloc)
 		return;
 	gcv.line_width = 1;
-        gcv.line_style = LineSolid;
+	gcv.line_style = LineSolid;
 	gcv.fill_style = FillSolid;
-        gc = XCreateGC(fl_display, pixmap, GCLineWidth | GCLineStyle | GCFillStyle, &gcv);
-        XSetState(fl_display, gc, col_background, col_background, GXcopy, AllPlanes);
+	gc = XCreateGC(fl_display, pixmap, GCLineWidth | GCLineStyle | GCFillStyle, &gcv);
+	XSetState(fl_display, gc, col_background, col_background, GXcopy, AllPlanes);
 	XFillRectangle(fl_display, pixmap, gc, 0, 0, W, H);
-        XFreeGC(fl_display, gc);
+	XFreeGC(fl_display, gc);
 	redraw();
 }
 
@@ -201,8 +201,8 @@ void scope::clear(void)
 void scope::drawdata(short data[], int len, int xm)
 {
 	int cnt;
-        GC gc;
-        XGCValues gcv;
+	GC gc;
+	XGCValues gcv;
 
 	mode();
 	if (!pixmalloc || (drawmode != HDRVC_DIAGMODE_CONSTELLATION &&
@@ -210,8 +210,8 @@ void scope::drawdata(short data[], int len, int xm)
 			   drawmode != HDRVC_DIAGMODE_DEMOD))
 		return;
 	gcv.line_width = 1;
-        gcv.line_style = LineSolid;
-        gc = XCreateGC(fl_display, pixmap, GCLineWidth | GCLineStyle, &gcv);
+	gcv.line_style = LineSolid;
+	gc = XCreateGC(fl_display, pixmap, GCLineWidth | GCLineStyle, &gcv);
 	if (drawmode == HDRVC_DIAGMODE_CONSTELLATION) {
 #define XCOORD(x) ((SHRT_MAX - (int)(x)) * W / USHRT_MAX)
 #define YCOORD(y) ((SHRT_MAX - (int)(y)) * H / USHRT_MAX)
@@ -241,7 +241,7 @@ void scope::drawdata(short data[], int len, int xm)
 #undef XCOORD
 #undef YCOORD
 	}
-        XFreeGC(fl_display, gc);
+	XFreeGC(fl_display, gc);
 	redraw();
 }
 
@@ -349,7 +349,7 @@ static const char *usage_str =
 
 int main(int argc, char *argv[])
 {
-        int c, i;
+	int c, i;
 	int ret;
 	unsigned int ifflags;
 	char name[64];

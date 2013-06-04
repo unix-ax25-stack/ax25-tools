@@ -82,23 +82,23 @@ char *generate_rand_pw(int len)
 	if (len > PASSSIZE)
 		len = PASSSIZE;
 
-        for (i = 0; i < len; i++) {
-                j = conv_random(10+26*2, 0);
-                if (j < 10) {
-                        pass[i] = j + '0';
-                        continue;
-                }
-                j -= 10;
-                if (j < 26) {
-                        pass[i] = j + 'A';
+	for (i = 0; i < len; i++) {
+		j = conv_random(10+26*2, 0);
+		if (j < 10) {
+			pass[i] = j + '0';
 			continue;
-                }
-                j -= 26;
-                pass[i] = j + 'a';
-        }
-        pass[len] = 0;
+		}
+		j -= 10;
+		if (j < 26) {
+			pass[i] = j + 'A';
+			continue;
+		}
+		j -= 26;
+		pass[i] = j + 'a';
+	}
+	pass[len] = 0;
 
-        return pass;
+	return pass;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -357,7 +357,7 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 			for (p = pass; *p && !isspace(*p & 0xff); p++) ;
 			*p = 0;
 
-        		if ( (*pwtype & PW_MD5) && !Strcasecmp(p_buf, "md5") ) {
+			if ( (*pwtype & PW_MD5) && !Strcasecmp(p_buf, "md5") ) {
 				fclose(f);
 				*pwtype = PW_MD5;
 				goto found;
@@ -391,6 +391,6 @@ found:
 
 end:
 	*pwtype = (((*pwtype) & PW_CLEARTEXT) ? PW_CLEARTEXT : 0);
-	           /*         ^ may allow cleartext? - then cleartext, else deny */
+		   /*         ^ may allow cleartext? - then cleartext, else deny */
 	return 0;
 }

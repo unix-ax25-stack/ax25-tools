@@ -455,7 +455,7 @@ int main(int argc, char **argv)
 	}
 
 	for (;;) {
- 		alen = sa_len;
+		alen = sa_len;
 
 		if ((size = recvfrom(s, buf, 1500, 0, psa, &alen)) == -1) {
 			if (logging) {
@@ -479,11 +479,11 @@ int main(int argc, char **argv)
 
 		for (p = list; p != NULL; p = p->next)
 #ifdef	USE_SOCKADDR_SLL
- 			if (p->from_idx == from_idx && (check_calls(p, buf, size) == 0)) {
- 				sll.sll_ifindex = p->to_idx;
+			if (p->from_idx == from_idx && (check_calls(p, buf, size) == 0)) {
+				sll.sll_ifindex = p->to_idx;
 #else
- 			if ((strcmp(p->from, from_dev_name) == 0) && (check_calls(p, buf, size) == 0)) {
- 				strcpy(psa->sa_data, p->to);
+			if ((strcmp(p->from, from_dev_name) == 0) && (check_calls(p, buf, size) == 0)) {
+				strcpy(psa->sa_data, p->to);
 #endif
 				/*
 				 * cave: alen (set by recvfrom()) may > salen

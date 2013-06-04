@@ -319,7 +319,7 @@ int forward(int s, int argc, char *argv[])
 		return 1;
 	}
 #else
-        fprintf(stderr, "axparms: Not compiled in with forwarding option.\n");
+	fprintf(stderr, "axparms: Not compiled in with forwarding option.\n");
 #endif /* HAVE_AX25_FWD_STRUCT */
 
 	return 0;

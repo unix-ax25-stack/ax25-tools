@@ -118,11 +118,11 @@ the HDLC driver:
 
 .nf
 struct hdlcdrv_ops {
-        const char *\fIdrvname\fP;
-        const char *\fIdrvinfo\fP;
-        int (*\fIopen\fP)(struct device *);
-        int (*\fIclose\fP)(struct device *);
-        int (*\fIioctl\fP)(struct device *, struct ifreq *, int);
+	const char *\fIdrvname\fP;
+	const char *\fIdrvinfo\fP;
+	int (*\fIopen\fP)(struct device *);
+	int (*\fIclose\fP)(struct device *);
+	int (*\fIioctl\fP)(struct device *, struct ifreq *, int);
 };
 .fi
 
@@ -149,14 +149,14 @@ from and to the driver using the following struct:
 
 .nf
 struct hdlcdrv_ioctl {
-        int cmd;
-        union {
-                struct hdlcdrv_params mp;
-                struct hdlcdrv_channel_params cp;
-                struct hdlcdrv_channel_state cs;
-                unsigned int calibrate;
-                unsigned char bits;
-        } data;
+	int cmd;
+	union {
+		struct hdlcdrv_params mp;
+		struct hdlcdrv_channel_params cp;
+		struct hdlcdrv_channel_state cs;
+		unsigned int calibrate;
+		unsigned char bits;
+	} data;
 };
 .fi
 

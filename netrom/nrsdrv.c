@@ -81,16 +81,16 @@ static void key_rts(int fd)
 	/* Wait for CTS to be low */
 	while (1) {
 		/* Get CTS status */
-                if (ioctl(fd, TIOCMGET, &status) < 0) {
+		if (ioctl(fd, TIOCMGET, &status) < 0) {
 			syslog(LOG_INFO|LOG_ERR, "TIOCMGET failed: flowcontrol disabled (%m)\n");
 			flowcontrol = 0;
-                        return;
-                }
+			return;
+		}
 		if (status & TIOCM_CTS) {
 			if (debugging) {
 				fprintf(stderr,"CTS high: waiting\n");
 			}
-                	ioctl(fd, TIOCMIWAIT, &status);
+			ioctl(fd, TIOCMIWAIT, &status);
 		} else {
 			break;
 		}
@@ -100,10 +100,10 @@ static void key_rts(int fd)
 		fprintf(stderr,"CTS low: keying RTS\n");
 	}
 	status |= TIOCM_RTS | TIOCM_DTR;
-        if (ioctl(fd, TIOCMSET, &status) < 0) {
+	if (ioctl(fd, TIOCMSET, &status) < 0) {
 		syslog(LOG_INFO|LOG_ERR, "TIOCMGET failed: flowcontrol disabled (%m)\n");
 		flowcontrol = 0;
-        }
+	}
 }
 
 static void unkey_rts(int fd)
@@ -116,13 +116,13 @@ static void unkey_rts(int fd)
 	if (debugging) {
 		fprintf(stderr,"Transmission finished: unkeying RTS\n");
 	}
-        ioctl(fd, TIOCMGET, &status);
+	ioctl(fd, TIOCMGET, &status);
 	status &= ~TIOCM_RTS;
-        status |= TIOCM_DTR;
-        if (ioctl(fd, TIOCMSET, &status) < 0) {
+	status |= TIOCM_DTR;
+	if (ioctl(fd, TIOCMSET, &status) < 0) {
 		syslog(LOG_INFO|LOG_ERR, "TIOCMGET failed: flowcontrol disabled (%m)\n");
 		flowcontrol = 0;
-        }
+	}
 }
 
 static void nrs_esc(unsigned char *s, int len)

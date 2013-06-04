@@ -86,21 +86,21 @@ static int x_error_handler(Display *disp, XErrorEvent *evt)
 
 static int openwindow(char *disp, int constell, int samplesperbit)
 {
-        XSetWindowAttributes attr;
-        XGCValues gr_values;
-        XColor color, dummy;
-        XSizeHints sizehints;
+	XSetWindowAttributes attr;
+	XGCValues gr_values;
+	XColor color, dummy;
+	XSizeHints sizehints;
 
-        if (!(display = XOpenDisplay(NULL)))
-                return -1;
-        XSetErrorHandler(x_error_handler);
-        XAllocNamedColor(display, DefaultColormap(display, 0), "red",
-                         &color, &dummy);
+	if (!(display = XOpenDisplay(NULL)))
+		return -1;
+	XSetErrorHandler(x_error_handler);
+	XAllocNamedColor(display, DefaultColormap(display, 0), "red",
+			 &color, &dummy);
 	col_zeroline = color.pixel;
 	col_background = WhitePixel(display, 0);
 	col_trace = BlackPixel(display, 0);
-        attr.background_pixel = col_background;
-        if (!(window = XCreateWindow(display, XRootWindow(display, 0),
+	attr.background_pixel = col_background;
+	if (!(window = XCreateWindow(display, XRootWindow(display, 0),
 				     200, 200, WIDTH, HEIGHT, 5,
 				     DefaultDepth(display, 0),
 				     InputOutput, DefaultVisual(display, 0),
@@ -113,28 +113,28 @@ static int openwindow(char *disp, int constell, int samplesperbit)
 		fprintf(stderr, "smdiag: unable to open offscreen pixmap\n");
 		exit(1);
 	}
-        xmul = WIDTH / (2*(samplesperbit > 0 ? samplesperbit : 1));
-        XSelectInput(display, window, KeyPressMask | StructureNotifyMask
+	xmul = WIDTH / (2*(samplesperbit > 0 ? samplesperbit : 1));
+	XSelectInput(display, window, KeyPressMask | StructureNotifyMask
 		     | ExposureMask) ;
-        XAllocNamedColor(display, DefaultColormap(display, 0), "red",
-                         &color, &dummy);
-        gr_values.foreground = col_trace;
-        gr_values.line_width = 1;
-        gr_values.line_style = LineSolid;
-        gr_context = XCreateGC(display, window, GCForeground | GCLineWidth |
-                               GCLineStyle, &gr_values);
-        XStoreName(display, window, "diagnostics");
-        /*
-         * Do not allow the window to be resized
-         */
-        memset(&sizehints, 0, sizeof(sizehints));
-        sizehints.min_width = sizehints.max_width = WIDTH;
-        sizehints.min_height = sizehints.max_height = HEIGHT;
-        sizehints.flags = PMinSize | PMaxSize;
-        XSetWMNormalHints(display, window, &sizehints);
-        XMapWindow(display, window);
-        XSynchronize(display, 1);
-        return 0;
+	XAllocNamedColor(display, DefaultColormap(display, 0), "red",
+			 &color, &dummy);
+	gr_values.foreground = col_trace;
+	gr_values.line_width = 1;
+	gr_values.line_style = LineSolid;
+	gr_context = XCreateGC(display, window, GCForeground | GCLineWidth |
+			       GCLineStyle, &gr_values);
+	XStoreName(display, window, "diagnostics");
+	/*
+	 * Do not allow the window to be resized
+	 */
+	memset(&sizehints, 0, sizeof(sizehints));
+	sizehints.min_width = sizehints.max_width = WIDTH;
+	sizehints.min_height = sizehints.max_height = HEIGHT;
+	sizehints.flags = PMinSize | PMaxSize;
+	XSetWMNormalHints(display, window, &sizehints);
+	XMapWindow(display, window);
+	XSynchronize(display, 1);
+	return 0;
 }
 
 #undef WIDTH
@@ -144,11 +144,11 @@ static int openwindow(char *disp, int constell, int samplesperbit)
 
 static void closewindow(void)
 {
-        if (!display)
-                return;
-        XDestroyWindow(display, window);
-        XCloseDisplay(display);
-        display = NULL;
+	if (!display)
+		return;
+	XDestroyWindow(display, window);
+	XCloseDisplay(display);
+	display = NULL;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -159,17 +159,17 @@ static void closewindow(void)
 static void drawdata(short *data, int len, int replace, int xm)
 {
 	int cnt;
-        GC gc;
-        XGCValues gcv;
-        XWindowAttributes winattrs;
+	GC gc;
+	XGCValues gcv;
+	XWindowAttributes winattrs;
 
-        if (!display || !pixmap)
-                return;
-        XGetWindowAttributes(display, window, &winattrs);
+	if (!display || !pixmap)
+		return;
+	XGetWindowAttributes(display, window, &winattrs);
 	gcv.line_width = 1;
-        gcv.line_style = LineSolid;
-        gc = XCreateGC(display, pixmap, GCLineWidth | GCLineStyle, &gcv);
-        XSetState(display, gc, col_background, col_background, GXcopy,
+	gcv.line_style = LineSolid;
+	gc = XCreateGC(display, pixmap, GCLineWidth | GCLineStyle, &gcv);
+	XSetState(display, gc, col_background, col_background, GXcopy,
 		  AllPlanes);
 	if (replace)
 		XFillRectangle(display, pixmap, gc, 0, 0,
@@ -177,16 +177,16 @@ static void drawdata(short *data, int len, int replace, int xm)
 	else
 		XCopyArea(display, window, pixmap, gr_context, 0, 0,
 			  winattrs.width, winattrs.height, 0, 0);
-        XSetForeground(display, gc, col_trace);
+	XSetForeground(display, gc, col_trace);
 	for (cnt = 0; cnt < len-1; cnt++)
 		XDrawLine(display, pixmap, gc, XCOORD(cnt), YCOORD(data[cnt]),
 			  XCOORD(cnt+1), YCOORD(data[cnt+1]));
-        XSetForeground(display, gc, col_zeroline);
+	XSetForeground(display, gc, col_zeroline);
 	XDrawLine(display, pixmap, gc, 0, YCOORD(0), winattrs.width,
 		  YCOORD(0));
 	XCopyArea(display, pixmap, window, gr_context, 0, 0, winattrs.width,
-                  winattrs.height, 0, 0);
-        XFreeGC(display, gc);
+		  winattrs.height, 0, 0);
+	XFreeGC(display, gc);
 	XSync(display, 0);
 }
 
@@ -201,30 +201,30 @@ static void drawdata(short *data, int len, int replace, int xm)
 static void drawconstell(short *data, int len)
 {
 	int cnt;
-        GC gc;
-        XGCValues gcv;
-        XWindowAttributes winattrs;
+	GC gc;
+	XGCValues gcv;
+	XWindowAttributes winattrs;
 
-        if (!display || !pixmap)
-                return;
-        XGetWindowAttributes(display, window, &winattrs);
+	if (!display || !pixmap)
+		return;
+	XGetWindowAttributes(display, window, &winattrs);
 	gcv.line_width = 1;
-        gcv.line_style = LineSolid;
-        gc = XCreateGC(display, pixmap, GCLineWidth | GCLineStyle, &gcv);
-        XSetState(display, gc, col_background, col_background, GXcopy,
+	gcv.line_style = LineSolid;
+	gc = XCreateGC(display, pixmap, GCLineWidth | GCLineStyle, &gcv);
+	XSetState(display, gc, col_background, col_background, GXcopy,
 		  AllPlanes);
 	XCopyArea(display, window, pixmap, gr_context, 0, 0,
 		  winattrs.width, winattrs.height, 0, 0);
-        XSetForeground(display, gc, col_trace);
+	XSetForeground(display, gc, col_trace);
 	for (cnt = 0; cnt < len-1; cnt += 2)
 		XDrawPoint(display, pixmap, gc,
 			   XCOORD(data[cnt]), YCOORD(data[cnt+1]));
-        XSetForeground(display, gc, col_zeroline);
+	XSetForeground(display, gc, col_zeroline);
 	XDrawLine(display, pixmap, gc, 0, YCOORD(0), winattrs.width, YCOORD(0));
 	XDrawLine(display, pixmap, gc, XCOORD(0), 0, XCOORD(0), winattrs.height);
 	XCopyArea(display, pixmap, window, gr_context, 0, 0, winattrs.width,
-                  winattrs.height, 0, 0);
-        XFreeGC(display, gc);
+		  winattrs.height, 0, 0);
+	XFreeGC(display, gc);
 	XSync(display, 0);
 }
 
@@ -235,47 +235,47 @@ static void drawconstell(short *data, int len)
 
 static void clearwindow(void)
 {
-        XWindowAttributes winattrs;
+	XWindowAttributes winattrs;
 	GC gc;
-        XGCValues gcv;
+	XGCValues gcv;
 
-        if (!display || !pixmap)
-                return;
-        XGetWindowAttributes(display, window, &winattrs);
+	if (!display || !pixmap)
+		return;
+	XGetWindowAttributes(display, window, &winattrs);
 	gcv.line_width = 1;
-        gcv.line_style = LineSolid;
-        gc = XCreateGC(display, pixmap, GCLineWidth | GCLineStyle, &gcv);
-        XSetState(display, gc, col_background, col_background, GXcopy,
+	gcv.line_style = LineSolid;
+	gc = XCreateGC(display, pixmap, GCLineWidth | GCLineStyle, &gcv);
+	XSetState(display, gc, col_background, col_background, GXcopy,
 		  AllPlanes);
 	XFillRectangle(display, pixmap, gc, 0, 0,
 		       winattrs.width, winattrs.height);
-        XSetForeground(display, gc, col_zeroline);
-        XClearArea(display, window, 0, 0, 0, 0, False);
+	XSetForeground(display, gc, col_zeroline);
+	XClearArea(display, window, 0, 0, 0, 0, False);
 	XCopyArea(display, pixmap, window, gr_context, 0, 0, winattrs.width,
-                  winattrs.height, 0, 0);
-        XFreeGC(display, gc);
+		  winattrs.height, 0, 0);
+	XFreeGC(display, gc);
 }
 
 /* ---------------------------------------------------------------------- */
 
 static Bool predicate(Display *display, XEvent *event, char *arg)
 {
-        return True;
+	return True;
 }
 
 /* ---------------------------------------------------------------------- */
 
 static char *getkey(void)
 {
-        XWindowAttributes winattrs;
-        XEvent evt;
-        static char kbuf[32];
-        int i;
+	XWindowAttributes winattrs;
+	XEvent evt;
+	static char kbuf[32];
+	int i;
 
-        if (!display)
-                return NULL;
+	if (!display)
+		return NULL;
 	XSync(display, 0);
-        while (XCheckIfEvent(display, &evt, predicate, NULL)) {
+	while (XCheckIfEvent(display, &evt, predicate, NULL)) {
 		switch (evt.type) {
 		case KeyPress:
 			i = XLookupString((XKeyEvent *)&evt, kbuf, sizeof(kbuf)-1,
@@ -296,8 +296,8 @@ static char *getkey(void)
 		default:
 			break;
 		}
-        }
-        return NULL;
+	}
+	return NULL;
 }
 
 /* ---------------------------------------------------------------------- */
