@@ -7,7 +7,6 @@ man_MANS = dmascc_cfg.1
 
 EXTRA_DIST = $(man_MANS) $(doc_DATA)
 
-docdir=$(prefix)/doc/ax25-tools
 doc_DATA = README.dmascc
 
 installconf:

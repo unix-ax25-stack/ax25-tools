@@ -6,7 +6,6 @@ sbin_PROGRAMS = ax25_call netrom_call rose_call tcp_call
 
 man_MANS = ax25_call.8 netrom_call.8 rose_call.8 tcp_call.8
 
-docdir=${prefix}/doc/ax25-tools
 doc_DATA= README.user_call
 
 EXTRA_DIST = $(man_MANS) $(doc_DATA)
