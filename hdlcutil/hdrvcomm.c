@@ -69,7 +69,7 @@ static const char *if_name = "bcsf0";
 static char *prg_name;
 static int fd = -1;
 static struct ifreq ifr_h;
-static int promisc = 0;
+static int promisc;
 static int afpacket = 1;
 static int msqid = -1;
 

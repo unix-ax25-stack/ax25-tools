@@ -30,13 +30,13 @@
 
 struct dest_struct dest_list[50];
 
-int dest_count = 0;
+int dest_count;
 
 int debug            = FALSE;
 int route_restrict   = FALSE;
 int logging          = FALSE;
 
-struct route_struct *first_route = NULL;
+struct route_struct *first_route;
 
 static struct mask_struct {
 	unsigned long int mask;

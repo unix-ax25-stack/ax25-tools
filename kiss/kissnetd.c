@@ -25,7 +25,7 @@
 #include <limits.h>
 
 static char *Version = "1.5";
-static int VerboseMode = 0;
+static int VerboseMode;
 static int MaxFrameSize = 512;
 
 #define REOPEN_TIMEOUT	30	/* try tio reopen every 10 s */
@@ -43,7 +43,7 @@ struct PortDescriptor {
 
 static struct PortDescriptor *PortList[FD_SETSIZE];
 
-static int NbPort = 0;
+static int NbPort;
 
 static void Usage(void)
 {
@@ -161,7 +161,7 @@ static void ReopenPort(int PortNumber)
 static void TickReopen(void)
 {
 	int i;
-	static int wrote_info = 0;
+	static int wrote_info;
 	time_t CurrentTime = time(NULL);
 
 	for (i=0; i<NbPort; i++) {

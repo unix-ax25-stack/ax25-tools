@@ -35,7 +35,7 @@ static char *types[] = {
 	"UI",
 	"????"};
 
-static struct PortRecord *PortList = NULL;
+static struct PortRecord *PortList;
 
 static void PrintHeader(int data)
 {

@@ -39,10 +39,10 @@ static char *kissdev, *nrsdev;
 #define	NRS_CKSUM	3
 static int nrs_state = NRS_WAIT;
 
-static unsigned char nrs_cksum = 0;
+static unsigned char nrs_cksum;
 
 static unsigned char nrs_rxbuffer[512];
-static int nrs_rxcount = 0;
+static int nrs_rxcount;
 
 #define	FEND		0300
 #define	FESC		0333
@@ -56,7 +56,7 @@ static int nrs_rxcount = 0;
 static int kiss_state = KISS_WAIT;
 
 static unsigned char kiss_rxbuffer[512];
-static int kiss_rxcount = 0;
+static int kiss_rxcount;
 
 static void terminate(int sig)
 {

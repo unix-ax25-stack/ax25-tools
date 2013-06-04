@@ -428,12 +428,12 @@ static unsigned short mask16tab[16] = {
 
 
 char   policy_add_user = 1;
-char   policy_add_empty_password = 0;
-char   policy_add_prog_useradd = 0;
+char   policy_add_empty_password;
+char   policy_add_prog_useradd;
 char   policy_guest = 1;
-char   policy_associate = 0;
+char   policy_associate;
 char   pwcheck = 1;
-char   secure_home = 0;
+char   secure_home;
 
 gid_t  user_gid =  400;
 char   *user_shell = "/bin/bash";
@@ -443,8 +443,8 @@ int    start_uid = 400;
 int    end_uid   = 65535;
 int    paclen    = ROSE_PACLEN;		/* Its the shortest ie safest */
 
-int    huffman = 0;
-int    bin = 0;
+int    huffman;
+int    bin;
 int    fdmaster;
 
 struct write_queue {
@@ -453,8 +453,8 @@ struct write_queue {
 	unsigned int  len;
 };
 
-struct write_queue *wqueue_head = NULL;
-struct write_queue *wqueue_tail = NULL;
+struct write_queue *wqueue_head;
+struct write_queue *wqueue_tail;
 long wqueue_length = 0L;
 
 
@@ -850,7 +850,7 @@ int write_ax25(char *s, int len, int kick)
 	struct termios termios;
 	static struct termios save_termios;
 	static struct termios save_termios_master;
-	static int last_ended_with_CR = 0;
+	static int last_ended_with_CR;
 
 	int i = 0;
 	int j = 0;

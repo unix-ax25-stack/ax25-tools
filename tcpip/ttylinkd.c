@@ -472,7 +472,7 @@ int send_control(int skt, struct in_addr addr, CTL_MSG msg, CTL_RESPONSE *resp)
 	fd_set fdvar;
 	struct timeval timeout;
 	struct sockaddr_in sin;
-	static int talk_port = 0;
+	static int talk_port;
 	struct servent *pse;
 
 	/* Look up talk port once only */

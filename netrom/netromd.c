@@ -40,7 +40,7 @@ struct port_struct port_list[20];
 int port_count = FALSE;
 int compliant  = FALSE;
 int logging    = FALSE;
-int debug      = 0;
+int debug;
 
 ax25_address my_call;
 ax25_address node_call;

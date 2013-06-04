@@ -11,7 +11,7 @@
 
 #define BUFLEN	8192
 
-int compression		= 0;
+int compression;
 int paclen_in		= 256;
 int paclen_out		= 256;
 
@@ -22,7 +22,7 @@ static unsigned char buf[BUFLEN];
 #include <zlib.h>
 
 /* Error in (de)compression happened? */
-static int compression_error = 0;
+static int compression_error;
 
 /* These are for the (de)compressor */
 static unsigned char input_buffer[BUFLEN];

@@ -67,7 +67,7 @@ typedef enum {data, command} frame_t;
 static __u8 ibuf[SIZE];	/* buffer for input operations */
 static __u8 obuf[SIZE];	/* buffer for sixpack_tx() */
 
-static int invalid_ports = 0;
+static int invalid_ports;
 
 static char *usage_string = "usage: m6pack [-l] [-s speed] [-x num_ptmx_devices] [-v] tyinterface pty ..\n";
 

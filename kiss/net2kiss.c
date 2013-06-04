@@ -65,10 +65,10 @@
 static int fdif, fdpty;
 static struct ifreq ifr;
 static char *progname;
-static int verbose = 0;
-static int i_am_unix98_pty_master = 0; /* unix98 ptmx support */
-static char *namepts = NULL;  /* name of the unix98 pts slave, which
-	                       * the client has to use */
+static int verbose;
+static int i_am_unix98_pty_master;	/* unix98 ptmx support */
+static char *namepts;			/* name of the unix98 pts slave, which
+					 * the client has to use */
 
 /* --------------------------------------------------------------------- */
 

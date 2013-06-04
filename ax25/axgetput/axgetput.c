@@ -24,25 +24,25 @@
 #include "util.h"
 #include "proto_bin.h"
 
-int fdin = 0;
+int fdin;
 int fdout = 1;
 int fderr = 2;
-int fdout_is_pipe = 0;
-int fdin_is_pipe = 0;
+int fdout_is_pipe;
+int fdin_is_pipe;
 
-int is_stream = 0;
-int mode = 0;
-int do_crc_only = 0;
+int is_stream;
+int mode;
+int do_crc_only;
 
 char c_eol = '\n';
 
 unsigned int BLOCKSIZ = BLOCKSIZ_DEFAULT;
 
-char *send_on_signal = 0;
+char *send_on_signal;
 
 static struct termios prev_termios;
-static int prev_termios_stored = 0;
-static mode_t mode_tty = 0;
+static int prev_termios_stored;
+static mode_t mode_tty;
 
 #ifndef	MYNAME
 #define MYNAME "axgetput"
@@ -98,7 +98,7 @@ static void eol_convention(int state_should)
   /* need patched axspawn */
 #define	BIN_ON	"//BIN ON\r"
 #define	BIN_OFF	"//BIN OFF\r"
-  static int state_is = 0;
+  static int state_is;
 
   /* already in correct state?  */
   if ((state_is && state_should) || (!state_is && !state_should))
