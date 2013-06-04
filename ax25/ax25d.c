@@ -1,6 +1,4 @@
 /*
- * $Id: ax25d.c,v 1.9 2011/08/18 09:51:08 dl9sau Exp $
- *
  *  This is my version of axl.c, written for the LBBS code to make it
  *    compatable with the kernel AX25 driver.  It appears to work, with
  *    my setup, so it'll probably not work else where :-).

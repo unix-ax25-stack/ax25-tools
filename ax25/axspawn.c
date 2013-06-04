@@ -1,7 +1,4 @@
 /*
- *
- * $Id: axspawn.c,v 1.27 2011/08/18 10:43:49 dl9sau Exp $
- *
  * axspawn.c - run a program from ax25d.
  *
  * Copyright (c) 1996 Joerg Reuter DL1BKE (jreuter@poboxes.com)
