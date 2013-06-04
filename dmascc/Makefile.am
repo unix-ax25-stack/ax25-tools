@@ -8,4 +8,3 @@ dist_man_MANS = dmascc_cfg.1
 dist_doc_DATA = README.dmascc
 
 installconf:
-

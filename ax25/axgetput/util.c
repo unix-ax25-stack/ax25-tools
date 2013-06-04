@@ -205,4 +205,3 @@ void date_unix2dos(int unix_date,unsigned short *time, unsigned short *date)
         }
         *date = nl_day-day_n[month-1]+1+(month << 5)+(year << 9);
 }
-

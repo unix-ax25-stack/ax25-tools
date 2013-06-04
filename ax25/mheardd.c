@@ -475,4 +475,3 @@ static struct mheard_list_struct *findentry(ax25_address *callsign, char *port)
 
 	return oldest;
 }
-
