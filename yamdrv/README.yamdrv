@@ -11,23 +11,23 @@ yam3 default to COM4 0x3e8 irq3
 ----------
 
 Added : bitrate/baudrate configuration.
-Added : mcs file may be loaded from yamcfg. 
+Added : mcs file may be loaded from yamcfg.
         One mcs file is affected to each bitrate.
-		
+
 		mcs data for 1200 and 9600 bds are preloaded in the driver
 		but may be changed by yamcfg.
 
 options of yamcfg :
 
-  [iobase <iobase>] 
-  [irq <irq>] 
-  [bitrate <bitrate>] 
+  [iobase <iobase>]
+  [irq <irq>]
+  [bitrate <bitrate>]
   [baudrate <baudrate>]
-  [duplex <mode>] 
-  [hold <delay>] 
+  [duplex <mode>]
+  [hold <delay>]
   [txdelay <txdelay>]
-  [txtail <txtail>] 
-  [slottime <slottime>] 
+  [txtail <txtail>]
+  [slottime <slottime>]
   [persist <persistence>]
   [load <bitrate> <filename.mcs>]
 
@@ -52,26 +52,26 @@ The program yamcfg get or set the parameters of the yam driver
 yamcfg -h gives a minimum help
 
 Example setup of yam0 for 1 serial port (com2) :
-  
+
   file /etc/ax25/axports :
-  port0 F1OAT-9 9600 256 2 VHF  (9600 bit/s)  
+  port0 F1OAT-9 9600 256 2 VHF  (9600 bit/s)
 
   commands :
   setserial /dev/cua0 port 0	# to avoid conflict with yam driver
   insmod yam
   yamcfg yam0 io 0x2f8 irq 3
-  ifconfig yam0 hw ax25 f1oat-9 up  
-  
-  
+  ifconfig yam0 hw ax25 f1oat-9 up
+
+
 
 Example setup of yam0,3 for 4 serial port (com1->com4) :
-  
+
   file /etc/ax25/axports :
-  port0 F1OAT-9 9600 256 2 VHF  (9600 bit/s)  
-  port1 F1OAT-8 9600 256 2 UHF1 (9600 bit/s)  
-  port2 F1OAT-7 9600 256 2 UHF2 (9600 bit/s)  
-  port3 F1OAT-8 9600 256 2 UHF3 (9600 bit/s)  
-  
+  port0 F1OAT-9 9600 256 2 VHF  (9600 bit/s)
+  port1 F1OAT-8 9600 256 2 UHF1 (9600 bit/s)
+  port2 F1OAT-7 9600 256 2 UHF2 (9600 bit/s)
+  port3 F1OAT-8 9600 256 2 UHF3 (9600 bit/s)
+
   commands :
   setserial /dev/cua0 port 0	# to avoid conflict with yam driver
   setserial /dev/cua1 port 0	# to avoid conflict with yam driver
@@ -80,13 +80,13 @@ Example setup of yam0,3 for 4 serial port (com1->com4) :
   insmod yam
   yamcfg yam2 irq 5
   yamcfg yam3 irq 7
-  ifconfig yam0 hw ax25 f1oat-9 up  
-  ifconfig yam1 hw ax25 f1oat-8 up  
-  ifconfig yam2 hw ax25 f1oat-7 up  
-  ifconfig yam3 hw ax25 f1oat-6 up  
-  
+  ifconfig yam0 hw ax25 f1oat-9 up
+  ifconfig yam1 hw ax25 f1oat-8 up
+  ifconfig yam2 hw ax25 f1oat-7 up
+  ifconfig yam3 hw ax25 f1oat-6 up
 
- 
+
+
 Good test !!!
 
 73's Frederic F1OAT and Jean-Paul F6FBB

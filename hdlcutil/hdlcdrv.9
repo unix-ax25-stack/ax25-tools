@@ -33,8 +33,8 @@ hdlcdrv \- HDLC amateur (AX.25) packet radio network driver
 .SH DESCRIPTION
 This driver should ease the implementation of simple AX.25 packet radio
 modems where the software is responsible for the HDLC encoding and decoding.
-Examples of such modems include the \fIbaycom\fP family and the 
-\fIsoundcard\fP modems. 
+Examples of such modems include the \fIbaycom\fP family and the
+\fIsoundcard\fP modems.
 
 This driver provides a standard Linux network driver interface.
 It can even be compiled if Kernel AX.25 is not enabled in the Linux
@@ -140,7 +140,7 @@ which then gets invoked by the hardware.
 \fBifconfig\ \fP\fIifname\fP\fB\ down\fP and should undo all actions done
 by \fBopen\fP, i.e. release io regions and irqs.
 
-\fBioctl\fP may be provided to implement device specific ioctl's. 
+\fBioctl\fP may be provided to implement device specific ioctl's.
 
 .SH "IOCTL CALLS"
 

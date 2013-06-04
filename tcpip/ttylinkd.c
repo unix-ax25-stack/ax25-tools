@@ -7,13 +7,13 @@
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, 
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have recieved a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software 
+ * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge. MA 02139, USA.
  */
  /*
@@ -80,7 +80,7 @@ void read_config_file(int dummy);
 	"look-up",
 	"delete",
 	"announce" };
-*/	
+*/
 static char *Responses[] = {
 	"success",
 	"sysop not logged on",
@@ -112,12 +112,12 @@ int main(int argc, char *argv[])
 	struct sockaddr_rose *peer_srose;
 	socklen_t sa_len, length;
 	int i;
-		
+
 	/* Open up the system logger */
 	openlog(argv[0], LOG_PID, LOG_DAEMON);
-	
+
 	write(STDOUT_FILENO, version, strlen(version));
-	
+
 	/* Work out who is calling us */
 	userfamily = AF_UNSPEC;
 	memset(user, 0, NAME_SIZE);
@@ -163,11 +163,11 @@ int main(int argc, char *argv[])
 				break;
 			} /*switch */
 		} /* - */
-	} /* for */ 
+	} /* for */
 	if (user[0] == '\0')
 	{
 		sa_len = sizeof(sa);
-		if (getpeername(STDOUT_FILENO, &sa, &sa_len) < 0)		
+		if (getpeername(STDOUT_FILENO, &sa, &sa_len) < 0)
 		{
 			fprintf(stderr, "%s: getpeername() failed, you must specify a callsign in stdin mode.\n", argv[0]);
 			syslog(LOG_CRIT | LOG_DAEMON, "main(): getpeername() failed.");
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
 			switch(sa.sa_family) {
 				case AF_INET:
 					peer_sin = (struct sockaddr_in*)&sa;
-					write(STDOUT_FILENO, buf, strlen(buf));			
+					write(STDOUT_FILENO, buf, strlen(buf));
 					sprintf(buf, "Please enter your callsign: ");
 					write(STDOUT_FILENO, buf, strlen(buf));
 					fflush(stdout);
@@ -215,8 +215,8 @@ int main(int argc, char *argv[])
 					syslog(LOG_DAEMON | LOG_CRIT, "Unsupported address family.");
 					exit(1);
 			}
-			
-		}													
+
+		}
 	} /* argc */
 
 	/* Read the configuration file to find the System Operator. */
@@ -268,19 +268,19 @@ int main(int argc, char *argv[])
         msg_sin = (struct sockaddr_in*)&msg_sa;
 	msg_sin->sin_port = htons(0);
 	memcpy((char*)&(msg_sin->sin_addr), phe->h_addr, phe->h_length);
-	
+
 	if ((skt = socket(PF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): socket() failed.");
 		exit(1);
 	}
-	
+
 	if (bind( skt, &msg_sa, sizeof(msg_sa)) != 0)
 	{
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): bind() failed.");
 		exit(1);
 	}
-	
+
 	length = sizeof(msg_sa);
 	if (getsockname(skt, &msg_sa, &length) < 0)
 	{
@@ -294,21 +294,21 @@ int main(int argc, char *argv[])
 	ctl_sin.sin_family = AF_INET;
 	memcpy((char*)&ctl_sin.sin_addr, phe->h_addr, phe->h_length);
 	ctl_sin.sin_port = htons(0);
-	
+
 	if ((ctl_skt = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
 	{
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): socket() while attempting to create control socket.");
 		close(skt);
 		exit(1);
 	}
-	
+
 	if (bind(ctl_skt, (struct sockaddr*)&ctl_sin, sizeof(ctl_sin)) != 0)
 	{
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): Error when trying to bind() control socket.");
 		close(skt);
 		exit(1);
 	}
-	
+
 	length = sizeof(ctl_sin);
 	if (getsockname(ctl_skt, (struct sockaddr*)&ctl_sin, &length) < 0)
 	{
@@ -317,7 +317,7 @@ int main(int argc, char *argv[])
 		close(ctl_skt);
 		exit(1);
 	}
-	
+
 	/* Start talking to the talk daemon */
 	memset((char*)&msg, 0, sizeof(msg));
 	msg.vers = TALK_VERSION;
@@ -330,8 +330,8 @@ int main(int argc, char *argv[])
 	msg.pid = htonl(getpid());
 	strncpy(msg.l_name, user, NAME_SIZE-1);
 	strncpy(msg.r_name, sysop_user, NAME_SIZE-1);
-	
-	
+
+
 	/* Now look for an invite */
 	msg.type = LOOK_UP;
 	(void) send_control(ctl_skt, rem_addr, msg, &resp);
@@ -348,7 +348,7 @@ int main(int argc, char *argv[])
 			printf("Cannot talk to sysop errno=%d.\n",i);
 		else
 			printf("Cannot talk to sysop, reason: %s.\n",Responses[i]);
-		
+
 		close(skt);
 		close(ctl_skt);
 		return 0;
@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): Error when trying to listen() on socket.");
 		exit(1);
 	}
-			
+
 	/* Now we have to make an invitation for the other user */
 	msg.type = LEAVE_INVITE;
 	if (send_control(ctl_skt, my_addr, msg, &resp) != SUCCESS)
@@ -374,14 +374,14 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 	local_id = resp.id_num;
-	
+
 	sprintf(buf, "Paging sysop.\n");
 	write(STDOUT_FILENO, buf, strlen(buf));
-	
+
 	/* Wait for the sysop to connect to us */
 	signal(SIGALRM, alarm_handle);
 	alarm(30);
-	
+
 	if ((new_skt = accept(skt, 0, 0)) < 0)
 	{
 		if (errno == EINTR)
@@ -401,21 +401,21 @@ int main(int argc, char *argv[])
 	}
 	alarm(0);
 	signal(SIGALRM, SIG_DFL);
-	
+
 	close(skt);
 	skt = new_skt;
-	
+
 	/* Delete invitations from both daemons */
 	msg.type = DELETE;
 	msg.id_num = htonl(local_id);
 	send_control(ctl_skt, my_addr, msg, &resp);
 	msg.id_num = htonl(remote_id);
 	send_control(ctl_skt, rem_addr, msg, &resp);
-	
-	sprintf(buf, "Sysop has responded.\n");		
+
+	sprintf(buf, "Sysop has responded.\n");
 	write(STDOUT_FILENO, buf, strlen(buf));
-	
-	/* 
+
+	/*
 	 * A little thing that they don't mention anywhere is the fact that the
 	 * first three characters on a connection are used to work out to erase,
 	 * kill and word erase characters. Nice to know eh?
@@ -443,7 +443,7 @@ int main(int argc, char *argv[])
 	erasec = buf[0];
 	killc = buf[1];
 	werasec = buf[2];
-		
+
 	/* Tell the sysop who this person is */
 	if (sa.sa_family == AF_AX25)
 	{
@@ -455,18 +455,18 @@ int main(int argc, char *argv[])
 		sprintf(buf, "Incoming ttylink from %s@%s.\n", user, inet_ntoa(peer_sin->sin_addr));
 		write(skt, buf, strlen(buf));
 	}
-				
-	
+
+
 	do_talk(skt);
 
 	close(skt);
-	close(ctl_skt);					
+	close(ctl_skt);
 	return 0;
 }
 
 /*
  * Used to send control messages to our friendly local talk daemon
- */ 
+ */
 int send_control(int skt, struct in_addr addr, CTL_MSG msg, CTL_RESPONSE *resp)
 {
 	fd_set fdvar;
@@ -474,7 +474,7 @@ int send_control(int skt, struct in_addr addr, CTL_MSG msg, CTL_RESPONSE *resp)
 	struct sockaddr_in sin;
 	static int talk_port = 0;
 	struct servent *pse;
-	
+
 	/* Look up talk port once only */
 	if (talk_port == 0)
 	{
@@ -492,7 +492,7 @@ int send_control(int skt, struct in_addr addr, CTL_MSG msg, CTL_RESPONSE *resp)
 	sin.sin_addr = addr;
 	sin.sin_family = AF_INET;
 	sin.sin_port = talk_port;
-	
+
 	if (sendto(skt, (char*)&msg, sizeof(msg), 0, (struct sockaddr*)&sin, sizeof(sin)) != sizeof(msg))
 	{
 		syslog(LOG_DAEMON | LOG_ERR, "send_control(): sendto failed (%m).");
@@ -504,23 +504,23 @@ int send_control(int skt, struct in_addr addr, CTL_MSG msg, CTL_RESPONSE *resp)
 	FD_SET(skt, &fdvar);
 	timeout.tv_sec = RING_WAIT;
 	timeout.tv_usec = 0;
-	
+
 	if (select(32, &fdvar, NULL, NULL, &timeout) < 0)
 		syslog(LOG_DAEMON | LOG_ERR, "send_control(): select failed. (%m)");
-	
+
 	/*
 	 * The server is ignoring us, see ya later
-	 */			
+	 */
 	if (!(FD_ISSET(skt, &fdvar)))
 	{
 		printf("Talk server not responding after %d seconds, aborting.\n", RING_WAIT);
 		return -1;
 	}
-	
+
 	/* Get the message */
-	if(recv(skt, resp, sizeof(resp),0) ==0)	
+	if(recv(skt, resp, sizeof(resp),0) ==0)
 		syslog(LOG_DAEMON | LOG_ERR, "send_control(): recv failed. (%m)");
-		
+
 	return resp->answer;
 }
 
@@ -530,7 +530,7 @@ int send_sysop_data(char *buf, int len)
 	static char outbuf[82];
 	static char *bptr = outbuf;
 	int i;
-	
+
 	for(i = 0; i < len; i++)
 	{
 		/* Check for erase character */
@@ -540,14 +540,14 @@ int send_sysop_data(char *buf, int len)
 				bptr--;
 			continue;
 		}
-		
+
 		/* Check for kill character */
 		if (buf[i] == killc)
 		{
 			bptr = outbuf;
 			continue;
 		}
-		
+
 		/* Check for word-erase character */
 		if (buf[i] == werasec)
 		{
@@ -573,7 +573,7 @@ int send_sysop_data(char *buf, int len)
 			*bptr = buf[i];
 			bptr++;
 		}
-				
+
 		/* Check for carriage return, which means send it */
 		/* We also send if we have more than 80 characters */
 		if (buf[i] == '\n' || (bptr - outbuf) > 80 )
@@ -587,7 +587,7 @@ int send_sysop_data(char *buf, int len)
 	} /* for */
 	return 0;
 }
-		
+
 /* Used to process the data from the user - len must not exceed 256 */
 int send_user_data(int skt, char *buf, int len)
 {
@@ -637,14 +637,14 @@ void do_talk(int skt)
 	char inbuf[256], outbuf[256];
 	struct timeval timeout;
 	int i;
-	
-	
+
+
 	while(1)
 	{
 		FD_ZERO(&fdvar);
 		FD_SET(skt, &fdvar);
 		FD_SET(STDIN_FILENO, &fdvar);
-		
+
 		timeout.tv_sec = 30;
 		timeout.tv_usec = 0;
 		if (select(32, &fdvar, NULL, NULL, &timeout) == 0)
@@ -654,7 +654,7 @@ void do_talk(int skt)
 			if (ioctl(skt, FIONREAD, (struct sgttyb*)&i) < 0)
 				return;
 		}
-		
+
 		if (FD_ISSET(skt, &fdvar))
 		{
 			if ((i = read(skt, inbuf, 256)) <= 0)
@@ -686,12 +686,12 @@ void do_talk(int skt)
 			}
 		}
 	}
-}			
+}
 
 void alarm_handle(int i)
 {
 	char buf[256];
-	
+
 	strcpy(buf, "Sysop not responding.\n");
 	write(STDOUT_FILENO, buf, strlen(buf));
 }
@@ -701,13 +701,13 @@ void read_config_file(int dummy)
 	char buf[128];
 	char param[20], value[108];
 	FILE *fp;
-	
+
 	if ( (fp = fopen(config_file, "r")) == NULL) {
-		syslog(LOG_DAEMON | LOG_ERR, "Cannot find configuration file: %s (%m)\n",config_file); 
+		syslog(LOG_DAEMON | LOG_ERR, "Cannot find configuration file: %s (%m)\n",config_file);
 		return;
 	}
 	/* Reset any variables here */
-	
+
 	while ( fgets(buf, 128, fp) != NULL) {
 		if ( buf[0] == '#')
 			continue;

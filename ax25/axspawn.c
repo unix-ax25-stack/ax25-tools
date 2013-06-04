@@ -4,18 +4,18 @@
  * Copyright (c) 1996 Joerg Reuter DL1BKE (jreuter@poboxes.com)
  *
  * This program is a hack.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *                
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
- * It might even kill your cat... ;-) 
+ * It might even kill your cat... ;-)
  *
  * Status: alpha (still...)
  *
@@ -28,19 +28,19 @@
  * 	default * * * * * 1 root /usr/local/sbin/axspawn axspawn --wait
  *
  * The program will check if the peer is an AX.25 socket, the
- * callsign is a valid amateur radio callsign, strip the SSID, 
+ * callsign is a valid amateur radio callsign, strip the SSID,
  * check if UID/GID are valid, allow a password-less login if the
  * password-entry in /etc/passwd is "+" or empty; in every other case
  * login will prompt for a password.
  *
- * Still on my TODO list: a TheNet compatible or MD5 based 
+ * Still on my TODO list: a TheNet compatible or MD5 based
  * authentication scheme... Won't help you if you changed the "+"-entry
- * in /etc/passwd to a valid passord and login with telnet, though. 
+ * in /etc/passwd to a valid passord and login with telnet, though.
  * A better solution could be a small program called from .profile.
  *
  * Axspawn can create user accounts automatically. You may specify
  * the user shell, first and maximum user id, group ID in the config
- * file and (unlike WAMPES) create a file "/usr/local/etc/ax25.profile" 
+ * file and (unlike WAMPES) create a file "/usr/local/etc/ax25.profile"
  * which will be copied to ~/.profile.
  *
  * This is an example for the config file:
@@ -126,7 +126,7 @@
  * shorter than 6 characters (without SSID). There must be at least
  * one digit, and max. two digits within the call. The SSID must
  * be within the range of 0 and 15. Please drop me a note if you
- * know a valid Amateur Radio (sic!) callsign that does not fit this 
+ * know a valid Amateur Radio (sic!) callsign that does not fit this
  * pattern _and_ can be represented correctly in AX.25.
  *
  * It uses the forkpty from libbsd.a (found after analyzing logind)
@@ -509,7 +509,7 @@ int Strncasecmp(const char *s1, const char *s2, int n)
 pid_t forkpty(int *, char *, void *, struct winsize *);
 
 /* The buffer in src (first byte length-1) is decoded into dest
-   (first byte length-1). If decoding is not successful, non-0 
+   (first byte length-1). If decoding is not successful, non-0
    is returned
 */
 
@@ -522,7 +522,7 @@ int encstathuf(char *src, int srclen, char *dest, int *destlen)
 	int bit8;
 	unsigned short huffcode;
 	int hufflen;
-	
+
 	if ((src == NULL) || (dest == NULL)) {
 		syslog(LOG_NOTICE, "Huffman encode: src or dest NULL!");
 		return(1);
@@ -574,7 +574,7 @@ int encstathuf(char *src, int srclen, char *dest, int *destlen)
 }
 
 /* The buffer in src (first byte length-1) is decoded into dest
-	 (first byte length-1). If decoding is not successful, non-0 
+	 (first byte length-1). If decoding is not successful, non-0
    is returned
 */
 
@@ -679,11 +679,11 @@ int read_ax25(unsigned char *s, int size)
 	if (bin) {
 		return(len);
 	}
-	
+
 
 	for (k = 0; k < len; k++)
 		if (s[k] == '\r') s[k] = '\n';
-		
+
 
 	if (!huffman && !Strncasecmp(s, "//COMP ON\n", 10)) {
 		sprintf(buffer,"\r//COMP 1\r");
@@ -746,7 +746,7 @@ void kick_wqueue(int dummy)
 	int bufsize = (huffman ? 256-1 : paclen);
 	char decoded[260];
 	int  declen;
-	
+
 	signal(SIGALRM, SIG_IGN);
 	itv.it_value.tv_sec = 0;
 	itv.it_value.tv_usec = QUEUE_DELAY;
@@ -767,7 +767,7 @@ void kick_wqueue(int dummy)
 			}
 			p = s;
 			s_len = 0;
-	
+
 			while ((w_buf = wqueue_head)) {
 				curr_len = (w_buf->len > bufsize-s_len ? bufsize-s_len : w_buf->len);
 				memcpy(p, w_buf->data, curr_len);
@@ -821,7 +821,7 @@ void kick_wqueue(int dummy)
 			wqueue_head = w_buf->next;
 			free(w_buf->data);
 			free(w_buf);
-	
+
 			if (!wqueue_head) {
 				wqueue_tail = NULL;
 				return;
@@ -833,7 +833,7 @@ void kick_wqueue(int dummy)
 		 * new data is available in order to send "full packets"
 		 */
 		if (wqueue_length < paclen)
-			break;	
+			break;
 	}
 
 	itv.it_interval.tv_sec = 0;
@@ -855,7 +855,7 @@ int write_ax25(char *s, int len, int kick)
 	int i = 0;
 	int j = 0;
 	char *p;
-	
+
 	if (!len)
 		return 0;
 	signal(SIGALRM, SIG_IGN);
@@ -888,7 +888,7 @@ int write_ax25(char *s, int len, int kick)
 		tcsetattr(0, TCSANOW, &save_termios);
 		last_ended_with_CR = 0;
 		return 0;
-	 } 
+	 }
 
 
 	if (!bin) {
@@ -915,7 +915,7 @@ int write_ax25(char *s, int len, int kick)
 			}
 			else
 				*(p + i) = *(p + j);
-			i++; j++;										
+			i++; j++;
 		}
 		len = i;
 		if (len && s[len-1] == '\r')
@@ -935,8 +935,8 @@ int write_ax25(char *s, int len, int kick)
 
 	memcpy(buf->data, s, len);
 	buf->len = len;
-	buf->next = NULL;	
-	
+	buf->next = NULL;
+
 	if (wqueue_head == NULL)
 	{
 		wqueue_head = buf;
@@ -947,7 +947,7 @@ int write_ax25(char *s, int len, int kick)
 		wqueue_tail = buf;
 		wqueue_length += len;
 	}
-	
+
 	if (wqueue_length > 7*paclen || kick || bin)
 	{
 		kick_wqueue(0);
@@ -967,12 +967,12 @@ int get_assoc(struct sockaddr_ax25 *sax25)
 	FILE *fp;
 	int  uid;
 	char buf[81];
-	
+
 	fp = fopen(PROC_AX25_CALLS_FILE, "r");
 	if (!fp) return -1;
-	
+
 	fgets(buf, sizeof(buf)-1, fp);
-	
+
 	while(!feof(fp))
 	{
 		if (fscanf(fp, "%d %s", &uid, buf) == 2)
@@ -984,7 +984,7 @@ int get_assoc(struct sockaddr_ax25 *sax25)
 			}
 	}
 	fclose(fp);
-	
+
 	return -1;
 }
 
@@ -1020,7 +1020,7 @@ void cleanup(char *tty)
 }
 
 
-/* 
+/*
  * add a new user to /etc/passwd and do some init
  */
 
@@ -1040,7 +1040,7 @@ void new_user(char *newuser)
 	struct stat fst;
 	int fd_a, fd_b, fd_l;
 	mode_t homedir_mode = S_IRUSR|S_IWUSR|S_IXUSR|S_IXOTH|(secure_home ? 0 : (S_IRGRP|S_IXGRP));
-	
+
 	/*
 	 * build path for home directory
 	 */
@@ -1072,9 +1072,9 @@ retry:
 	/*
 	 * build directories for home
 	 */
-	 
+
 	p = homedir;
-		
+
 	while (*p == '/') p++;
 
 	chdir("/");
@@ -1117,12 +1117,12 @@ retry:
 				{
 					chown(p, uid, user_gid);
 					chmod(p, homedir_mode);
-				} 
+				}
 			}
 			else
 				goto out;
 		}
-		
+
 		if (chdir(p) < 0)
 			goto out;
 		p = q;
@@ -1157,7 +1157,7 @@ end_mkdirs:
 		fp = fopen(PASSWDFILE, "a+");
 		if (fp == NULL)
 			goto out;
-	
+
 		pw.pw_name   = newuser;
 		pw.pw_passwd = ((policy_add_empty_password) ? "" : "+");
 		pw.pw_uid    = uid;
@@ -1165,12 +1165,12 @@ end_mkdirs:
 		pw.pw_gecos  = username;
 		pw.pw_dir    = userdir;
 		pw.pw_shell  = user_shell;
-	
+
 		if (getpwuid(uid) != NULL) goto retry;	/* oops?! */
 
 		if (putpwent(&pw, fp) < 0)
 			goto out;
-	
+
 		fclose(fp);
 	}
 
@@ -1179,7 +1179,7 @@ end_mkdirs:
 	 */
 
 	fd_a = open(CONF_AXSPAWN_PROF_FILE, O_RDONLY);
-	
+
 	if (fd_a > 0)
 	{
 		int first = 1;
@@ -1187,7 +1187,7 @@ end_mkdirs:
 
 		if (fd_b < 0)
 			goto out;
-		
+
 		/* just 2b sure */
 		if (lseek(fd_b, 0L, SEEK_END) > 0L)
 			write(fd_b, "\n", 1);
@@ -1222,16 +1222,16 @@ void read_config(void)
 	char buf[512];
 	char cmd[40], param[80];
 	char *p;
-	
+
 	if (fp == NULL)
 		return;
-		
+
 	while (!feof(fp))
 	{
 		fgets(buf, sizeof(buf), fp);
 		p = strchr(buf, '#');
 		if (p) *p='\0';
-		
+
 		if (buf[0] != '\0')
 		{
 			sscanf(buf, "%s %s", cmd, param);
@@ -1297,12 +1297,12 @@ void read_config(void)
 			} else
 			if (!strncmp(cmd, "secure_home", 11)) {
 				secure_home = (param[0] == 'y');
-			} else	
+			} else
 			if (!strncmp(cmd, "assoc", 5))
 			{
 				if (!strcmp(param, "yes"))
 					policy_associate = 1;
-				else 
+				else
 					policy_associate = 0;
 			} else
 			if (!strncmp(cmd, "shell", 5))
@@ -1315,7 +1315,7 @@ void read_config(void)
 			}
 		}
 	}
-	
+
 	fclose(fp);
 }
 
@@ -1328,7 +1328,7 @@ void signal_handler(int dummy)
 	cleanup(ptyslave+5);
 	exit(1);
 }
-			
+
 int main(int argc, char **argv)
 {
 	char call[20], user[20], as_user[20];
@@ -1400,7 +1400,7 @@ int main(int argc, char **argv)
 		}
 	}
 	strupr(prompt);
-	
+
 	openlog("axspawn", LOG_PID, LOG_DAEMON);
 
 	if (getuid() != 0) {
@@ -1411,7 +1411,7 @@ int main(int argc, char **argv)
 
 	addrlen = sizeof(struct full_sockaddr_ax25);
 	k = getpeername(0, (struct sockaddr *) &sockaddr, &addrlen);
-	
+
 	if (k < 0) {
 		syslog(LOG_NOTICE, "getpeername: %m\n");
 		return 1;
@@ -1457,7 +1457,7 @@ int main(int argc, char **argv)
 				{
 					ssid *= 10;
 					ssid += (int) (call[k] - '0');
-					
+
 					if (ssid > 15) invalid++;
 				}
 				ssidcnt++;
@@ -1481,7 +1481,7 @@ int main(int argc, char **argv)
 		else
 			invalid++;
 	}
-		
+
 	if ( invalid || (k < MINLEN) || (digits > 2) || (digits < 1) )
 	{
 		write_ax25_static_line(MSG_NOCALL);
@@ -1489,7 +1489,7 @@ int main(int argc, char **argv)
 		sleep(EXITDELAY);
 		return 1;
 	}
-	
+
 	if (wait_for_tcp) {
 		/* incoming TCP/IP connection? */
 		if (read_ax25(buf, sizeof(buf)) < 0)
@@ -1522,7 +1522,7 @@ int main(int argc, char **argv)
 			user_changed = 1;
 		}
 	}
-	
+
 	if (!*as_user)
 		strcpy(as_user, user);
 	pw = getpwnam(as_user);
@@ -1536,13 +1536,13 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		if (policy_add_user) 
+		if (policy_add_user)
 		{
 			new_user(as_user);
 			pw = getpwnam(as_user);
 			endpwent();
 		}
-		
+
 		if (pw == NULL && policy_guest)
 		{
 			strcpy(as_user,guest);
@@ -1557,7 +1557,7 @@ int main(int argc, char **argv)
 		sleep(EXITDELAY);
 		return 1;
 	}
-	
+
 	if (!rootlogin && (pw->pw_uid == 0 || pw->pw_gid == 0))
 	{
 		write_ax25_static_line(MSG_NOCALL);
@@ -1565,7 +1565,7 @@ int main(int argc, char **argv)
 		sleep(EXITDELAY);
 		return 1;
 	}
-	
+
 again:
 	if (!(pwd = read_pwd(pw, &pwtype))) {
 		if ((!pwtype || pwtype != PW_CLEARTEXT) && (pwtype != PW_UNIX)) {
@@ -1649,18 +1649,18 @@ again:
 			close(fds);
 		}
 	}
-	
+
 	fcntl(1, F_SETFL, O_NONBLOCK);
-	
+
 	pid = forkpty(&fdmaster, ptyslave, NULL, &win);
-	
+
 	if (pid == 0)
 	{
 		struct termios termios;
 		char *shell = "/bin/sh";
 
         	memset((char *) &termios, 0, sizeof(termios));
-        	
+
         	ioctl(0, TIOCSCTTY, (char *) 0);
 
 		termios.c_iflag = ICRNL | IXOFF;
@@ -1686,7 +1686,7 @@ again:
 		gettimeofday(&tv, NULL);
 		ut_line.ut_tv.tv_sec = tv.tv_sec;
 		ut_line.ut_tv.tv_usec = tv.tv_usec;
-                ut_line.ut_addr = 0;                
+                ut_line.ut_addr = 0;
                 pututline(&ut_line);
                 endutent();
 
@@ -1731,7 +1731,7 @@ again:
 				if (p[1]) {
 					if ((p = strdup(p)))
 						*p = '-';
-					
+
 				} else p = 0;
 			}
 			if (!p)
@@ -1773,7 +1773,7 @@ again:
 		 	*/
 			chargv[chargc++] = "-h";
 			chargv[chargc++] = protocol;
-                	if (pwtype != PW_CLEARTEXT /* PW_SYS or PW_MD5 are already authenticated */ 
+                	if (pwtype != PW_CLEARTEXT /* PW_SYS or PW_MD5 are already authenticated */
 				|| pwcheck == 2 || (pwcheck == 3 && (pw->pw_gid == user_gid || is_guest)) || !strcmp(pw->pw_passwd, "+"))
 	        		chargv[chargc++] = "-f";
                 	chargv[chargc++] = as_user;
@@ -1816,7 +1816,7 @@ again:
         	signal(SIGTERM, signal_handler);
         	signal(SIGINT, signal_handler);
         	signal(SIGQUIT, signal_handler);
- 
+
         	while(1)
         	{
        			FD_ZERO(&fds_read);
@@ -1826,9 +1826,9 @@ again:
         		if (wqueue_length <= paclen*7)
 				FD_SET(fdmaster, &fds_read);
         		FD_SET(fdmaster, &fds_err);
-        		
+
         		k = select(fdmaster+1, &fds_read, NULL, &fds_err, NULL);
-  
+
         		if (k > 0)
         		{
         			if (FD_ISSET(0, &fds_err))
@@ -1842,9 +1842,9 @@ again:
         				cleanup(ptyslave+5);
         				return 1;
         			}
-        			
+
         			if (FD_ISSET(fdmaster, &fds_err))
-        			{	
+        			{
 					/* give the last packet in the timer controlled sendqueue a chance.. */
 					if (wqueue_length) {
 						continue;
@@ -1869,7 +1869,7 @@ again:
         				} else
         					write(fdmaster, buf, cnt);
         			}
-        			
+
         			if (FD_ISSET(fdmaster, &fds_read))
         			{
         				cnt = read(fdmaster, buf, (huffman ? 254 : sizeof(buf)));
@@ -1889,7 +1889,7 @@ again:
         				}
         				write_ax25(buf, cnt, 0);
         			}
-        		} else 
+        		} else
         		if (k < 0 && errno != EINTR)
         		{
 				if (huffman) {
@@ -1903,7 +1903,7 @@ again:
         			return 0;
         		}
         	}
-        } 
+        }
         else
         {
 		write_ax25_static_line(MSG_CANNOTFORK);
@@ -1911,7 +1911,7 @@ again:
         	sleep(EXITDELAY);
         	return 1;
         }
-        
+
         sleep(EXITDELAY);
 
 	return 0;

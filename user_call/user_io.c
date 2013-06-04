@@ -193,7 +193,7 @@ int select_loop(int s)
 		FD_ZERO(&read_fd);
 		FD_SET(STDIN_FILENO, &read_fd);
 		FD_SET(s, &read_fd);
-		
+
 		select(s + 1, &read_fd, NULL, NULL, NULL);
 
 		if (FD_ISSET(s, &read_fd)) {

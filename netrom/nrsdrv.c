@@ -145,7 +145,7 @@ static void nrs_esc(unsigned char *s, int len)
 				*ptr++ = c;
 				break;
 		}
-		
+
 		csum += c;
 	}
 
@@ -192,7 +192,7 @@ static void kiss_esc(unsigned char *s, int len)
 static void nrs_unesc(unsigned char *buffer, int len)
 {
 	int i;
-	
+
 	for (i = 0; i < len; i++) {
 		switch (nrs_state) {
 			case NRS_WAIT:
@@ -204,7 +204,7 @@ static void nrs_unesc(unsigned char *buffer, int len)
 				break;
 
 			case NRS_DATA:
-				switch (buffer[i]) {	
+				switch (buffer[i]) {
 					case STX:	/* !! */
 						nrs_rxcount = 0;
 						nrs_cksum   = 0;
@@ -225,7 +225,7 @@ static void nrs_unesc(unsigned char *buffer, int len)
 				break;
 
 			case NRS_ESCAPE:
-				nrs_state = NRS_DATA; 
+				nrs_state = NRS_DATA;
 				if (nrs_rxcount < 512) {
 					nrs_cksum += buffer[i];
 					nrs_rxbuffer[nrs_rxcount++] = buffer[i];
@@ -246,7 +246,7 @@ static void nrs_unesc(unsigned char *buffer, int len)
 static void kiss_unesc(unsigned char *buffer, int len)
 {
 	int i;
-	
+
 	for (i = 0; i < len; i++) {
 		switch (kiss_state) {
 			case KISS_WAIT:
@@ -267,7 +267,7 @@ static void kiss_unesc(unsigned char *buffer, int len)
 				break;
 
 			case KISS_DATA:
-				switch (buffer[i]) {	
+				switch (buffer[i]) {
 					case FEND:
 						if (kiss_rxcount > 2)
 							nrs_esc(kiss_rxbuffer, kiss_rxcount);
@@ -336,7 +336,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (debugging) {
-		fprintf(stderr,"Flow control %s\n", 
+		fprintf(stderr,"Flow control %s\n",
 			flowcontrol ? "enabled" : "disabled");
 	}
 
@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
 		openlog("nrsdrv", LOG_PID, LOG_DAEMON);
 		syslog(LOG_INFO, "KISS device %s connected to NRS device %s\n", argv[optind + 0], argv[optind + 1]);
 	}
-		
+
 	signal(SIGHUP, SIG_IGN);
 	signal(SIGTERM, terminate);
 
@@ -421,7 +421,7 @@ int main(int argc, char *argv[])
 
 	for (;;) {
 		FD_ZERO(&read_fd);
-		
+
 		FD_SET(kissfd, &read_fd);
 		FD_SET(nrsfd, &read_fd);
 
@@ -437,7 +437,7 @@ int main(int argc, char *argv[])
 			}
 			kiss_unesc(buffer, n);
 		}
-		
+
 		if (FD_ISSET(nrsfd, &read_fd)) {
 			if ((n = read(nrsfd, buffer, 512)) <= 0) {
 				if (logging) {

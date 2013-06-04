@@ -71,7 +71,7 @@
  *	1.6  Aug 1995	Reset the 'defaults' entry's when we start parsing
  *			  a new interface.
  *
- *	1.7  Dec 1995	Added BROKEN_NETROM_KERNEL define for setsockopt.	
+ *	1.7  Dec 1995	Added BROKEN_NETROM_KERNEL define for setsockopt.
  *
  *	1.8  Jan 1996	Added support for AX25_BIND_ANY_DEVICE, specify just
  *			  [CALL-X VIA *].
@@ -228,7 +228,7 @@ void err_config(void) {
 		if (Logging)
 			syslog(LOG_INFO, "config file reload error, continuing with original");
 	}
-}		
+}
 
 /*--------------------------------------------------------------------------*/
 
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
 	char buf[1024];
 	char *p;
 	char *mesg;
-   
+
 	while ((cnt = getopt(argc, argv, "c:lv")) != EOF) {
 		switch (cnt) {
 			case 'c':
@@ -336,7 +336,7 @@ int main(int argc, char *argv[])
 				int argc;
 				int new;
 				int i;
-            
+
 				/*
 				 * Setting up a non-blocking accept() so is does not hang up
 				 *  - I am not sure at this time why I didn't/don't assign
@@ -358,7 +358,7 @@ int main(int argc, char *argv[])
 
 				i = FALSE;
 				ioctl(paxl->fd, FIONBIO, &i);
- 
+
 				if (new < 0) {
 					if (errno == EWOULDBLOCK)
 						continue;	/* It's gone ??? */
@@ -368,7 +368,7 @@ int main(int argc, char *argv[])
 					close(paxl->fd);
 					paxl->fd = -1;
 					reload_timer(10);
-					continue; 
+					continue;
 				}
 
 				switch (paxl->af_type) {
@@ -522,7 +522,7 @@ int main(int argc, char *argv[])
 
 							/* checkVC == 1: wait for data */
 							if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC)) {
-								syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO), "AX.25 %s (%s:%s) AX25.IP-VC host connected. %s", 
+								syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO), "AX.25 %s (%s:%s) AX25.IP-VC host connected. %s",
 									User, Port, myAX25Name,
 									(raxl->VCloginEnable ? "waiting for first PID=text packet for triggered login" : "discarding PID=text packets"));
 							}
@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
 								buf[i] = 0;
 								if (Logging && raxl->LoggingVC > 1) {
 									/* debug */
-									syslog((LOG_DEBUG), "DEBUG: AX.25 %s (%s:%s) AX25.IP-VC host said: >%s<", User, Port, myAX25Name, buf); 
+									syslog((LOG_DEBUG), "DEBUG: AX.25 %s (%s:%s) AX25.IP-VC host said: >%s<", User, Port, myAX25Name, buf);
 								}
 							        /* skip leading mess */
 								for (p = buf; *p && (isspace(*p & 0xff) || *p == '\r'); p++) ;
@@ -645,7 +645,7 @@ static void SignalTERM(int code)
 		syslog(LOG_INFO, "terminating on SIGTERM\n");
 		closelog();
 	}
-	
+
 	exit(0);
 }
 
@@ -655,7 +655,7 @@ static void WorkoutArgs(int af_type, char *shell, int *argc, char **argv)
 	char *sp, *cp;
 	int cnt  = 0;
 	int args = 0;
-   
+
 	for (cp = shell; *cp != '\0'; cp++) {
 		if (isspace(*cp) && cnt != 0) {
 			buffer[cnt]  = '\0';
@@ -829,7 +829,7 @@ static int ReadConfig(void)
 
 		if (buffer[0] == '#')
 			continue;
-         
+
 		switch (buffer[0]) {
 			case '[':		/* AX25 port call */
 				af_type = AF_AX25;
@@ -837,7 +837,7 @@ static int ReadConfig(void)
 				error   = FALSE;
 				iamdigi = FALSE;
 				break;
-   
+
 			case '<':		/* NETROM iface call */
 				af_type = AF_NETROM;
 				hunt    = TRUE;
@@ -851,7 +851,7 @@ static int ReadConfig(void)
 				error   = FALSE;
 				iamdigi = FALSE;
 				break;
-   
+
 			default:
 				if (hunt && !error)
 					goto BadLine;
@@ -1210,7 +1210,7 @@ ignore:
 					goto BadArgsFree;
 
 				axl_ent->flags = ParseFlags(s, line);
-            
+
 				if (!(axl_ent->flags & FLAG_LOCKOUT)) {
 					/* Get username */
 					if ((s = strtok(NULL, " \t")) == NULL)
@@ -1340,7 +1340,7 @@ static unsigned long ParseFlags(const char *kp, int line)
 static struct axlist *ClearList(struct axlist *list)
 {
 	struct axlist *tp1, *tp2, *tmp;
-   
+
 	for (tp1 = list; tp1 != NULL; ) {
 		for (tp2 = tp1->ents; tp2 != NULL; ) {
 			if (tp2->port != NULL)
@@ -1384,11 +1384,11 @@ static char *stripssid(const char *call)
 {
 	static char newcall[10];
 	char *s;
-	
+
 	strcpy(newcall, call);
 
 	if ((s = strchr(newcall, '-')) != NULL)
 		*s = '\0';
-	
+
 	return newcall;
 }

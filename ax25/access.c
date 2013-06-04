@@ -214,14 +214,14 @@ void write_example_passwd(char *pwfile, char pwlocation, struct passwd *pw) {
 	close(i);
 	if ( ! (f = fopen(pwfile, "w")) )
 		return;
-	fprintf(f, "# %s Password file for axspawn\n", (pwlocation == SYSTEMPW ? "System" : "User")); 
+	fprintf(f, "# %s Password file for axspawn\n", (pwlocation == SYSTEMPW ? "System" : "User"));
 	if (pwlocation == SYSTEMPW) {
 		fprintf(f, "# disable user self-administered passwords in $HOME/.%s\n", PWFILE);
 		fprintf(f, "# with the line \"systempasswordonly\"\n");
 		fprintf(f, "# systempasswordonly\n");
 	}
 	fprintf(f, "# Examples (sys and md5 passwords may differ):\n");
-	fprintf(f, "# md5 standard (secure) - length: >= %d and <= %d characters\n", MINPWLEN_MD5, PASSSIZE); 
+	fprintf(f, "# md5 standard (secure) - length: >= %d and <= %d characters\n", MINPWLEN_MD5, PASSSIZE);
 	fprintf(f, "# %smd5:%s\n", (pwlocation == SYSTEMPW ? "username:" : ""), generate_rand_pw(MINPWLEN_MD5));
 	fprintf(f, "# sys/baycom standard (not very secure) - length: >= %d and <= %d characters\n", MINPWLEN_SYS, PASSSIZE);
 	fprintf(f, "# %ssys:%s\n", (pwlocation == SYSTEMPW ? "username:" : ""), generate_rand_pw(MINPWLEN_SYS));
@@ -373,7 +373,7 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 		}
 	}
 found:
-	
+
 	if (!pass || !*pwtype)
 		goto end;
 

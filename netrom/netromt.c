@@ -26,7 +26,7 @@
 static int build_header(unsigned char *message)
 {
 	message[0] = NODES_SIG;
-	
+
 	strcpy(message + 1, nr_config_get_alias(NULL));
 	strncat(message + 1, "       ", MNEMONIC_LEN - strlen(message + 1));
 
@@ -83,12 +83,12 @@ static void build_mine(int s, struct full_sockaddr_ax25 *dest, int dlen, int loc
 	}
 
 	fclose(fp);
-	
+
 	if (sendto(s, message, len, 0, (struct sockaddr *)dest, dlen) == -1) {
 		if (logging)
 			syslog(LOG_ERR, "netromt: sendto: %m");
 	}
-	
+
 	sleep(pause);
 }
 
@@ -129,7 +129,7 @@ static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, in
 			obs_count = atoi(strtok(NULL, " "));
 			neigh_no  = atoi(strtok(NULL, " "));
 			neighbour = NULL;
-			
+
 			if (obs_count < min_obs || quality == 0) continue;
 
 			/* "Blank" mnemonic */
@@ -139,7 +139,7 @@ static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, in
 			fseek(fpneigh, 0L, SEEK_SET);
 
 			fgets(neigh_buffer, 90, fpneigh);
-			
+
 			while (fgets(neigh_buffer, 90, fpneigh) != NULL) {
 				if (atoi(strtok(neigh_buffer, " ")) == neigh_no) {
 					neighbour = strtok(NULL, " ");
@@ -172,7 +172,7 @@ static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, in
 			}
 			len += CALLSIGN_LEN;
 
-			message[len] = quality;		
+			message[len] = quality;
 			len += QUALITY_LEN;
 
 			/* No room for another entry? */
@@ -186,7 +186,7 @@ static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, in
 				if (logging)
 					syslog(LOG_ERR, "netromt: sendto: %m");
 			}
-			
+
 			sleep(pause);
 		}
 

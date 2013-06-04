@@ -26,7 +26,7 @@ static void terminate(int sig)
 		syslog(LOG_INFO, "terminating on SIGTERM\n");
 		closelog();
 	}
-	
+
 	exit(0);
 }
 
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 	int s, n, dlen, len, interval = 30;
 	char *addr, *port, *message, *portcall;
 	char *srccall = NULL, *destcall = NULL;
-	
+
 	while ((n = getopt(argc, argv, "c:d:lmst:v")) != -1) {
 		switch (n) {
 			case 'c':
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
 	port    = argv[optind];
 	message = argv[optind + 1];
-	
+
 	if (ax25_config_load_ports() == 0) {
 		fprintf(stderr, "beacon: no AX.25 ports defined\n");
 		return 1;
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
 			}
 			return 1;
 		}
-		
+
 		if (sendto(s, message, strlen(message), 0, (struct sockaddr *)&dest, dlen) == -1) {
 			if (logging) {
 				syslog(LOG_ERR, "sendto: %m");

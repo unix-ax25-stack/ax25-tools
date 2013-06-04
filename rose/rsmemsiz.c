@@ -54,7 +54,7 @@ static char buf[300];
 
 int uptime(double *uptime_secs, double *idle_secs) {
     double up=0, idle=0;
-    
+
     FILE_TO_BUF(UPTIME_FILE)
     if (sscanf(buf, "%lf %lf", &up, &idle) < 2) {
 	fprintf(stdout, "ERROR: Bad data in %s\r", UPTIME_FILE);
@@ -67,7 +67,7 @@ int uptime(double *uptime_secs, double *idle_secs) {
 
 int loadavg(double *av1, double *av5, double *av15) {
     double avg_1=0, avg_5=0, avg_15=0;
-    
+
     FILE_TO_BUF(LOADAVG_FILE)
     if (sscanf(buf, "%lf %lf %lf", &avg_1, &avg_5, &avg_15) < 3) {
 	fprintf(stdout, "ERROR: Bad data in %s\r", LOADAVG_FILE);
@@ -83,7 +83,7 @@ int loadavg(double *av1, double *av5, double *av15) {
    [ <label> ... ]				# header lines
    [ <label> ] <num> [ <num> ... ]		# table rows
    [ repeats of above line ]
-   
+
    Any lines with fewer <num>s than <label>s get trailing <num>s set to zero.
    The return value is a NULL terminated unsigned** which is the table of
    numbers without labels.  Convenient enumeration constants for the major and
@@ -100,7 +100,7 @@ unsigned** meminfo(void) {
     static unsigned num[MAX_ROW * MAX_COL];	/* number storage */
     char *p;
     int i, j, k, l;
-    
+
     FILE_TO_BUF(MEMINFO_FILE)
     if (!row[0])				/* init ptrs 1st time through */
 	for (i=0; i < MAX_ROW; i++)		/* std column major order: */
@@ -124,7 +124,7 @@ unsigned** meminfo(void) {
 
 
 /*
- * by Heikki Hannikainen <oh7lzb@sral.fi> 
+ * by Heikki Hannikainen <oh7lzb@sral.fi>
  * The following was mostly learnt from the procps package and the
  * gnu sh-utils (mainly uname).
  */

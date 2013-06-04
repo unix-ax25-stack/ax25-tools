@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 			return 1;
 		}
 		axconnect.fsa_digipeater[n].ax25_call[6] |= AX25_HBIT;
-		n++;		
+		n++;
 	}
 
 	/*
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	axconnect.fsa_digipeater[n].ax25_call[6] |= AX25_HBIT;
-	n++;		
+	n++;
 
 	/*
 	 *	And my local ROSE callsign.
@@ -215,9 +215,9 @@ int main(int argc, char **argv)
 		close(s);
 
 		write(STDOUT_FILENO, buffer, strlen(buffer));
-		
+
 		sleep(20);
-		
+
 		return 0;
 	}
 
@@ -236,7 +236,7 @@ int main(int argc, char **argv)
 		FD_ZERO(&read_fd);
 		FD_SET(STDIN_FILENO, &read_fd);
 		FD_SET(s, &read_fd);
-		
+
 		select(s + 1, &read_fd, NULL, NULL, NULL);
 
 		if (FD_ISSET(s, &read_fd)) {

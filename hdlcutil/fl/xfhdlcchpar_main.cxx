@@ -58,7 +58,7 @@ void cb_update(Fl_Widget *widget, void *udata)
 	cp.ppersist = (int)(ppersist->value());
 	cp.fulldup = !!fulldup->value();
 	ret = hdrvc_set_channel_access_param(cp);
-	if (ret < 0) 
+	if (ret < 0)
 		perror("hdrvc_set_channel_access_param");
 }
 
@@ -71,7 +71,7 @@ void cb_quit(Fl_Button *, long)
 
 /* ---------------------------------------------------------------------- */
 
-static const char *usage_str = 
+static const char *usage_str =
 "[-i smif]\n"
 "  -i: specify the name of the baycom kernel driver interface\n\n";
 

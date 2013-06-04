@@ -45,7 +45,7 @@ void transmit_routes(int s)
 		memset((char *)&rem_addr, 0, sizeof(rem_addr));
 		rem_addr.sin_family = AF_INET;
 		rem_addr.sin_addr   = dest_list[i].dest_addr;
-		rem_addr.sin_port   = htons(RIP_PORT);		
+		rem_addr.sin_port   = htons(RIP_PORT);
 
 		route = first_route;
 
@@ -58,7 +58,7 @@ void transmit_routes(int s)
 					memcpy(message + mess_len + 0, (char *)&route->addr, sizeof(struct in_addr));
 					message[mess_len + 4] = route->bits;
 					message[mess_len + 5] = route->metric;
-				
+
 					mess_len += RIP98_ENTRY;
 				}
 

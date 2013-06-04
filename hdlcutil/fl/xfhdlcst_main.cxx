@@ -62,7 +62,7 @@ void cb_timer(void *)
 
 /* ---------------------------------------------------------------------- */
 
-static const char *usage_str = 
+static const char *usage_str =
 "[-i smif]\n"
 "  -i: specify the name of the baycom kernel driver interface\n\n";
 
@@ -112,13 +112,13 @@ int main(int argc, char *argv[])
 	if (ret < 0) {
 		perror("hdrvc_get_mode_name");
 		modename->hide();
-	} else 
+	} else
 		modename->value(name);
 	ret = hdrvc_get_driver_name(name, sizeof(name));
 	if (ret < 0) {
 		perror("hdrvc_get_driver_name");
 		drivername->hide();
-	} else 
+	} else
 		drivername->value(name);
 	/*
 	 * check for soundmodem driver
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
 			demodcyc->value(buf);
 			sprintf(buf, "%d", smi.data.dbg.dma_residue);
 			dmares->value(buf);
-		} 
+		}
 	}
 	exit (0);
 }

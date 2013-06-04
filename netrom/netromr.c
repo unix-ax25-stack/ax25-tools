@@ -14,7 +14,7 @@
 #include <netinet/in.h>
 #include <net/if.h>
 
-#ifdef __GLIBC__ 
+#ifdef __GLIBC__
 #include <net/ethernet.h>
 #else
 #include <linux/if_ether.h>
@@ -160,7 +160,7 @@ void receive_nodes(unsigned char *buffer, int length, ax25_address *neighbour, i
 	}
 
 	fgets(neigh_buffer, 90, fp);
-	
+
 	obs_count = atoi(neigh_buffer);
 
 	fclose(fp);
@@ -179,7 +179,7 @@ void receive_nodes(unsigned char *buffer, int length, ax25_address *neighbour, i
 	}
 
 	fgets(neigh_buffer, 90, fp);
-	
+
 	portcall = ax25_ntoa(neighbour);
 
 	quality = port_list[index].default_qual;
