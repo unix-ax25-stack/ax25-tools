@@ -17,4 +17,3 @@ void ask_pw_sys(char *prompt, char *pass_want, char *pw);
 void ask_pw_md5(char *prompt, char *pass_want, char *pw);
 char *read_pwd (struct passwd *pw, int *pwtype);
 #endif
-

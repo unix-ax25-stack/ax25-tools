@@ -15,4 +15,3 @@ AX25_LOCALSTATEDIR=${localstatedir}/ax25/
 
 install-exec-hook:
 	(cd $(DESTDIR)$(sbindir))
-

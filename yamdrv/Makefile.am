@@ -8,4 +8,3 @@ mcs2h_SOURCES = mcs2h.c
 dist_doc_DATA = README.yamdrv
 
 installconf:
-
