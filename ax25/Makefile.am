@@ -29,13 +29,13 @@ INCLUDES = -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" \
 AX25_SYSCONFDIR=$(sysconfdir)/ax25/
 AX25_LOCALSTATEDIR=$(localstatedir)/ax25/
 
-man_MANS = ax25.4 ax25d.conf.5 axspawn.conf.5 rxecho.conf.5 \
+dist_man_MANS = ax25.4 ax25d.conf.5 axspawn.conf.5 rxecho.conf.5 \
 	   ax25d.8 axctl.8 axparms.8 axspawn.8 beacon.8 bpqparms.8 \
 	   mheard.1 mheardd.8 rxecho.8
 
 
 
-EXTRA_DIST = $(man_MANS) $(etcfiles) $(varfiles)
+EXTRA_DIST = $(etcfiles) $(varfiles)
 
 ax25d_SOURCES = ax25d.c
 axctl_SOURCES = axctl.c
