@@ -182,7 +182,7 @@ struct axlist {		/* Have used same struct for quickness */
 	int LoggingVC;		/* extra log stuff */
 };
 
-static struct axlist *AXL	= NULL;
+static struct axlist *AXL;
 static char *ConfigFile		= CONF_AX25D_FILE;
 static char User[10];				/* Room for 'GB9ZZZ-15\0' */
 static char Node[10];				/* Room for 'GB9ZZZ-15\0' */

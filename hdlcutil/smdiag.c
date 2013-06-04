@@ -51,7 +51,7 @@
 /* ---------------------------------------------------------------------- */
 
 static char *progname;
-static Display *display = NULL;
+static Display *display;
 static Window window;
 static Pixmap pixmap;
 static unsigned long col_zeroline;

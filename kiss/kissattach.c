@@ -33,15 +33,15 @@
 #endif
 
 static char *callsign;
-static int  speed	= 0;
-static int  mtu		= 0;
+static int  speed;
+static int  mtu;
 static int  logging	= FALSE;
-static char *progname	= NULL;
-static char *kttyname	= NULL;
-static char *portname	= NULL;
-static char *inetaddr	= NULL;
-static int allow_broadcast = 0;
-static int i_am_unix98_pty_master = 0; /* unix98 ptmx support */
+static char *progname;
+static char *kttyname;
+static char *portname;
+static char *inetaddr;
+static int allow_broadcast;
+static int i_am_unix98_pty_master;		/* unix98 ptmx support */
 
 static char *kiss_basename(char *s)
 {

@@ -78,9 +78,9 @@
 static unsigned char ibuf[SIZE];	/* buffer for input operations	*/
 static unsigned char obuf[SIZE];	/* buffer for kiss_tx()		*/
 
-static int crc_errors		= 0;
-static int invalid_ports	= 0;
-static int return_polls		= 0;
+static int crc_errors;
+static int invalid_ports;
+static int return_polls	;
 
 static char *usage_string	= "usage: mkiss [-p interval] [-c] [-f] [-h] [-l] [-s speed] [-v] [-x <num_ptmx_devices>] ttyinterface pty ..\n";
 
@@ -89,7 +89,7 @@ static int dump_report		= FALSE;
 static int logging              = FALSE;
 static int crcflag		= FALSE;
 static int hwflag		= FALSE;
-static int pollspeed		= 0;
+static int pollspeed;
 
 /* CRC-stuff */
 typedef unsigned short int u16;
@@ -114,9 +114,9 @@ struct iface
 				       * the client has to use */
 };
 
-static struct iface *tty	= NULL;
-static struct iface *pty[16]	= { NULL };
-static int numptys		= 0;
+static struct iface *tty;
+static struct iface *pty[16];
+static int numptys;
 
 static void init_crc(void)
 {
@@ -143,7 +143,7 @@ static void init_crc(void)
 static int poll(int fd, int ports)
 {
 	char buffer[3];
-	static int port = 0;
+	static int port;
 
 	buffer[0] = FEND;
 	buffer[1] = POLL | (port << 4);

@@ -27,7 +27,7 @@
 #include "../pathnames.h"
 
 char *callsign;
-int  mtu   = 0;
+int  mtu;
 
 int readconfig(char *port)
 {
