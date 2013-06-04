@@ -21,7 +21,7 @@ static int crcbit[8] = {
 static int init_crc(void)
 {
   int i,j;
-  
+
   for (i = 0; i < 256; i++) {
     crctab[i] = 0;
     for (j = 0; j < 8; j++) {
@@ -192,7 +192,7 @@ int bput(void)
       goto abort;
     }
     if (!len) {
-      save_close(fddata); 
+      save_close(fddata);
       if (!term_line) {
         sprintf(err_msg, "error: unexpected end of file during read: %s\n", strerror(errno));
 	return 1;
@@ -331,7 +331,7 @@ int bget(void) {
       file_time =  statbuf.st_mtime;
     else
       file_time = time(0);
-    
+
     /* compute crc  */
     while ((len = read(fddata, buf, BLOCKSIZ)) > 0) {
       int i;

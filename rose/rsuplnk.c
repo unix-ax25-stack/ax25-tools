@@ -102,7 +102,7 @@ int main(int argc, char **argv)
 
 	for (n = 0; n < ax25peer.fsa_ax25.sax25_ndigis; n++) {
 		addr = ax25_ntoa(&ax25peer.fsa_digipeater[n]);
-		
+
 		if (strspn(addr, "0123456789-") == strlen(addr)) {
 			if ((p = strchr(addr, '-')) != NULL)
 				*p = '\0';
@@ -249,7 +249,7 @@ int main(int argc, char **argv)
 		FD_ZERO(&read_fd);
 		FD_SET(STDIN_FILENO, &read_fd);
 		FD_SET(s, &read_fd);
-		
+
 		select(s + 1, &read_fd, NULL, NULL, NULL);
 
 		if (FD_ISSET(s, &read_fd)) {

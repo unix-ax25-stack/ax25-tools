@@ -43,7 +43,7 @@ struct sm_ioctl {
 	int cmd;
 	union {
 		struct sm_config cfg;
-		struct sm_diag_data diag;	
+		struct sm_diag_data diag;
 		struct sm_mixer_data mix;
 		struct sm_debug_data dbg;
 	} data;

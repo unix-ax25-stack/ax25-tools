@@ -79,7 +79,7 @@ int my_read(int fd, char *s, int len_max, int *eof, char *p_break)
 
   return len_got;
 }
-    
+
 /*---------------------------------------------------------------------------*/
 
 int secure_write(int fd, char *s, int len_write) {

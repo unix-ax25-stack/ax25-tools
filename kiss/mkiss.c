@@ -32,7 +32,7 @@
  * 1.06 23/11/96 Tomi Manninen - Added simple support for polled kiss.
  *
  * 1.07 12/24/97 Deti Fliegl - Added Flexnet/BayCom CRC mode with commandline
- * parameter -f    
+ * parameter -f
  *
  * 1.08 xx/xx/99 Tom Mazouch - Adjustable poll interval
  */
@@ -158,14 +158,14 @@ static int poll(int fd, int ports)
 }
 
 static int put_ubyte(unsigned char* s, u16* crc, unsigned char c, int usecrc)
-{ 
+{
   	int len = 1;
 
-  	if (c == FEND) { 
+  	if (c == FEND) {
 		*s++ = FESC;
 		*s++ = TFEND;
 		len++;
-  	} else { 
+  	} else {
 		*s++ = c;
 		if (c == FESC) {
 			*s++ = TFESC;
@@ -214,7 +214,7 @@ static int kiss_tx(int fd, int port, unsigned char *s, int len, int usecrc)
 		c = (c & 0x0F) | (port << 4);
 		ptr += put_ubyte(ptr, &crc, c, usecrc);
 	}
-	
+
 	/*
 	 * For each byte in the packet, send the appropriate
 	 * character sequence, according to the SLIP protocol.
@@ -238,7 +238,7 @@ static int kiss_tx(int fd, int port, unsigned char *s, int len, int usecrc)
 		}
 		break;
 	}
-	
+
 	*ptr++ = FEND;
 	return write(fd, obuf, ptr - obuf);
 }
@@ -255,7 +255,7 @@ static int kiss_rx(struct iface *ifp, unsigned char c, int usecrc)
 			len = 0;		/* ...drop frame	*/
 			ifp->errors++;
 		}
-		
+
 		if (len != 0) {
 			switch (usecrc) {
 			case G8BPQ_CRC:
@@ -334,7 +334,7 @@ static int kiss_rx(struct iface *ifp, unsigned char c, int usecrc)
 	*ifp->optr++ = c;
 
 	switch (usecrc) {
-	case G8BPQ_CRC:	
+	case G8BPQ_CRC:
 		ifp->crc ^= c;
 		break;
 	case FLEX_CRC:
@@ -393,7 +393,7 @@ static void report(void)
 	       crcflag == G8BPQ_CRC ? "en" : "dis");
 	syslog(LOG_INFO, "FLEX checksumming %sabled.",
 	       crcflag == FLEX_CRC ? "en" : "dis");
-	       
+
 	syslog(LOG_INFO, "polling %sabled.",
 	       pollspeed ? "en" : "dis");
 	if (pollspeed)

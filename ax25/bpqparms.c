@@ -1,19 +1,19 @@
-/* 
+/*
    bpqparms.c
 
    Copyright 1996, by Joerg Reuter jreuter@poboxes.com
 
-   This program is free software; you can redistribute it and/or modify 
-   it under the terms of the (modified) GNU General Public License 
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the (modified) GNU General Public License
    delivered with the LinuX kernel source.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should find a copy of the GNU General Public License in 
-   /usr/src/linux/COPYING; 
+   You should find a copy of the GNU General Public License in
+   /usr/src/linux/COPYING;
 
 */
 
@@ -54,9 +54,9 @@ int get_hwaddr(unsigned char *k, char *s)
 	if (strcmp(s, "default") == 0 || strcmp(s, "broadcast") == 0) {
 		memcpy(k, broadcast, ETH_ALEN);
 	} else {
-		n = sscanf(s, "%x:%x:%x:%x:%x:%x", 
+		n = sscanf(s, "%x:%x:%x:%x:%x:%x",
 		&eth[0], &eth[1], &eth[2], &eth[3], &eth[4], &eth[5]);
-		
+
 		if (n < 6)
 			return 1;
 
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 					return 1;
 				}
 				break;
-				
+
 			case 'a':
 				flag |= 2;
 				if (get_hwaddr(addr.accept, optarg)) {
@@ -117,26 +117,26 @@ int main(int argc, char **argv)
 				usage();
 		}
 	}
-	
+
 	if (!(flag & 0x01) || optind+1 > argc)
 		usage();
-	
+
 	strcpy(dev, argv[optind]);
 
 	if ((flag & 0x02) == 0)
 		memcpy(addr.accept, addr.destination, ETH_ALEN);
 
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
-	
+
 	strcpy(ifr.ifr_name, dev);
 	ifr.ifr_data = (caddr_t) &addr;
-	
+
 	if (ioctl(fd, SIOCSBPQETHADDR, &ifr) < 0) {
 		perror("bpqparms SIOCSBPQETHADDR");
 		close(fd);
 		return 1;
 	}
-	
+
 	close(fd);
 
 	return 0;

@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <net/if.h>
 
-#ifdef __GLIBC__ 
+#ifdef __GLIBC__
 #include <net/ethernet.h>
 #else
 #include <linux/if_ether.h>
@@ -250,8 +250,8 @@ rawsend:
 			}
 		}
 	}
-	
+
 	close(s);
-	
+
 	return 0;
 }

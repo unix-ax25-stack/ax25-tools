@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
   fdin_is_pipe = (isatty(fdin) ? 0 : 1);
   fdout_is_pipe = (isatty(fdout) ? 0 : 1);
 
-  if (fdin_is_pipe && fdout_is_pipe) { 
+  if (fdin_is_pipe && fdout_is_pipe) {
     fprintf(stderr, "error: cannot work in between two pipes\n");
     exit(1);
   }

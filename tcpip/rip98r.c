@@ -42,7 +42,7 @@ static int cmp_route(struct route_struct *route, struct in_addr addr, int bits, 
 
 	if (route->action == DEL_ROUTE || route->action == NEW_ROUTE)
 		return UNMATCH_ROUTE;
-		
+
 	if (old_addr != new_addr)
 		return UNMATCH_ROUTE;
 
@@ -118,7 +118,7 @@ void receive_routes(int s)
 	for (p = message + RIP98_HEADER; p < message + mess_len; p += RIP98_ENTRY) {
 		memcpy((char *)&addr, (char *)p, sizeof(addr));
 		bits   = p[4];
-		metric = p[5];	
+		metric = p[5];
 
 		network = inet_netof(addr);
 
@@ -140,7 +140,7 @@ void receive_routes(int s)
 			syslog(LOG_DEBUG, "    route to %s/%d metric %d\n", inet_ntoa(addr), bits, metric);
 
 		metric++;
-		
+
 		if (metric > RIP98_INFINITY)
 			metric = RIP98_INFINITY;
 
@@ -157,7 +157,7 @@ void receive_routes(int s)
 
 				case REPLACE_ROUTE:
 					route->action = DEL_ROUTE;
-				
+
 				case ADDITIONAL_ROUTE:
 					if (!found) {
 						if ((new = malloc(sizeof(struct route_struct))) == NULL) {
@@ -170,10 +170,10 @@ void receive_routes(int s)
 						new->bits   = bits;
 						new->metric = metric;
 						new->action = NEW_ROUTE;
-				
+
 						new->next   = first_route;
 						first_route = new;
-	
+
 						found = TRUE;
 					}
 
@@ -196,12 +196,12 @@ void receive_routes(int s)
 			new->bits   = bits;
 			new->metric = metric;
 			new->action = NEW_ROUTE;
-				
+
 			new->next   = first_route;
 			first_route = new;
 		}
 	}
-	
+
 	for (route = first_route; route != NULL; route = route->next) {
 		if (route->action == DEL_ROUTE) {
 			memset((char *)&rt, 0, sizeof(rt));
@@ -233,7 +233,7 @@ void receive_routes(int s)
 				rt.rt_flags |= RTF_HOST;
 			} else {
 				netmask = bits2mask(route->bits);
-			
+
 				trg.sin_family = AF_INET;
 				memcpy((char *)&trg.sin_addr, (char *)&netmask, sizeof(struct in_addr));
 				trg.sin_port   = 0;

@@ -58,7 +58,7 @@ static unsigned int drawflags = 0;
 /* ---------------------------------------------------------------------- */
 
 scope::scope(int x, int y, int w, int h, const char *l)
-	: Fl_Box(x, y, w, h, l) 
+	: Fl_Box(x, y, w, h, l)
 {
 	box(FL_DOWN_FRAME);
 	X = x+3;
@@ -205,8 +205,8 @@ void scope::drawdata(short data[], int len, int xm)
         XGCValues gcv;
 
 	mode();
-	if (!pixmalloc || (drawmode != HDRVC_DIAGMODE_CONSTELLATION && 
-			   drawmode != HDRVC_DIAGMODE_INPUT && 
+	if (!pixmalloc || (drawmode != HDRVC_DIAGMODE_CONSTELLATION &&
+			   drawmode != HDRVC_DIAGMODE_INPUT &&
 			   drawmode != HDRVC_DIAGMODE_DEMOD))
 		return;
 	gcv.line_width = 1;
@@ -268,7 +268,7 @@ void cb_mode(Fl_Check_Button *, long which)
 	case 256:
 		drawflags ^= HDRVC_DIAGFLAG_DCDGATE;
 		break;
-		
+
 	case 0:
 		scdisp->mode(HDRVC_DIAGMODE_OFF);
 		drawflags = 0;
@@ -298,7 +298,7 @@ void cb_quit(Fl_Button *, long)
 {
 	struct sm_diag_data diag;
 	short data;
-	
+
 	diag.mode = HDRVC_DIAGMODE_OFF;
 	diag.flags = 0;
 	diag.datalen = 1;
@@ -330,7 +330,7 @@ void cb_timer(void *)
 	/*
 	 * draw scope
 	 */
-	if ((ret = hdrvc_diag2(scdisp->mode(), drawflags, data, sizeof(data) / sizeof(short), 
+	if ((ret = hdrvc_diag2(scdisp->mode(), drawflags, data, sizeof(data) / sizeof(short),
 			       &samplesperbit)) < 0) {
 		perror("hdrvc_diag2");
 		exit(1);
@@ -341,7 +341,7 @@ void cb_timer(void *)
 
 /* ---------------------------------------------------------------------- */
 
-static const char *usage_str = 
+static const char *usage_str =
 "[-i smif]\n"
 "  -i: specify the name of the baycom kernel driver interface\n\n";
 
@@ -396,13 +396,13 @@ int main(int argc, char *argv[])
 	if (ret < 0) {
 		perror("hdrvc_get_mode_name");
 		modename->hide();
-	} else 
+	} else
 		modename->value(name);
 	ret = hdrvc_get_driver_name(name, sizeof(name));
 	if (ret < 0) {
 		perror("hdrvc_get_driver_name");
 		drivername->hide();
-	} else 
+	} else
 		drivername->value(name);
 	Fl::add_timeout(0.1, cb_timer);
 	scopewindow->show();

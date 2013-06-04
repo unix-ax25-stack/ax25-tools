@@ -69,11 +69,11 @@ static int x_error_handler(Display *disp, XErrorEvent *evt)
 
     XGetErrorText(disp, evt->error_code, err_buf, sizeof(err_buf));
     fprintf(stderr, "X Error: %s\n", err_buf);
-    XGetErrorDatabaseText(disp, mtype, "MajorCode", "Request Major code %d", 
+    XGetErrorDatabaseText(disp, mtype, "MajorCode", "Request Major code %d",
 			  mesg, sizeof(mesg));
     fprintf(stderr, mesg, evt->request_code);
     sprintf(number, "%d", evt->request_code);
-    XGetErrorDatabaseText(disp, "XRequest", number, "", err_buf, 
+    XGetErrorDatabaseText(disp, "XRequest", number, "", err_buf,
 			  sizeof(err_buf));
     fprintf(stderr, " (%s)\n", err_buf);
     abort();
@@ -100,9 +100,9 @@ static int openwindow(char *disp, int constell, int samplesperbit)
 	col_background = WhitePixel(display, 0);
 	col_trace = BlackPixel(display, 0);
         attr.background_pixel = col_background;
-        if (!(window = XCreateWindow(display, XRootWindow(display, 0), 
-				     200, 200, WIDTH, HEIGHT, 5, 
-				     DefaultDepth(display, 0), 
+        if (!(window = XCreateWindow(display, XRootWindow(display, 0),
+				     200, 200, WIDTH, HEIGHT, 5,
+				     DefaultDepth(display, 0),
 				     InputOutput, DefaultVisual(display, 0),
 				     CWBackPixel, &attr))) {
 		fprintf(stderr, "smdiag: unable to open X window\n");
@@ -161,7 +161,7 @@ static void drawdata(short *data, int len, int replace, int xm)
 	int cnt;
         GC gc;
         XGCValues gcv;
-        XWindowAttributes winattrs;	
+        XWindowAttributes winattrs;
 
         if (!display || !pixmap)
                 return;
@@ -169,13 +169,13 @@ static void drawdata(short *data, int len, int replace, int xm)
 	gcv.line_width = 1;
         gcv.line_style = LineSolid;
         gc = XCreateGC(display, pixmap, GCLineWidth | GCLineStyle, &gcv);
-        XSetState(display, gc, col_background, col_background, GXcopy, 
+        XSetState(display, gc, col_background, col_background, GXcopy,
 		  AllPlanes);
 	if (replace)
-		XFillRectangle(display, pixmap, gc, 0, 0, 
+		XFillRectangle(display, pixmap, gc, 0, 0,
 			       winattrs.width, winattrs.height);
 	else
-		XCopyArea(display, window, pixmap, gr_context, 0, 0, 
+		XCopyArea(display, window, pixmap, gr_context, 0, 0,
 			  winattrs.width, winattrs.height, 0, 0);
         XSetForeground(display, gc, col_trace);
 	for (cnt = 0; cnt < len-1; cnt++)
@@ -203,7 +203,7 @@ static void drawconstell(short *data, int len)
 	int cnt;
         GC gc;
         XGCValues gcv;
-        XWindowAttributes winattrs;	
+        XWindowAttributes winattrs;
 
         if (!display || !pixmap)
                 return;
@@ -211,13 +211,13 @@ static void drawconstell(short *data, int len)
 	gcv.line_width = 1;
         gcv.line_style = LineSolid;
         gc = XCreateGC(display, pixmap, GCLineWidth | GCLineStyle, &gcv);
-        XSetState(display, gc, col_background, col_background, GXcopy, 
+        XSetState(display, gc, col_background, col_background, GXcopy,
 		  AllPlanes);
-	XCopyArea(display, window, pixmap, gr_context, 0, 0, 
+	XCopyArea(display, window, pixmap, gr_context, 0, 0,
 		  winattrs.width, winattrs.height, 0, 0);
         XSetForeground(display, gc, col_trace);
 	for (cnt = 0; cnt < len-1; cnt += 2)
-		XDrawPoint(display, pixmap, gc, 
+		XDrawPoint(display, pixmap, gc,
 			   XCOORD(data[cnt]), YCOORD(data[cnt+1]));
         XSetForeground(display, gc, col_zeroline);
 	XDrawLine(display, pixmap, gc, 0, YCOORD(0), winattrs.width, YCOORD(0));
@@ -235,7 +235,7 @@ static void drawconstell(short *data, int len)
 
 static void clearwindow(void)
 {
-        XWindowAttributes winattrs;	
+        XWindowAttributes winattrs;
 	GC gc;
         XGCValues gcv;
 
@@ -245,15 +245,15 @@ static void clearwindow(void)
 	gcv.line_width = 1;
         gcv.line_style = LineSolid;
         gc = XCreateGC(display, pixmap, GCLineWidth | GCLineStyle, &gcv);
-        XSetState(display, gc, col_background, col_background, GXcopy, 
+        XSetState(display, gc, col_background, col_background, GXcopy,
 		  AllPlanes);
-	XFillRectangle(display, pixmap, gc, 0, 0, 
+	XFillRectangle(display, pixmap, gc, 0, 0,
 		       winattrs.width, winattrs.height);
         XSetForeground(display, gc, col_zeroline);
         XClearArea(display, window, 0, 0, 0, 0, False);
 	XCopyArea(display, pixmap, window, gr_context, 0, 0, winattrs.width,
                   winattrs.height, 0, 0);
-        XFreeGC(display, gc);	
+        XFreeGC(display, gc);
 }
 
 /* ---------------------------------------------------------------------- */
@@ -267,7 +267,7 @@ static Bool predicate(Display *display, XEvent *event, char *arg)
 
 static char *getkey(void)
 {
-        XWindowAttributes winattrs;	
+        XWindowAttributes winattrs;
         XEvent evt;
         static char kbuf[32];
         int i;
@@ -278,7 +278,7 @@ static char *getkey(void)
         while (XCheckIfEvent(display, &evt, predicate, NULL)) {
 		switch (evt.type) {
 		case KeyPress:
-			i = XLookupString((XKeyEvent *)&evt, kbuf, sizeof(kbuf)-1, 
+			i = XLookupString((XKeyEvent *)&evt, kbuf, sizeof(kbuf)-1,
 					  NULL, NULL);
 			if (!i)
 				return NULL;
@@ -290,7 +290,7 @@ static char *getkey(void)
 			return NULL;
 		case Expose:
 			XGetWindowAttributes(display, window, &winattrs);
-			XCopyArea(display, pixmap, window, gr_context, 0, 0, 
+			XCopyArea(display, pixmap, window, gr_context, 0, 0,
 				  winattrs.width, winattrs.height, 0, 0);
 			break;
 		default:
@@ -311,7 +311,7 @@ static void printmode(unsigned int mode, unsigned int trigger)
 
 /* ---------------------------------------------------------------------- */
 
-static const char *usage_str = 
+static const char *usage_str =
 "[-d display] [-i smif] [-c] [-e]\n"
 "  -d: display host\n"
 "  -i: specify the name of the baycom kernel driver interface\n"

@@ -1,4 +1,4 @@
-SUBDIRS = axgetput 
+SUBDIRS = axgetput
 
 etcfiles = ax25.profile ax25d.conf axspawn.conf rxecho.conf
 varfiles = mheard.dat
@@ -24,7 +24,7 @@ LDADD = $(AX25_LIB)
 axspawn_LDADD = $(AX25_LIB) $(UTIL_LIB)
 
 INCLUDES = -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" \
-	   -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\" 
+	   -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\"
 
 AX25_SYSCONFDIR=$(sysconfdir)/ax25/
 AX25_LOCALSTATEDIR=$(localstatedir)/ax25/

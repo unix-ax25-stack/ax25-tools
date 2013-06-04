@@ -286,7 +286,7 @@ static void SortByFrame(void)
 		p = n;
 	}
 }
-		
+
 int main(int argc, char *argv[])
 {
 	int headers = TRUE;
@@ -346,7 +346,7 @@ int main(int argc, char *argv[])
 				return 1;
 		}
 	}
-	
+
 	LoadPortData();
 
 	switch (mode) {

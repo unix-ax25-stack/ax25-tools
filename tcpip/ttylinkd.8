@@ -1,6 +1,6 @@
 .TH TTYLINKD 8 "5 March 1997" Linux "Linux System Managers Manual"
 .SH NAME
-ttylinkd \- TTYlink daemon for AX.25, NET/ROM, ROSE and IP. 
+ttylinkd \- TTYlink daemon for AX.25, NET/ROM, ROSE and IP.
 .SH SYNOPSIS
 .B ttylinkd [-hv] [-c callsign] [-f file]
 .SH DESCRIPTION
@@ -10,11 +10,11 @@ is a simple daemon that allows incoming ttylink calls to be routed through
 to Linux's normal talkd(8)
 system and provides a pipe between the two.
 .LP
-.B ttylinkd 
+.B ttylinkd
 is usually setup to be spawned from ax25d(8) or inetd(8)
 but can, since version 0.03, be used on the command line, although
 talk(1) is a much better idea for interactive users.
-.LP 
+.LP
 Use splitscreen(1)
 for outgoing ttylink sessions.
 .SH OPTIONS
@@ -44,7 +44,7 @@ Use <file> for the configuration file, instead of the default
 .BR talkd (8).
 .SH BUGS
 .LP
-There is still some need for some checking of who is still logged on.  
+There is still some need for some checking of who is still logged on.
 .LP
 The daemon may hang if you disconnect from it strangely.
 .LP

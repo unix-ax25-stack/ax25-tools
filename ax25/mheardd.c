@@ -187,7 +187,7 @@ int main(int argc, char **argv)
 			position = ftell(fp);
 			s++;
 		}
-		
+
 		fclose(fp);
 	} else {
 		if ((fp = fopen(DATA_MHEARD_FILE, "w")) != NULL)
@@ -198,7 +198,7 @@ int main(int argc, char **argv)
 		perror("mheardd: socket");
 		return 1;
 	}
-	
+
 	if (!daemon_start(FALSE)) {
 		fprintf(stderr, "mheardd: cannot become a daemon\n");
 		return 1;
@@ -220,7 +220,7 @@ int main(int argc, char **argv)
 			}
 			return 1;
 		}
-		
+
 		if ((port = ax25_config_get_name(sa.sa_data)) == NULL) {
 			if (logging)
 				syslog(LOG_WARNING, "unknown port '%s'\n", sa.sa_data);
@@ -276,9 +276,9 @@ int main(int argc, char **argv)
 		while (!end) {
 			memcpy(&mheard->entry.digis[mheard->entry.ndigis], data, sizeof(ax25_address));
 			mheard->entry.ndigis++;
-			
+
 			end = (data[ALEN] & HDLCAEB);
-			
+
 			data += AXLEN;
 			size -= AXLEN;
 		}
@@ -387,10 +387,10 @@ int main(int argc, char **argv)
 					break;
 			}
 		}
-		
+
 		if (mheard->entry.first_heard == 0)
 			time(&mheard->entry.first_heard);
-			
+
 		time(&mheard->entry.last_heard);
 
 		if ((fp = fopen(DATA_MHEARD_FILE, "r+")) == NULL) {
@@ -398,16 +398,16 @@ int main(int argc, char **argv)
 				syslog(LOG_ERR, "cannot open mheard data file\n");
 			continue;
 		}
-		
+
 		if (mheard->position == 0xFFFFFF) {
 			fseek(fp, 0L, SEEK_END);
 			mheard->position = ftell(fp);
 		}
 
 		fseek(fp, mheard->position, SEEK_SET);
-		
+
 		fwrite(&mheard->entry, sizeof(struct mheard_struct), 1, fp);
-		
+
 		fclose(fp);
 	}
 }
@@ -445,7 +445,7 @@ static struct mheard_list_struct *findentry(ax25_address *callsign, char *port)
 {
 	struct mheard_list_struct *oldest = NULL;
 	int i;
-	
+
 	for (i = 0; i < mheard_list_size; i++)
 		if (mheard_list[i].in_use &&
 		    ax25_cmp(&mheard_list[i].entry.from_call, callsign) == 0 &&
