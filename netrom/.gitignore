@@ -1,3 +1,5 @@
+*.o
+.deps
 Makefile
 Makefile.in
 netromd
@@ -6,5 +8,3 @@ nrattach
 nrbroadcast
 nrparms
 nrsdrv
-.deps
-*.o

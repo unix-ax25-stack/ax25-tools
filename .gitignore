@@ -1,6 +1,10 @@
+.deps
+INSTALL
+Makefile
+Makefile.in
 aclocal.m4
-ax25-tools.spec
 autom4te.cache
+ax25-tools.spec
 config.cache
 config.h
 config.h.in
@@ -10,8 +14,4 @@ configure
 depcomp
 install-sh
 missing
-INSTALL
-Makefile
-Makefile.in
 stamp-h1
-.deps

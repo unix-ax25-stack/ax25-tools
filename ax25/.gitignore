@@ -1,3 +1,4 @@
+*.o
 .deps
 Makefile
 Makefile.in
@@ -10,4 +11,3 @@ bpqparms
 mheard
 mheardd
 rxecho
-*.o

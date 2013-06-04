@@ -1,8 +1,8 @@
+
+.deps
 Makefile
 Makefile.in
 ax25_call
 netrom_call
 rose_call
 tcp_call
-.deps
-

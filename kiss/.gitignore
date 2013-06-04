@@ -1,3 +1,5 @@
+*.o
+.deps
 Makefile
 Makefile.in
 kissattach
@@ -5,5 +7,3 @@ kissnetd
 kissparms
 mkiss
 net2kiss
-.deps
-*.o

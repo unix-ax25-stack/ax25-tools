@@ -1,9 +1,9 @@
+*.o
+.deps
 Makefile
 Makefile.in
 rsattach
 rsdwnlnk
+rsmemsiz
 rsparms
 rsuplnk
-rsmemsiz
-.deps
-*.o
