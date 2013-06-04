@@ -8,8 +8,7 @@ sbin_PROGRAMS =
 
 bin_PROGRAMS = axgetput
 
-man_MANS = axgetput.1 
-EXTRA_DIST = $(man_MANS) 
+dist_man_MANS = axgetput.1 
 
 axgetput_SOURCES = axgetput.c axgetput.h util.h proto_bin.h util.c proto_bin.c includes.h
 

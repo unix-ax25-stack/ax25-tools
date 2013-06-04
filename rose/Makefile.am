@@ -8,9 +8,9 @@ rsmemsiz_LDADD =
 sbin_SCRIPTS = rsusers.sh
 
 
-man_MANS = rose.4 rsattach.8 rsparms.8 rsdwnlnk.8 rsuplnk.8
+dist_man_MANS = rose.4 rsattach.8 rsparms.8 rsdwnlnk.8 rsuplnk.8
 
-EXTRA_DIST = $(man_MANS) $(sbin_SCRIPTS)
+EXTRA_DIST = $(sbin_SCRIPTS)
 
 INCLUDES = -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" \
 	   -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\" 

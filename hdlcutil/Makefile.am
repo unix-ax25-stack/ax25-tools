@@ -19,7 +19,4 @@ INCLUDES = -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" \
 AX25_SYSCONFDIR=$(sysconfdir)/ax25/
 AX25_LOCALSTATEDIR=$(localstatedir)/ax25/
 
-man_MANS = sethdlc.8 smmixer.8 baycom.9 hdlcdrv.9 soundmodem.9 smdiag.8
-
-EXTRA_DIST = $(man_MANS) 
-
+dist_man_MANS = sethdlc.8 smmixer.8 baycom.9 hdlcdrv.9 soundmodem.9 smdiag.8

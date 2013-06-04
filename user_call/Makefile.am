@@ -4,11 +4,9 @@ installconf:
 
 sbin_PROGRAMS = ax25_call netrom_call rose_call tcp_call
 
-man_MANS = ax25_call.8 netrom_call.8 rose_call.8 tcp_call.8
+dist_man_MANS = ax25_call.8 netrom_call.8 rose_call.8 tcp_call.8
 
-doc_DATA= README.user_call
-
-EXTRA_DIST = $(man_MANS) $(doc_DATA)
+dist_doc_DATA= README.user_call
 
 LDADD = $(AX25_LIB) $(Z_LIB)
 

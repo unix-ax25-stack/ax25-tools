@@ -5,9 +5,7 @@ yamcfg_SOURCES =  yamcfg.c yam.h
 
 mcs2h_SOURCES = mcs2h.c
 
-doc_DATA = README.yamdrv
-
-EXTRA_DIST = $(doc_DATA)
+dist_doc_DATA = README.yamdrv
 
 installconf:
 
