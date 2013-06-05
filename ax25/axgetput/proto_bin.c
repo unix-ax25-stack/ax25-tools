@@ -37,8 +37,7 @@ static int init_crc(void)
 
 static int do_crc(char b, unsigned int crc)
 {
-	crc = (crctab[(crc >> 8)] ^ ((crc << 8) | (b & 0xff))) & 0xffff;
-	return crc;
+	return (crctab[(crc >> 8)] ^ ((crc << 8) | (b & 0xff))) & 0xffff;
 }
 
 unsigned int calc_crc(char *buf, int n, unsigned crc)
