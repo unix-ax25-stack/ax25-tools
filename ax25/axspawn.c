@@ -525,11 +525,11 @@ int encstathuf(char *src, int srclen, char *dest, int *destlen)
 
 	if ((src == NULL) || (dest == NULL)) {
 		syslog(LOG_NOTICE, "Huffman encode: src or dest NULL!");
-		return(1);
+		return 1;
 	}
 	if (srclen > 255) {
 		syslog(LOG_NOTICE, "Huffman encode: srclen > 255: %d", srclen);
-		return(1);
+		return 1;
 	}
 	srcptr = src;
 	destptr = &dest[1];
@@ -552,7 +552,7 @@ int encstathuf(char *src, int srclen, char *dest, int *destlen)
 				memcpy(&dest[1],src,srclen);
 				dest[0] = 255;
 				*destlen = srclen + 1;
-				return(0);
+				return 0;
 			}
 			bit8 = 0;
 			*destptr = 0;
@@ -570,7 +570,7 @@ int encstathuf(char *src, int srclen, char *dest, int *destlen)
 	if (bit8 != 0) (*destlen)++;
 	(*destlen)++;
 	dest[0] = (char)(srclen-1);
-	return(0);
+	return 0;
 }
 
 /* The buffer in src (first byte length-1) is decoded into dest
@@ -588,24 +588,24 @@ int decstathuf(char *src, char *dest, int srclen, int *destlen)
 	unsigned short decod;
 	unsigned short newnode;
 
-	if ((src == NULL) || (dest == NULL)) return(1);
+	if ((src == NULL) || (dest == NULL)) return 1;
 
 	srcptr = src;
 	destptr = dest;
 	*destlen = (int)((*srcptr)+1);
 	srcptr++;
 	if (--srclen == 0) {
-		return(1);
+		return 1;
 	}
 	if (*destlen == 0) {
-		return(1);
+		return 1;
 	}
 
 	if (*destlen == 256) {
 		/* no compression, only copy */
 		memcpy(dest,src+1,srclen);
 		*destlen = (unsigned char)(srclen);
-		return(0);
+		return 0;
 	}
 	wrklen = 0;
 	decod = 0;
@@ -639,10 +639,10 @@ int decstathuf(char *src, char *dest, int srclen, int *destlen)
 		if (wrklen >= *destlen) break;
 		bitmask = 0x80;
 		srcptr++;
-		if (srclen == 0) return(1);
+		if (srclen == 0) return 1;
 		srclen--;
 	}
-	return(0);
+	return 0;
 }
 
 
@@ -654,7 +654,7 @@ int _write_ax25(const char *s, int len)
 
 	i = write(1, s, len);
 	fflush(stdout);
-	return (i > 0 ? i : 0);	/* on error, -1 is returned  */
+	return i > 0 ? i : 0;	/* on error, -1 is returned  */
 }
 
 int read_ax25(unsigned char *s, int size)
@@ -677,7 +677,7 @@ int read_ax25(unsigned char *s, int size)
 		}
 	}
 	if (bin) {
-		return(len);
+		return len;
 	}
 
 

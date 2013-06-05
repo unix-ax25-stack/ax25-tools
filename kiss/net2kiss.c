@@ -254,7 +254,7 @@ static int openpty(int *amaster, int *aslave, char *name,
 			line[9] = *cp2;
 			if ((master = open(line, O_RDWR, 0)) == -1) {
 				if (errno == ENOENT)
-					return (-1);	/* out of ptys */
+					return -1;	/* out of ptys */
 			} else {
 				line[5] = 't';
 				(void) chown(line, getuid(),
@@ -284,7 +284,7 @@ static int openpty(int *amaster, int *aslave, char *name,
 		}
 	}
 	errno = ENOENT;	/* out of ptys */
-	return (-1);
+	return -1;
 }
 
 /* ---------------------------------------------------------------------- */
