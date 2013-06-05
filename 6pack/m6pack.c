@@ -408,7 +408,6 @@ static void report(struct iface *tty, struct iface **pty, int numptys)
 		       pty[i]->rxpackets, pty[i]->rxbytes,
 		       pty[i]->errors);
 	}
-	return;
 }
 
 int main(int argc, char *argv[])
