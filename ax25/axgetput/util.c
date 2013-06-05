@@ -62,7 +62,7 @@ int my_read(int fd, char *s, int len_max, int *eof, char *p_break)
        * len = 0: normal eof. if we're looking for a string, return -1 since
        * we have'nt found
        */
-      return (len == 0 && p_break ? -1 : (len_got ? len_got : len));
+      return len == 0 && p_break ? -1 : (len_got ? len_got : len);
     }
     len_got += len;
 

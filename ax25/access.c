@@ -32,7 +32,7 @@ static void char_to_hex(char *c, char *h, int n);
 int conv_rand(void)
 {
 	seed = (1103515245L * seed + 12345) & CONV_RAND_MAX;
-	return ((int) (seed & 077777));
+	return (int) (seed & 077777);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -46,7 +46,7 @@ void conv_randomize(void)
 
 int conv_random(int num, int base)
 {
-	return (((long) (conv_rand() * time(0)) & CONV_RAND_MAX) % num + base);
+	return ((long) (conv_rand() * time(0)) & CONV_RAND_MAX) % num + base;
 }
 
 /*--------------------------------------------------------------------------*/

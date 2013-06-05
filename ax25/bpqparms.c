@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 
 			case 'v':
 				printf("bpqparms: %s\n", VERSION);
-				return(0);
+				return 0;
 
 			case 'h':
 			case ':':
