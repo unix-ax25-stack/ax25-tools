@@ -418,7 +418,6 @@ static void report(void)
 		       pty[i]->rxpackets, pty[i]->rxbytes,
 		       pty[i]->errors);
 	}
-	return;
 }
 
 int main(int argc, char *argv[])

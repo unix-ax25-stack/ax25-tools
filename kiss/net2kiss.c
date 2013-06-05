@@ -392,7 +392,6 @@ static void kiss_packet(int fdif, char *addr,
 		return;
 	}
 	die("sendto");
-	return;
 }
 
 /* --------------------------------------------------------------------- */
