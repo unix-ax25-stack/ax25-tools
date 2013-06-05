@@ -101,11 +101,11 @@ static void display_packet(unsigned char *bp, unsigned int len)
 			cmd = (bp[6] & 0x80);
 		}
 		printf("fm ");
-		for(i = 7; i < 13; i++)
+		for (i = 7; i < 13; i++)
 			if ((bp[i] &0xfe) != 0x40)
 				printf("%c",bp[i] >> 1);
 		printf("-%u to ",(bp[13] >> 1) & 0xf);
-		for(i = 0; i < 6; i++)
+		for (i = 0; i < 6; i++)
 			if ((bp[i] &0xfe) != 0x40)
 				printf("%c", bp[i] >> 1);
 		printf("-%u", (bp[6] >> 1) & 0xf);
@@ -114,7 +114,7 @@ static void display_packet(unsigned char *bp, unsigned int len)
 		if ((!(bp[-1] & 1)) && (len >= 7))
 			printf(" via ");
 		while ((!(bp[-1] & 1)) && (len >= 7)) {
-			for(i = 0; i < 6; i++)
+			for (i = 0; i < 6; i++)
 				if ((bp[i] &0xfe) != 0x40)
 					printf("%c",bp[i] >> 1);
 			printf("-%u",(bp[6] >> 1) & 0xf);
@@ -124,7 +124,7 @@ static void display_packet(unsigned char *bp, unsigned int len)
 				printf(",");
 		}
 	}
-	if(!len)
+	if (!len)
 		return;
 	i = *bp++;
 	len--;
@@ -216,7 +216,7 @@ static void print_bits(int (*bitproc)(void))
 	char str[9];
 	char *cp;
 
-	for(;;) {
+	for (;;) {
 		ret = bitproc();
 		if (ret < 0) {
 			if (errno == EAGAIN)
@@ -226,7 +226,7 @@ static void print_bits(int (*bitproc)(void))
 			return;
 		}
 		strcpy(cp = str, "00000000");
-		for(i = 0; i < 8; i++, cp++, ret >>= 1)
+		for (i = 0; i < 8; i++, cp++, ret >>= 1)
 			*cp += (ret & 1);
 		printf("%s", str);
 	}

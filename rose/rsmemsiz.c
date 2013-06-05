@@ -110,7 +110,7 @@ unsigned** meminfo(void) {
 	for (j=0; j < MAX_COL; j++)
 	    row[i][j] = 0;
     for (i=0; i < MAX_ROW && *p; i++) {		/* loop over rows */
-	while(*p && !isdigit(*p)) p++;		/* skip chars until a digit */
+	while (*p && !isdigit(*p)) p++;		/* skip chars until a digit */
 	for (j=0; j < MAX_COL && *p; j++) {	/* scanf column-by-column */
 	    l = sscanf(p, "%u%n", row[i] + j, &k);
 	    p += k;				/* step over used buffer */

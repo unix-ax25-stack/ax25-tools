@@ -132,11 +132,11 @@ static void display_packet(unsigned char *bp, unsigned int len)
 			cmd = (bp[6] & 0x80);
 		}
 		printf("fm ");
-		for(i = 7; i < 13; i++)
+		for (i = 7; i < 13; i++)
 			if ((bp[i] &0xfe) != 0x40)
 				printf("%c",bp[i] >> 1);
 		printf("-%u to ",(bp[13] >> 1) & 0xf);
-		for(i = 0; i < 6; i++)
+		for (i = 0; i < 6; i++)
 			if ((bp[i] &0xfe) != 0x40)
 				printf("%c",bp[i] >> 1);
 		printf("-%u",(bp[6] >> 1) & 0xf);
@@ -144,7 +144,7 @@ static void display_packet(unsigned char *bp, unsigned int len)
 		len -= 14;
 		if ((!(bp[-1] & 1)) && (len >= 7)) printf(" via ");
 		while ((!(bp[-1] & 1)) && (len >= 7)) {
-			for(i = 0; i < 6; i++)
+			for (i = 0; i < 6; i++)
 				if ((bp[i] &0xfe) != 0x40)
 					printf("%c",bp[i] >> 1);
 			printf("-%u",(bp[6] >> 1) & 0xf);
@@ -154,7 +154,7 @@ static void display_packet(unsigned char *bp, unsigned int len)
 				printf(",");
 		}
 	}
-	if(!len)
+	if (!len)
 		return;
 	i = *bp++;
 	len--;

@@ -129,7 +129,7 @@ int bput(void)
 
   p_buf = buf;
   for (i = 0; (p = strsep(&p_buf, "#")); i++) {
-    switch(i) {
+    switch (i) {
     case 0:
     case 1:
       break;

@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 	memset(user, 0, NAME_SIZE);
 	strcpy(sysop_addr, SYSOP_USER);
 	strcpy(config_file, CONF_TTYLINKD_FILE);
-	for(i=1 ; i < argc ; i++)
+	for (i=1 ; i < argc ; i++)
 	{
 		if (argv[i][0] == '-')
 		{
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
 			return 0;
 		} else {
 			userfamily = sa.sa_family;
-			switch(sa.sa_family) {
+			switch (sa.sa_family) {
 				case AF_INET:
 					peer_sin = (struct sockaddr_in*)&sa;
 					write(STDOUT_FILENO, buf, strlen(buf));
@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
 				case AF_AX25:
 				case AF_NETROM:
 					peer_sax = (struct sockaddr_ax25*)&sa;
-					for(i=0 ; i < 6 ; i++)
+					for (i=0 ; i < 6 ; i++)
 					{
 						user[i] = tolower(((peer_sax->sax25_call.ax25_call[i]) >>1)&0x7f);
 						if (user[i] == ' ')
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 					break;
 				case AF_ROSE:
 					peer_srose = (struct sockaddr_rose*)&sa;
-					for(i=0 ; i < 6 ; i++)
+					for (i=0 ; i < 6 ; i++)
 					{
 						user[i] = tolower(((peer_srose->srose_call.ax25_call[i]) >>1)&0x7f);
 						if (user[i] == ' ')
@@ -518,7 +518,7 @@ int send_control(int skt, struct in_addr addr, CTL_MSG msg, CTL_RESPONSE *resp)
 	}
 
 	/* Get the message */
-	if(recv(skt, resp, sizeof(resp),0) ==0)
+	if (recv(skt, resp, sizeof(resp),0) ==0)
 		syslog(LOG_DAEMON | LOG_ERR, "send_control(): recv failed. (%m)");
 
 	return resp->answer;
@@ -531,7 +531,7 @@ int send_sysop_data(char *buf, int len)
 	static char *bptr = outbuf;
 	int i;
 
-	for(i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		/* Check for erase character */
 		if (buf[i] == erasec)
@@ -551,7 +551,7 @@ int send_sysop_data(char *buf, int len)
 		/* Check for word-erase character */
 		if (buf[i] == werasec)
 		{
-			while( (bptr > outbuf) && (*bptr != ' ') )
+			while ( (bptr > outbuf) && (*bptr != ' ') )
 				bptr--;
 			continue;
 		}
@@ -595,7 +595,7 @@ int send_user_data(int skt, char *buf, int len)
 	char *bptr = outbuf;
 	int i;
 
-	for(i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		if (buf[i] == '\r')
 		{
@@ -639,7 +639,7 @@ void do_talk(int skt)
 	int i;
 
 
-	while(1)
+	while (1)
 	{
 		FD_ZERO(&fdvar);
 		FD_SET(skt, &fdvar);

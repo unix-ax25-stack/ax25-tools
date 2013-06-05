@@ -675,7 +675,7 @@ static void WorkoutArgs(int af_type, char *shell, int *argc, char **argv)
 		if (*cp == '%') {
 			cp++;
 
-			switch(*cp) {
+			switch (*cp) {
 				case 'd':	/* portname */
 					for (sp = Port; *sp != '\0' && *sp != '-'; sp++)
 						buffer[cnt++] = *sp;
@@ -712,7 +712,7 @@ static void WorkoutArgs(int af_type, char *shell, int *argc, char **argv)
 
 				case 'p':	/* NODENAME IN lower */
 					if (af_type == AF_NETROM) {
-						for(sp = Node; *sp != '\0' && *sp != '-'; sp++)
+						for (sp = Node; *sp != '\0' && *sp != '-'; sp++)
 							buffer[cnt++] = tolower(*sp);
 					} else {
 						buffer[cnt++] = '%';

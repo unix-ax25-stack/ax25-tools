@@ -219,7 +219,7 @@ static int kiss_tx(int fd, int port, unsigned char *s, int len, int usecrc)
 	 * For each byte in the packet, send the appropriate
 	 * character sequence, according to the SLIP protocol.
 	 */
-	for(i = 0; i < len - 1; i++)
+	for (i = 0; i < len - 1; i++)
 		ptr += put_ubyte(ptr, &crc, s[i], usecrc);
 
 	/*
