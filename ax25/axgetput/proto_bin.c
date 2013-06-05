@@ -208,11 +208,8 @@ int bput(void)
 			return 0;
 		}
 
-		if (msg_crc) {
-			int i;
-			for (i = 0; i < len; i++)
-				crc = do_crc((int ) buf[i], crc);
-		}
+		if (msg_crc)
+			crc = calc_crc(buf, len, 0);
 
 		if (buf[len-1] == '\r') {
 			if (last_line_had_CR) {
@@ -342,9 +339,7 @@ int bget(void) {
 
 		/* compute crc  */
 		while ((len = read(fddata, buf, BLOCKSIZ)) > 0) {
-			int i;
-			for (i = 0; i < len; i++)
-				crc = do_crc((int ) buf[i], crc);
+			crc = calc_crc(buf, len, 0);
 			file_size += len;
 		}
 		if (len < 0) {
@@ -364,9 +359,7 @@ int bget(void) {
 			if (!is_stream || do_crc_only) {
 				sprintf(err_msg, "error: not enough memory\n");
 				while ((len = read(fddata, buf, sizeof(buf))) > 0) {
-					int i;
-					for (i = 0; i < len; i++)
-						crc = do_crc((int ) buf[i], crc);
+					crc = calc_crc(buf, len, 0);
 					file_size += len;
 					if (!do_crc_only)
 						store_line(buf, len);
