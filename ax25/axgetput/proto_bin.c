@@ -35,7 +35,7 @@ static int init_crc(void)
 
 /*---------------------------------------------------------------------------*/
 
-static int do_crc(char b, int n, unsigned int crc)
+static int do_crc(char b, unsigned int crc)
 {
 	crc = (crctab[(crc >> 8)] ^ ((crc << 8) | (b & 0xff))) & 0xffff;
 	return crc;
@@ -203,7 +203,7 @@ int bput(void)
 		if (msg_crc) {
 			int i;
 			for (i = 0; i < len; i++)
-				crc = do_crc((int ) buf[i], 1, crc);
+				crc = do_crc((int ) buf[i], crc);
 		}
 
 		if (buf[len-1] == '\r') {
@@ -336,7 +336,7 @@ int bget(void) {
 		while ((len = read(fddata, buf, BLOCKSIZ)) > 0) {
 			int i;
 			for (i = 0; i < len; i++)
-				crc = do_crc((int ) buf[i], 1, crc);
+				crc = do_crc((int ) buf[i], crc);
 			file_size += len;
 		}
 		if (len < 0) {
@@ -358,7 +358,7 @@ int bget(void) {
 				while ((len = read(fddata, buf, sizeof(buf))) > 0) {
 					int i;
 					for (i = 0; i < len; i++)
-						crc = do_crc((int ) buf[i], 1, crc);
+						crc = do_crc((int ) buf[i], crc);
 					file_size += len;
 					if (!do_crc_only)
 						store_line(buf, len);
