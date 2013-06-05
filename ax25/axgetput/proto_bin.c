@@ -41,6 +41,14 @@ static int do_crc(char b, unsigned int crc)
 	return crc;
 }
 
+unsigned int calc_crc(char *buf, int n, unsigned crc)
+{
+	while (--n >= 0)
+		crc = do_crc(*buf++, crc);
+
+	return crc;
+}
+
 /*---------------------------------------------------------------------------*/
 
 static long parse_sfbin_date_to_unix(const char *s)
