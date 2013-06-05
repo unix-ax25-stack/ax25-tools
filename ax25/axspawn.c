@@ -1367,7 +1367,7 @@ int main(int argc, char **argv)
 
 	digits = letters = invalid = ssid = ssidcnt = 0;
 
-	for (k = 1; k < argc; k++){
+	for (k = 1; k < argc; k++) {
 		if (!strcmp(argv[k], "-w") || !strcmp(argv[k], "--wait"))
 			wait_for_tcp = 1;
 		if (!strcmp(argv[k], "-c") || !strcmp(argv[k], "--changeuser"))

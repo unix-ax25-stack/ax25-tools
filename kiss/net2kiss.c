@@ -638,7 +638,7 @@ int main(int argc, char *argv[])
 		}
 		/* Users await the slave pty to be referenced in the 2nd line */
 		printf("Awaiting client connects on\n%s\n", namepts);
-		if (!verbose){
+		if (!verbose) {
 			fflush(stdout);
 			fflush(stderr);
 			close(0);
