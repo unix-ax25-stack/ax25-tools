@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
 }
 
   while ((c = getopt(argc, argv, (mode % 2) ? "ivh?" : "b:isvh?")) != EOF) {
-    switch(c) {
+    switch (c) {
     case 'b':
       if (((BLOCKSIZ = (unsigned ) atoi(optarg)) < BLOCKSIZ_MIN) || BLOCKSIZ > BLOCKSIZ_MAX) {
 	fprintf(stderr, "error: invalid blocksize: %d\n", BLOCKSIZ);

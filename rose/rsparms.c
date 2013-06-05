@@ -89,7 +89,7 @@ void nodes(int s, int argc, char *argv[])
 			exit(1);
 		}
 
-		while(fgets(buff,80,fn)) {
+		while (fgets(buff,80,fn)) {
 			args=sscanf(buff,"%10s %4s %*s %9s %9s %9s",address, rmask, neigh1, neigh2, neigh3);
 			if (strcmp(address,"address")==0)
 				continue;

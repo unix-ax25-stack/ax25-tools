@@ -973,7 +973,7 @@ int get_assoc(struct sockaddr_ax25 *sax25)
 
 	fgets(buf, sizeof(buf)-1, fp);
 
-	while(!feof(fp))
+	while (!feof(fp))
 	{
 		if (fscanf(fp, "%d %s", &uid, buf) == 2)
 			if (sax25->sax25_uid == uid)
@@ -1079,7 +1079,7 @@ retry:
 
 	chdir("/");
 
-	while(p)
+	while (p)
 	{
 		q = strchr(p, '/');
 		if (q)
@@ -1817,7 +1817,7 @@ again:
 		signal(SIGINT, signal_handler);
 		signal(SIGQUIT, signal_handler);
 
-		while(1)
+		while (1)
 		{
 			FD_ZERO(&fds_read);
 			FD_ZERO(&fds_err);
