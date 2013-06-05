@@ -107,16 +107,16 @@ int main(int argc, char **argv)
 			if ((p = strchr(addr, '-')) != NULL)
 				*p = '\0';
 			switch (strlen(addr)) {
-				case 4:
-					memcpy(rose_address + 0, addr, 4);
-					dnicindex = n;
-					break;
-				case 6:
-					memcpy(rose_address + 4, addr, 6);
-					addrindex = n;
-					break;
-				default:
-					break;
+			case 4:
+				memcpy(rose_address + 0, addr, 4);
+				dnicindex = n;
+				break;
+			case 6:
+				memcpy(rose_address + 4, addr, 6);
+				addrindex = n;
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -208,18 +208,18 @@ int main(int argc, char **argv)
 	 */
 	if (connect(s, (struct sockaddr *)&roseconnect, addrlen) != 0) {
 		switch (errno) {
-			case ECONNREFUSED:
-				strcpy(buffer, "*** Disconnected - 0100 - Number Busy\r");
-				break;
-			case ENETUNREACH:
-				strcpy(buffer, "*** Disconnected - 0D00 - Not Obtainable\r");
-				break;
-			case EINTR:
-				strcpy(buffer, "*** Disconnected - 3900 - Ship Absent\r");
-				break;
-			default:
-				sprintf(buffer, "*** Disconnected - %d - %s\r", errno, strerror(errno));
-				break;
+		case ECONNREFUSED:
+			strcpy(buffer, "*** Disconnected - 0100 - Number Busy\r");
+			break;
+		case ENETUNREACH:
+			strcpy(buffer, "*** Disconnected - 0D00 - Not Obtainable\r");
+			break;
+		case EINTR:
+			strcpy(buffer, "*** Disconnected - 3900 - Ship Absent\r");
+			break;
+		default:
+			sprintf(buffer, "*** Disconnected - %d - %s\r", errno, strerror(errno));
+			break;
 		}
 
 		close(s);

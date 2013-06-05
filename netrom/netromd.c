@@ -138,46 +138,46 @@ int main(int argc, char **argv)
 
 	while ((i = getopt(argc, argv, "cdilp:q:t:v")) != -1) {
 		switch (i) {
-			case 'c':
-				compliant = TRUE;
-				break;
-			case 'd':
-				debug++;
-				break;
-			case 'i':
-				timelast = 0;
-				break;
-			case 'l':
-				logging = TRUE;
-				break;
-			case 'p':
-				pause = atoi(optarg);
-				if (pause < 1 || pause > 120) {
-					fprintf(stderr, "netromd: invalid pause value\n");
-					return 1;
-				}
-				break;
-			case 'q':
-				localval = atoi(optarg);
-				if (localval < 10 || localval > 255) {
-					fprintf(stderr, "netromd: invalid local quality\n");
-					return 1;
-				}
-				break;
-			case 't':
-				interval = atoi(optarg) * 60;
-				if (interval < 60 || interval > 7200) {
-					fprintf(stderr, "netromd: invalid time interval\n");
-					return 1;
-				}
-				break;
-			case 'v':
-				printf("netromd: %s\n", VERSION);
-				return 0;
-			case '?':
-			case ':':
-				fprintf(stderr, "usage: netromd [-d] [-i] [-l] [-q quality] [-t interval] [-v]\n");
+		case 'c':
+			compliant = TRUE;
+			break;
+		case 'd':
+			debug++;
+			break;
+		case 'i':
+			timelast = 0;
+			break;
+		case 'l':
+			logging = TRUE;
+			break;
+		case 'p':
+			pause = atoi(optarg);
+			if (pause < 1 || pause > 120) {
+				fprintf(stderr, "netromd: invalid pause value\n");
 				return 1;
+			}
+			break;
+		case 'q':
+			localval = atoi(optarg);
+			if (localval < 10 || localval > 255) {
+				fprintf(stderr, "netromd: invalid local quality\n");
+				return 1;
+			}
+			break;
+		case 't':
+			interval = atoi(optarg) * 60;
+			if (interval < 60 || interval > 7200) {
+				fprintf(stderr, "netromd: invalid time interval\n");
+				return 1;
+			}
+			break;
+		case 'v':
+			printf("netromd: %s\n", VERSION);
+			return 0;
+		case '?':
+		case ':':
+			fprintf(stderr, "usage: netromd [-d] [-i] [-l] [-q quality] [-t interval] [-v]\n");
+			return 1;
 		}
 	}
 

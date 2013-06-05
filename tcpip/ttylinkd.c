@@ -175,45 +175,45 @@ int main(int argc, char *argv[])
 		} else {
 			userfamily = sa.sa_family;
 			switch (sa.sa_family) {
-				case AF_INET:
-					peer_sin = (struct sockaddr_in*)&sa;
-					write(STDOUT_FILENO, buf, strlen(buf));
-					sprintf(buf, "Please enter your callsign: ");
-					write(STDOUT_FILENO, buf, strlen(buf));
-					fflush(stdout);
-					if (fgets(user, NAME_SIZE-1, stdin) == NULL)
-						return 0;
-					for (i = 0; user[i] != '\0' && user[i] != '\n' && user[i] != '\r'; i++)
-						;
-					user[i] = '\0';
-					if (strlen(user) < 1)
-						return 0;
-					userfamily = AF_INET;
+			case AF_INET:
+				peer_sin = (struct sockaddr_in*)&sa;
+				write(STDOUT_FILENO, buf, strlen(buf));
+				sprintf(buf, "Please enter your callsign: ");
+				write(STDOUT_FILENO, buf, strlen(buf));
+				fflush(stdout);
+				if (fgets(user, NAME_SIZE-1, stdin) == NULL)
+					return 0;
+				for (i = 0; user[i] != '\0' && user[i] != '\n' && user[i] != '\r'; i++)
+					;
+				user[i] = '\0';
+				if (strlen(user) < 1)
+					return 0;
+				userfamily = AF_INET;
+				break;
+			case AF_AX25:
+			case AF_NETROM:
+				peer_sax = (struct sockaddr_ax25*)&sa;
+				for (i=0 ; i < 6 ; i++)
+				{
+					user[i] = tolower(((peer_sax->sax25_call.ax25_call[i]) >>1)&0x7f);
+					if (user[i] == ' ')
 					break;
-				case AF_AX25:
-				case AF_NETROM:
-					peer_sax = (struct sockaddr_ax25*)&sa;
-					for (i=0 ; i < 6 ; i++)
-					{
-						user[i] = tolower(((peer_sax->sax25_call.ax25_call[i]) >>1)&0x7f);
-						if (user[i] == ' ')
-						break;
-					}
-					user[i] = '\0';
+				}
+				user[i] = '\0';
+				break;
+			case AF_ROSE:
+				peer_srose = (struct sockaddr_rose*)&sa;
+				for (i=0 ; i < 6 ; i++)
+				{
+					user[i] = tolower(((peer_srose->srose_call.ax25_call[i]) >>1)&0x7f);
+					if (user[i] == ' ')
 					break;
-				case AF_ROSE:
-					peer_srose = (struct sockaddr_rose*)&sa;
-					for (i=0 ; i < 6 ; i++)
-					{
-						user[i] = tolower(((peer_srose->srose_call.ax25_call[i]) >>1)&0x7f);
-						if (user[i] == ' ')
-						break;
-					}
-					user[i] = '\0';
-					break;
-				default:
-					syslog(LOG_DAEMON | LOG_CRIT, "Unsupported address family.");
-					exit(1);
+				}
+				user[i] = '\0';
+				break;
+			default:
+				syslog(LOG_DAEMON | LOG_CRIT, "Unsupported address family.");
+				exit(1);
 			}
 
 		}

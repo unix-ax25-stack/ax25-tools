@@ -200,25 +200,25 @@ int main(int argc, char *argv[])
 
 	while ((fd = getopt(argc, argv, "i:m:v")) != -1) {
 		switch (fd) {
-			case 'i':
-				if ((hp = gethostbyname(optarg)) == NULL) {
-					fprintf(stderr, "nrattach: invalid internet name/address - %s\n", optarg);
-					return 1;
-				}
-				break;
-			case 'm':
-				if ((mtu = atoi(optarg)) <= 0) {
-					fprintf(stderr, "nrattach: invalid mtu size - %s\n", optarg);
-					return 1;
-				}
-				break;
-			case 'v':
-				printf("nrattach: %s\n", VERSION);
-				return 0;
-			case ':':
-			case '?':
-				fprintf(stderr, "usage: nrattach [-i inetaddr] [-m mtu] [-v] port\n");
+		case 'i':
+			if ((hp = gethostbyname(optarg)) == NULL) {
+				fprintf(stderr, "nrattach: invalid internet name/address - %s\n", optarg);
 				return 1;
+			}
+			break;
+		case 'm':
+			if ((mtu = atoi(optarg)) <= 0) {
+				fprintf(stderr, "nrattach: invalid mtu size - %s\n", optarg);
+				return 1;
+			}
+			break;
+		case 'v':
+			printf("nrattach: %s\n", VERSION);
+			return 0;
+		case ':':
+		case '?':
+			fprintf(stderr, "usage: nrattach [-i inetaddr] [-m mtu] [-v] port\n");
+			return 1;
 		}
 	}
 

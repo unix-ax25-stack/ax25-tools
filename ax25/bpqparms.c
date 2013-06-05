@@ -79,42 +79,42 @@ int main(int argc, char **argv)
 
 	while ((cmd = getopt(argc, argv, "d:a:vVh")) != EOF) {
 		switch (cmd) {
-			case 'd':
-				flag |= 1;
-				if (get_hwaddr(addr.destination, optarg)) {
-					fprintf(stderr, "bpqparms: invalid 'destination' address %s\n", optarg);
-					return 1;
-				}
-				break;
+		case 'd':
+			flag |= 1;
+			if (get_hwaddr(addr.destination, optarg)) {
+				fprintf(stderr, "bpqparms: invalid 'destination' address %s\n", optarg);
+				return 1;
+			}
+			break;
 
-			case 'a':
-				flag |= 2;
-				if (get_hwaddr(addr.accept, optarg)) {
-					fprintf(stderr, "bpqparms: invalid 'accept' address %s\n", optarg);
-					return 1;
-				}
-				break;
+		case 'a':
+			flag |= 2;
+			if (get_hwaddr(addr.accept, optarg)) {
+				fprintf(stderr, "bpqparms: invalid 'accept' address %s\n", optarg);
+				return 1;
+			}
+			break;
 
-			case 'V':
-				printf("bpqparms version " VERSION "\n");
-				printf("Copyright 1996, Jörg Reuter (jreuter@poboxes.com)\n");
-				printf("This program is free software; you can redistribute it and/or modify\n");
-				printf("it under the terms of the GNU General Public License as published by\n");
-				printf("the Free Software Foundation; either version 2 of the License, or\n");
-				printf(" (at your option) any later version.\n\n");
-				printf("This program is distributed in the hope that it will be useful,\n");
-				printf("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
-				printf("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
-				return 0;
+		case 'V':
+			printf("bpqparms version " VERSION "\n");
+			printf("Copyright 1996, Jörg Reuter (jreuter@poboxes.com)\n");
+			printf("This program is free software; you can redistribute it and/or modify\n");
+			printf("it under the terms of the GNU General Public License as published by\n");
+			printf("the Free Software Foundation; either version 2 of the License, or\n");
+			printf(" (at your option) any later version.\n\n");
+			printf("This program is distributed in the hope that it will be useful,\n");
+			printf("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
+			printf("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
+			return 0;
 
-			case 'v':
-				printf("bpqparms: %s\n", VERSION);
-				return 0;
+		case 'v':
+			printf("bpqparms: %s\n", VERSION);
+			return 0;
 
-			case 'h':
-			case ':':
-			case '?':
-				usage();
+		case 'h':
+		case ':':
+		case '?':
+			usage();
 		}
 	}
 

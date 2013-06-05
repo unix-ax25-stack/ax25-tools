@@ -123,18 +123,18 @@ int main(int argc, char **argv)
 	 */
 	if (connect(s, (struct sockaddr *)&axconnect, addrlen) != 0) {
 		switch (errno) {
-			case ECONNREFUSED:
-				strcpy(buffer, "*** Connection refused - aborting\r");
-				break;
-			case ENETUNREACH:
-				strcpy(buffer, "*** No known route - aborting\r");
-				break;
-			case EINTR:
-				strcpy(buffer, "*** Connection timed out - aborting\r");
-				break;
-			default:
-				sprintf(buffer, "ERROR: cannot connect to AX.25 callsign, %s\r", strerror(errno));
-				break;
+		case ECONNREFUSED:
+			strcpy(buffer, "*** Connection refused - aborting\r");
+			break;
+		case ENETUNREACH:
+			strcpy(buffer, "*** No known route - aborting\r");
+			break;
+		case EINTR:
+			strcpy(buffer, "*** Connection timed out - aborting\r");
+			break;
+		default:
+			sprintf(buffer, "ERROR: cannot connect to AX.25 callsign, %s\r", strerror(errno));
+			break;
 		}
 
 		err(buffer);

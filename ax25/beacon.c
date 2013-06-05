@@ -40,35 +40,35 @@ int main(int argc, char *argv[])
 
 	while ((n = getopt(argc, argv, "c:d:lmst:v")) != -1) {
 		switch (n) {
-			case 'c':
-				srccall = optarg;
-				break;
-			case 'd':
-				destcall = optarg;
-				break;
-			case 'l':
-				logging = TRUE;
-				break;
-			case 'm':
-				mail = TRUE;
-				/* falls through */
-			case 's':
-				single = TRUE;
-				break;
-			case 't':
-				interval = atoi(optarg);
-				if (interval < 1) {
-					fprintf(stderr, "beacon: interval must be greater than on minute\n");
-					return 1;
-				}
-				break;
-			case 'v':
-				printf("beacon: %s\n", VERSION);
-				return 0;
-			case '?':
-			case ':':
-				fprintf(stderr, "usage: beacon [-c <src_call>] [-d <dest_call>] [-l] [-m] [-s] [-t interval] [-v] <port> <message>\n");
+		case 'c':
+			srccall = optarg;
+			break;
+		case 'd':
+			destcall = optarg;
+			break;
+		case 'l':
+			logging = TRUE;
+			break;
+		case 'm':
+			mail = TRUE;
+			/* falls through */
+		case 's':
+			single = TRUE;
+			break;
+		case 't':
+			interval = atoi(optarg);
+			if (interval < 1) {
+				fprintf(stderr, "beacon: interval must be greater than on minute\n");
 				return 1;
+			}
+			break;
+		case 'v':
+			printf("beacon: %s\n", VERSION);
+			return 0;
+		case '?':
+		case ':':
+			fprintf(stderr, "usage: beacon [-c <src_call>] [-d <dest_call>] [-l] [-m] [-s] [-t interval] [-v] <port> <message>\n");
+			return 1;
 		}
 	}
 
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	else
 		addr = strdup("IDENT");
 	if (addr == NULL)
-	  return 1;
+		return 1;
 
 	if ((dlen = ax25_aton(addr, &dest)) == -1) {
 		fprintf(stderr, "beacon: unable to convert callsign '%s'\n", addr);

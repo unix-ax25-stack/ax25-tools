@@ -36,8 +36,8 @@ struct PortDescriptor {
 	unsigned char	*FrameBuffer;
 	int		BufferIndex;
 	time_t		TimeLastOpen;
-	char		namepts[PATH_MAX];  /* name of the unix98 pts slaves, which
-				       * the client has to use */
+	char		namepts[PATH_MAX];	/* name of the unix98 pts slaves, which
+						 * the client has to use */
 	int		is_active;
 };
 

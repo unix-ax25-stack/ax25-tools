@@ -28,14 +28,14 @@
  *            callsign didn't match (and the frame wasn't echoed anywhere).
  *
  * *** 20021206 dl9sau:
- * 	      - fixed a bug preventing echo to multible ports; it may also
+ *            - fixed a bug preventing echo to multible ports; it may also
  *              lead to retransmission on the interface where it came from
  *            - fixed problem that frames via sendto(...,alen) had a wrong
  *              protocol (because alen became larger than the size of
  *              struct sockaddr).
  *            - sockaddr_pkt is the right struct for recvfrom/sendto on
  *              type SOCK_PACKET family AF_INET sockets.
- *	      - added support for new PF_PACKET family with sockaddr_ll
+ *            - added support for new PF_PACKET family with sockaddr_ll
  *
  * ***
  *
@@ -382,15 +382,15 @@ int main(int argc, char **argv)
 
 	while ((s = getopt(argc, argv, "lv")) != -1) {
 		switch (s) {
-			case 'l':
-				logging = TRUE;
-				break;
-			case 'v':
-				printf("rxecho: %s\n", VERSION);
-				return 0;
-			default:
-				fprintf(stderr, "usage: rxecho [-l] [-v]\n");
-				return 1;
+		case 'l':
+			logging = TRUE;
+			break;
+		case 'v':
+			printf("rxecho: %s\n", VERSION);
+			return 0;
+		default:
+			fprintf(stderr, "usage: rxecho [-l] [-v]\n");
+			return 1;
 		}
 	}
 
