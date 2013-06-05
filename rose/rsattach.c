@@ -184,19 +184,19 @@ int main(int argc, char *argv[])
 
 	while ((fd = getopt(argc, argv, "i:m:v")) != -1) {
 		switch (fd) {
-			case 'i':
-				if ((hp = gethostbyname(optarg)) == NULL) {
-					fprintf(stderr, "rsattach: invalid internet name/address - %s\n", optarg);
-					return 1;
-				}
-				break;
-			case 'v':
-				printf("rsattach: %s\n", VERSION);
-				return 0;
-			case ':':
-			case '?':
-				fprintf(stderr, "usage: rsattach [-i inetaddr] [-v] port\n");
+		case 'i':
+			if ((hp = gethostbyname(optarg)) == NULL) {
+				fprintf(stderr, "rsattach: invalid internet name/address - %s\n", optarg);
 				return 1;
+			}
+			break;
+		case 'v':
+			printf("rsattach: %s\n", VERSION);
+			return 0;
+		case ':':
+		case '?':
+			fprintf(stderr, "usage: rsattach [-i inetaddr] [-v] port\n");
+			return 1;
 		}
 	}
 

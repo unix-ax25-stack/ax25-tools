@@ -120,43 +120,43 @@ int main(int argc, char **argv)
 	*ports = 0;
 	while ((s = getopt(argc, argv, "fln:p:v")) != -1) {
 		switch (s) {
-			case 'l':
-				logging = TRUE;
-				break;
-			case 'f':
-				flush = TRUE;
-				break;
-			case 'n':
-				mheard_list_size = atoi(optarg);
-				if (mheard_list_size < 10 || mheard_list_size > MHEARD_LIST_SIZE) {
-					fprintf(stderr, "mheardd: list size must be between 10 and %d\n", MHEARD_LIST_SIZE);
-					return 1;
-				}
-				break;
-			case 'p':
-				if (strlen(optarg) > sizeof(ports)-4) {
-					fprintf(stderr, "mheardd: too many ports specified.");
-					return 1;
-				}
-				if (*optarg == '!') {
-					ports_excl = 1;
-					optarg++;
-				}
-				sprintf(ports, "|%s|", optarg);
-				for (p = ports; *p; p++) {
-					if (*p == ' ' || *p == ',')
-						*p = '|';
-				}
-				break;
-			case 'v':
-				printf("mheardd: %s\n", VERSION);
-				return 0;
-			case ':':
-				fprintf(stderr, "mheardd: option -n needs an argument\n");
+		case 'l':
+			logging = TRUE;
+			break;
+		case 'f':
+			flush = TRUE;
+			break;
+		case 'n':
+			mheard_list_size = atoi(optarg);
+			if (mheard_list_size < 10 || mheard_list_size > MHEARD_LIST_SIZE) {
+				fprintf(stderr, "mheardd: list size must be between 10 and %d\n", MHEARD_LIST_SIZE);
 				return 1;
-			case '?':
-				fprintf(stderr, "Usage: mheardd [-f] [-l] [-n number] [-p [!]port1[,port2,..]] [-v]\n");
+			}
+			break;
+		case 'p':
+			if (strlen(optarg) > sizeof(ports)-4) {
+				fprintf(stderr, "mheardd: too many ports specified.");
 				return 1;
+			}
+			if (*optarg == '!') {
+				ports_excl = 1;
+				optarg++;
+			}
+			sprintf(ports, "|%s|", optarg);
+			for (p = ports; *p; p++) {
+				if (*p == ' ' || *p == ',')
+					*p = '|';
+			}
+			break;
+		case 'v':
+			printf("mheardd: %s\n", VERSION);
+			return 0;
+		case ':':
+			fprintf(stderr, "mheardd: option -n needs an argument\n");
+			return 1;
+		case '?':
+			fprintf(stderr, "Usage: mheardd [-f] [-l] [-n number] [-p [!]port1[,port2,..]] [-v]\n");
+			return 1;
 		}
 	}
 
@@ -294,55 +294,55 @@ int main(int argc, char **argv)
 		mheard->entry.count++;
 
 		switch (type) {
-			case SABM:
-				mheard->entry.type = MHEARD_TYPE_SABM;
-				mheard->entry.uframes++;
-				break;
-			case SABME:
-				mheard->entry.type = MHEARD_TYPE_SABME;
-				mheard->entry.uframes++;
-				break;
-			case DISC:
-				mheard->entry.type = MHEARD_TYPE_DISC;
-				mheard->entry.uframes++;
-				break;
-			case UA:
-				mheard->entry.type = MHEARD_TYPE_UA;
-				mheard->entry.uframes++;
-				break;
-			case DM:
-				mheard->entry.type = MHEARD_TYPE_DM;
-				mheard->entry.uframes++;
-				break;
-			case RR:
-				mheard->entry.type = MHEARD_TYPE_RR;
-				mheard->entry.sframes++;
-				break;
-			case RNR:
-				mheard->entry.type = MHEARD_TYPE_RNR;
-				mheard->entry.sframes++;
-				break;
-			case REJ:
-				mheard->entry.type = MHEARD_TYPE_REJ;
-				mheard->entry.sframes++;
-				break;
-			case FRMR:
-				mheard->entry.type = MHEARD_TYPE_FRMR;
-				mheard->entry.uframes++;
-				break;
-			case I:
-				mheard->entry.type = MHEARD_TYPE_I;
-				mheard->entry.iframes++;
-				break;
-			case UI:
-				mheard->entry.type = MHEARD_TYPE_UI;
-				mheard->entry.uframes++;
-				break;
-			default:
-				if (logging)
-					syslog(LOG_WARNING, "unknown packet type %02X\n", *data);
-				mheard->entry.type = MHEARD_TYPE_UNKNOWN;
-				break;
+		case SABM:
+			mheard->entry.type = MHEARD_TYPE_SABM;
+			mheard->entry.uframes++;
+			break;
+		case SABME:
+			mheard->entry.type = MHEARD_TYPE_SABME;
+			mheard->entry.uframes++;
+			break;
+		case DISC:
+			mheard->entry.type = MHEARD_TYPE_DISC;
+			mheard->entry.uframes++;
+			break;
+		case UA:
+			mheard->entry.type = MHEARD_TYPE_UA;
+			mheard->entry.uframes++;
+			break;
+		case DM:
+			mheard->entry.type = MHEARD_TYPE_DM;
+			mheard->entry.uframes++;
+			break;
+		case RR:
+			mheard->entry.type = MHEARD_TYPE_RR;
+			mheard->entry.sframes++;
+			break;
+		case RNR:
+			mheard->entry.type = MHEARD_TYPE_RNR;
+			mheard->entry.sframes++;
+			break;
+		case REJ:
+			mheard->entry.type = MHEARD_TYPE_REJ;
+			mheard->entry.sframes++;
+			break;
+		case FRMR:
+			mheard->entry.type = MHEARD_TYPE_FRMR;
+			mheard->entry.uframes++;
+			break;
+		case I:
+			mheard->entry.type = MHEARD_TYPE_I;
+			mheard->entry.iframes++;
+			break;
+		case UI:
+			mheard->entry.type = MHEARD_TYPE_UI;
+			mheard->entry.uframes++;
+			break;
+		default:
+			if (logging)
+				syslog(LOG_WARNING, "unknown packet type %02X\n", *data);
+			mheard->entry.type = MHEARD_TYPE_UNKNOWN;
+			break;
 		}
 
 		data += ctlen;
@@ -350,41 +350,41 @@ int main(int argc, char **argv)
 
 		if (type == I || type == UI) {
 			switch (*data) {
-				case PID_TEXT:
-					mheard->entry.mode |= MHEARD_MODE_TEXT;
-					break;
-				case PID_SEGMENT:
-					mheard->entry.mode |= MHEARD_MODE_SEGMENT;
-					break;
-				case PID_ARP:
-					mheard->entry.mode |= MHEARD_MODE_ARP;
-					break;
-				case PID_NETROM:
-					mheard->entry.mode |= MHEARD_MODE_NETROM;
-					break;
-				case PID_IP:
-					mheard->entry.mode |= (type == I) ? MHEARD_MODE_IP_VC : MHEARD_MODE_IP_DG;
-					break;
-				case PID_ROSE:
-					mheard->entry.mode |= MHEARD_MODE_ROSE;
-					break;
-				case PID_TEXNET:
-					mheard->entry.mode |= MHEARD_MODE_TEXNET;
-					break;
-				case PID_FLEXNET:
-					mheard->entry.mode |= MHEARD_MODE_FLEXNET;
-					break;
-				case PID_PSATPB:
-					mheard->entry.mode |= MHEARD_MODE_PSATPB;
-					break;
-				case PID_PSATFT:
-					mheard->entry.mode |= MHEARD_MODE_PSATFT;
-					break;
-				default:
-					if (logging)
-						syslog(LOG_WARNING, "unknown PID %02X\n", *data);
-					mheard->entry.mode |= MHEARD_MODE_UNKNOWN;
-					break;
+			case PID_TEXT:
+				mheard->entry.mode |= MHEARD_MODE_TEXT;
+				break;
+			case PID_SEGMENT:
+				mheard->entry.mode |= MHEARD_MODE_SEGMENT;
+				break;
+			case PID_ARP:
+				mheard->entry.mode |= MHEARD_MODE_ARP;
+				break;
+			case PID_NETROM:
+				mheard->entry.mode |= MHEARD_MODE_NETROM;
+				break;
+			case PID_IP:
+				mheard->entry.mode |= (type == I) ? MHEARD_MODE_IP_VC : MHEARD_MODE_IP_DG;
+				break;
+			case PID_ROSE:
+				mheard->entry.mode |= MHEARD_MODE_ROSE;
+				break;
+			case PID_TEXNET:
+				mheard->entry.mode |= MHEARD_MODE_TEXNET;
+				break;
+			case PID_FLEXNET:
+				mheard->entry.mode |= MHEARD_MODE_FLEXNET;
+				break;
+			case PID_PSATPB:
+				mheard->entry.mode |= MHEARD_MODE_PSATPB;
+				break;
+			case PID_PSATFT:
+				mheard->entry.mode |= MHEARD_MODE_PSATFT;
+				break;
+			default:
+				if (logging)
+					syslog(LOG_WARNING, "unknown PID %02X\n", *data);
+				mheard->entry.mode |= MHEARD_MODE_UNKNOWN;
+				break;
 			}
 		}
 

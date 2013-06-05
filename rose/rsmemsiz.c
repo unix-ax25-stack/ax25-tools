@@ -96,30 +96,30 @@ int loadavg(double *av1, double *av5, double *av15) {
 #define MAX_COL 7
 
 unsigned** meminfo(void) {
-    static unsigned *row[MAX_ROW + 1];		/* row pointers */
-    static unsigned num[MAX_ROW * MAX_COL];	/* number storage */
-    char *p;
-    int i, j, k, l;
+	static unsigned *row[MAX_ROW + 1];	/* row pointers */
+	static unsigned num[MAX_ROW * MAX_COL];	/* number storage */
+	char *p;
+	int i, j, k, l;
 
-    FILE_TO_BUF(MEMINFO_FILE)
-    if (!row[0])				/* init ptrs 1st time through */
+	FILE_TO_BUF(MEMINFO_FILE)
+	if (!row[0])				/* init ptrs 1st time through */
 	for (i=0; i < MAX_ROW; i++)		/* std column major order: */
-	    row[i] = num + MAX_COL*i;		/* A[i][j] = A + COLS*i + j */
-    p = buf;
-    for (i=0; i < MAX_ROW; i++)			/* zero unassigned fields */
-	for (j=0; j < MAX_COL; j++)
-	    row[i][j] = 0;
-    for (i=0; i < MAX_ROW && *p; i++) {		/* loop over rows */
-	while (*p && !isdigit(*p)) p++;		/* skip chars until a digit */
-	for (j=0; j < MAX_COL && *p; j++) {	/* scanf column-by-column */
-	    l = sscanf(p, "%u%n", row[i] + j, &k);
-	    p += k;				/* step over used buffer */
-	    if (*p == '\n' || l < 1)		/* end of line/buffer */
-		break;
-	}
-    }
+		row[i] = num + MAX_COL*i;	/* A[i][j] = A + COLS*i + j */
+	p = buf;
+	for (i=0; i < MAX_ROW; i++)		/* zero unassigned fields */
+		for (j=0; j < MAX_COL; j++)
+			row[i][j] = 0;
+	for (i=0; i < MAX_ROW && *p; i++) {	/* loop over rows */
+		while (*p && !isdigit(*p)) p++;	/* skip chars until a digit */
+		for (j=0; j < MAX_COL && *p; j++) {	/* scanf column-by-column */
+		l = sscanf(p, "%u%n", row[i] + j, &k);
+		p += k;				/* step over used buffer */
+		if (*p == '\n' || l < 1)	/* end of line/buffer */
+			break;
+		}
+    	}
 /*    row[i+1] = NULL;	terminate the row list, currently unnecessary */
-    return row;					/* NULL return ==> error */
+	return row;				/* NULL return ==> error */
 }
 
 

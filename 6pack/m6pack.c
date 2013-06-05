@@ -95,7 +95,7 @@ struct iface
 	unsigned long	rxbytes;	/* RX bytes count		*/
 	unsigned long	txbytes;	/* TX bytes count		*/
 	char		namepts[PATH_MAX];  /* name of the unix98 pts slaves, which
-				       * the client has to use */
+					 * the client has to use */
 };
 
 #define PTY_ID_TTY (-1)

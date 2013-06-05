@@ -206,14 +206,14 @@ void transmit_nodes(int localval, int pause)
 	int i;
 
 	switch (fork()) {
-		case 0:
-			break;
-		case -1:
-			if (logging)
-				syslog(LOG_ERR, "netromt: fork: %m\n");
-			return;
-		default:
-			return;
+	case 0:
+		break;
+	case -1:
+		if (logging)
+			syslog(LOG_ERR, "netromt: fork: %m\n");
+		return;
+	default:
+		return;
 	}
 
 	dlen = ax25_aton("NODES", &dest);

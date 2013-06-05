@@ -279,31 +279,31 @@ int main(int argc, char **argv)
 
 	while ((i = getopt(argc, argv, "dlrt:v")) != -1) {
 		switch (i) {
-			case 'd':
-				debug = TRUE;
-				break;
-			case 'l':
-				logging = TRUE;
-				break;
-			case 'r':
-				route_restrict = TRUE;
-				break;
-			case 't':
-				interval = atoi(optarg) * 60;
-				if (interval < 60 || interval > 7200) {
-					fprintf(stderr, "rip98d: invalid time interval\n");
-					return 1;
-				}
-				break;
-			case 'v':
-				printf("rip98d: %s\n", VERSION);
-				return 0;
-			case ':':
+		case 'd':
+			debug = TRUE;
+			break;
+		case 'l':
+			logging = TRUE;
+			break;
+		case 'r':
+			route_restrict = TRUE;
+			break;
+		case 't':
+			interval = atoi(optarg) * 60;
+			if (interval < 60 || interval > 7200) {
 				fprintf(stderr, "rip98d: invalid time interval\n");
 				return 1;
-			case '?':
-				fprintf(stderr, "usage: rip98d [-d] [-l] [-r] [-t interval] [-v]\n");
-				return 1;
+			}
+			break;
+		case 'v':
+			printf("rip98d: %s\n", VERSION);
+			return 0;
+		case ':':
+			fprintf(stderr, "rip98d: invalid time interval\n");
+			return 1;
+		case '?':
+			fprintf(stderr, "usage: rip98d [-d] [-l] [-r] [-t interval] [-v]\n");
+			return 1;
 		}
 	}
 

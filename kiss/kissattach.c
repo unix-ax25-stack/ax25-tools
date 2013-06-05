@@ -234,32 +234,32 @@ int main(int argc, char *argv[])
 
 	while ((fd = getopt(argc, argv, "b6i:lm:v")) != -1) {
 		switch (fd) {
-			case '6':
-				disc = N_6PACK;
-				break;
-			case 'b':
-				allow_broadcast = 1;
-				break;
-			case 'i':
-				fprintf(stderr, "%s: -i flag depreciated, use new command line format instead.\n", progname);
-				inetaddr = optarg;
-				break;
-			case 'l':
-				logging = TRUE;
-				break;
-			case 'm':
-				if ((mtu = atoi(optarg)) <= 0) {
-					fprintf(stderr, "%s: invalid mtu size - %s\n", progname, optarg);
-					return 1;
-				}
-				break;
-			case 'v':
-				printf("%s: %s\n", progname, VERSION);
-				return 0;
-			case ':':
-			case '?':
-				usage();
+		case '6':
+			disc = N_6PACK;
+			break;
+		case 'b':
+			allow_broadcast = 1;
+			break;
+		case 'i':
+			fprintf(stderr, "%s: -i flag depreciated, use new command line format instead.\n", progname);
+			inetaddr = optarg;
+			break;
+		case 'l':
+			logging = TRUE;
+			break;
+		case 'm':
+			if ((mtu = atoi(optarg)) <= 0) {
+				fprintf(stderr, "%s: invalid mtu size - %s\n", progname, optarg);
 				return 1;
+			}
+			break;
+		case 'v':
+			printf("%s: %s\n", progname, VERSION);
+			return 0;
+		case ':':
+		case '?':
+			usage();
+			return 1;
 		}
 	}
 

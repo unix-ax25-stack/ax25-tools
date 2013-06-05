@@ -79,17 +79,17 @@ int routes(int s, int argc, char *argv[], ax25_address *callsign)
 					return 1;
 				}
 				switch (*argv[i]) {
-					case 'd':
-					case 'D':
-						ip_mode = 'D';
-						break;
-					case 'v':
-					case 'V':
-						ip_mode = 'V';
-						break;
-					default:
-						ip_mode = ' ';
-						break;
+				case 'd':
+				case 'D':
+					ip_mode = 'D';
+					break;
+				case 'v':
+				case 'V':
+					ip_mode = 'V';
+					break;
+				default:
+					ip_mode = ' ';
+					break;
 				}
 			} else {
 				if (ax25_aton_entry(argv[i], (char *)&ax25_route.digi_addr[j]) == -1)

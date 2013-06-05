@@ -151,37 +151,37 @@ void receive_routes(int s)
 
 			switch (cmp_route(route, addr, bits, metric)) {
 
-				case NO_ROUTE:
-					matched = TRUE;
-					break;
+			case NO_ROUTE:
+				matched = TRUE;
+				break;
 
-				case REPLACE_ROUTE:
-					route->action = DEL_ROUTE;
+			case REPLACE_ROUTE:
+				route->action = DEL_ROUTE;
 
-				case ADDITIONAL_ROUTE:
-					if (!found) {
-						if ((new = malloc(sizeof(struct route_struct))) == NULL) {
-							if (logging)
-								syslog(LOG_ERR, "out of memory\n");
-							return;
-						}
-
-						new->addr   = addr;
-						new->bits   = bits;
-						new->metric = metric;
-						new->action = NEW_ROUTE;
-
-						new->next   = first_route;
-						first_route = new;
-
-						found = TRUE;
+			case ADDITIONAL_ROUTE:
+				if (!found) {
+					if ((new = malloc(sizeof(struct route_struct))) == NULL) {
+						if (logging)
+							syslog(LOG_ERR, "out of memory\n");
+						return;
 					}
 
-					matched = TRUE;
-					break;
+					new->addr   = addr;
+					new->bits   = bits;
+					new->metric = metric;
+					new->action = NEW_ROUTE;
 
-				default:
-					break;
+					new->next   = first_route;
+					first_route = new;
+
+					found = TRUE;
+				}
+
+				matched = TRUE;
+				break;
+
+			default:
+				break;
 			}
 		}
 
