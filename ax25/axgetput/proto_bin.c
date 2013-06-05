@@ -11,7 +11,6 @@
 #include "util.h"
 
 static int crctab[256];
-static int bittab[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
 static int crcbit[8] = {
 	0x9188, 0x48c4, 0x2462, 0x1231, 0x8108, 0x4084, 0x2042, 0x1021
 };
@@ -25,9 +24,8 @@ static int init_crc(void)
 	for (i = 0; i < 256; i++) {
 		crctab[i] = 0;
 		for (j = 0; j < 8; j++) {
-			if ((bittab[j] & i) != 0) {
+			if ((i << j) & 0x80)
 				crctab[i] = crctab[i] ^ crcbit[j];
-			}
 		}
 	}
 	return 0;
