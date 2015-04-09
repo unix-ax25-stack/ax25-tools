@@ -185,7 +185,7 @@ struct axlist {		/* Have used same struct for quickness */
 static struct axlist *AXL	= NULL;
 static char *ConfigFile		= CONF_AX25D_FILE;
 static char User[10];				/* Room for 'GB9ZZZ-15\0' */
-static char Node[10];				/* Room for 'GB9ZZZ-15\0' */
+static char Node[11];				/* Room for 'GB9ZZZ-15\0' (NETROM) and 10 bytes ROSE '6505551234\0' */
 static char myAX25Name[10];			/* Room for 'GB9ZZZ-15\0' */
 static char *Port;
 static int Logging		= FALSE;
