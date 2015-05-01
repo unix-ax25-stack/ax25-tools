@@ -71,7 +71,7 @@
  *	1.6  Aug 1995	Reset the 'defaults' entry's when we start parsing
  *			  a new interface.
  *
- *	1.7  Dec 1995	Added BROKEN_NETROM_KERNEL define for setsockopt.	
+ *	1.7  Dec 1995	Added BROKEN_NETROM_KERNEL define for setsockopt.
  *
  *	1.8  Jan 1996	Added support for AX25_BIND_ANY_DEVICE, specify just
  *			  [CALL-X VIA *].
@@ -182,7 +182,7 @@ struct axlist {		/* Have used same struct for quickness */
 	int LoggingVC;		/* extra log stuff */
 };
 
-static struct axlist *AXL	= NULL;
+static struct axlist *AXL;
 static char *ConfigFile		= CONF_AX25D_FILE;
 static char User[10];				/* Room for 'GB9ZZZ-15\0' */
 static char Node[11];				/* Room for 'GB9ZZZ-15\0' (NETROM) and 10 bytes ROSE '6505551234\0' */
@@ -228,7 +228,7 @@ void err_config(void) {
 		if (Logging)
 			syslog(LOG_INFO, "config file reload error, continuing with original");
 	}
-}		
+}
 
 /*--------------------------------------------------------------------------*/
 
@@ -265,24 +265,24 @@ int main(int argc, char *argv[])
 	char buf[1024];
 	char *p;
 	char *mesg;
-   
+
 	while ((cnt = getopt(argc, argv, "c:lv")) != EOF) {
 		switch (cnt) {
-			case 'c':
-				ConfigFile = optarg;
-				break;
+		case 'c':
+			ConfigFile = optarg;
+			break;
 
-			case 'l':
-				Logging = TRUE;
-				break;
+		case 'l':
+			Logging = TRUE;
+			break;
 
-			case 'v':
-				printf("ax25d: %s\n", VERSION);
-				return 1;
+		case 'v':
+			printf("ax25d: %s\n", VERSION);
+			return 1;
 
-			default:
-				fprintf(stderr, "Usage: ax25d [-v] [-c altfile] [-l]\n");
-				return 1;
+		default:
+			fprintf(stderr, "Usage: ax25d [-v] [-c altfile] [-l]\n");
+			return 1;
 		}
 	}
 
@@ -336,7 +336,7 @@ int main(int argc, char *argv[])
 				int argc;
 				int new;
 				int i;
-            
+
 				/*
 				 * Setting up a non-blocking accept() so is does not hang up
 				 *  - I am not sure at this time why I didn't/don't assign
@@ -358,7 +358,7 @@ int main(int argc, char *argv[])
 
 				i = FALSE;
 				ioctl(paxl->fd, FIONBIO, &i);
- 
+
 				if (new < 0) {
 					if (errno == EWOULDBLOCK)
 						continue;	/* It's gone ??? */
@@ -368,22 +368,22 @@ int main(int argc, char *argv[])
 					close(paxl->fd);
 					paxl->fd = -1;
 					reload_timer(10);
-					continue; 
+					continue;
 				}
 
 				switch (paxl->af_type) {
-					case AF_AX25:
-						strcpy(User, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
-						strcpy(Node, "");
-						break;
-					case AF_NETROM:
-						strcpy(User, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
-						strcpy(Node, ax25_ntoa(&sockaddr.ax25.fsa_digipeater[0]));
-						break;
-					case AF_ROSE:
-						strcpy(User, ax25_ntoa(&sockaddr.rose.srose_call));
-						strcpy(Node, rose_ntoa(&sockaddr.rose.srose_addr));
-						break;
+				case AF_AX25:
+					strcpy(User, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
+					strcpy(Node, "");
+					break;
+				case AF_NETROM:
+					strcpy(User, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
+					strcpy(Node, ax25_ntoa(&sockaddr.ax25.fsa_digipeater[0]));
+					break;
+				case AF_ROSE:
+					strcpy(User, ax25_ntoa(&sockaddr.rose.srose_call));
+					strcpy(Node, rose_ntoa(&sockaddr.rose.srose_addr));
+					break;
 				}
 
 				for (raxl = paxl->ents; raxl != NULL; raxl = raxl->ents) {
@@ -413,33 +413,33 @@ int main(int argc, char *argv[])
 				getsockname(new, (struct sockaddr *)&sockaddr, &addrlen);
 
 				switch (paxl->af_type) {
-					case AF_AX25:
-						Port = ax25_config_get_port(&sockaddr.ax25.fsa_digipeater[0]);
-						break;
-					case AF_NETROM:
-						Port = nr_config_get_port(&sockaddr.ax25.fsa_ax25.sax25_call);
-						break;
-					case AF_ROSE:
-						Port = rs_config_get_port(&sockaddr.rose.srose_addr);
-						break;
-					default:
-						Port = "???";
-						break;
+				case AF_AX25:
+					Port = ax25_config_get_port(&sockaddr.ax25.fsa_digipeater[0]);
+					break;
+				case AF_NETROM:
+					Port = nr_config_get_port(&sockaddr.ax25.fsa_ax25.sax25_call);
+					break;
+				case AF_ROSE:
+					Port = rs_config_get_port(&sockaddr.rose.srose_addr);
+					break;
+				default:
+					Port = "???";
+					break;
 				}
 
 				if (raxl == NULL) {
 					/* No default */
 					if (Logging && !(paxl->flags & FLAG_NOLOGGING)) {
 						switch (paxl->af_type) {
-							case AF_AX25:
-								syslog(LOG_INFO, "AX.25 %s (%s) rejected - no default", User, Port);
-								break;
-							case AF_NETROM:
-								syslog(LOG_INFO, "NET/ROM %s@%s (%s) rejected - no default", User, Node, Port);
-								break;
-							case AF_ROSE:
-								syslog(LOG_INFO, "Rose %s@%s (%s) rejected - no default", User, Node, Port);
-								break;
+						case AF_AX25:
+							syslog(LOG_INFO, "AX.25 %s (%s) rejected - no default", User, Port);
+							break;
+						case AF_NETROM:
+							syslog(LOG_INFO, "NET/ROM %s@%s (%s) rejected - no default", User, Node, Port);
+							break;
+						case AF_ROSE:
+							syslog(LOG_INFO, "Rose %s@%s (%s) rejected - no default", User, Node, Port);
+							break;
 						}
 					}
 					close(new);
@@ -450,15 +450,15 @@ int main(int argc, char *argv[])
 					/* Not allowed to connect */
 					if (Logging && !(paxl->flags & FLAG_NOLOGGING)) {
 						switch (raxl->af_type) {
-							case AF_AX25:
-								syslog(LOG_INFO, "AX.25 %s (%s) rejected - port locked", User, Port);
-								break;
-							case AF_NETROM:
-								syslog(LOG_INFO, "NET/ROM %s@%s (%s) rejected - port locked", User, Node, Port);
-								break;
-							case AF_ROSE:
-								syslog(LOG_INFO, "Rose %s@%s (%s) rejected - port locked", User, Node, Port);
-								break;
+						case AF_AX25:
+							syslog(LOG_INFO, "AX.25 %s (%s) rejected - port locked", User, Port);
+							break;
+						case AF_NETROM:
+							syslog(LOG_INFO, "NET/ROM %s@%s (%s) rejected - port locked", User, Node, Port);
+							break;
+						case AF_ROSE:
+							syslog(LOG_INFO, "Rose %s@%s (%s) rejected - port locked", User, Node, Port);
+							break;
 						}
 					}
 					close(new);
@@ -476,155 +476,155 @@ int main(int argc, char *argv[])
 				pid = fork();
 
 				switch (pid) {
-					case -1:
-						if (Logging)
-							syslog(LOG_ERR, "fork error %m");
-						/*
-						 * I don't think AX25 at the moment will hold the
-						 * connection open, if the above does not make it
-						 * through first time.
-						 */
-						close(new);
-						break;			/* Oh well... */
+				case -1:
+					if (Logging)
+						syslog(LOG_ERR, "fork error %m");
+					/*
+					 * I don't think AX25 at the moment will hold the
+					 * connection open, if the above does not make it
+					 * through first time.
+					 */
+					close(new);
+					break;			/* Oh well... */
 
-					case 0:
+				case 0:
 
-						if (raxl->af_type == AF_AX25 && raxl->checkVC) {
-							/* to which of my own addresses has the user connected? */
-							getsockname(new, (struct sockaddr *)&sockaddr, &addrlen);
-							strcpy(myAX25Name, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
+					if (raxl->af_type == AF_AX25 && raxl->checkVC) {
+						/* to which of my own addresses has the user connected? */
+						getsockname(new, (struct sockaddr *)&sockaddr, &addrlen);
+						strcpy(myAX25Name, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
 
-							sprintf(buf, "/usr/sbin/ax25rtctl -l ip | grep -i ' %s ' | /bin/grep 'v ' >/dev/null", User);
+						sprintf(buf, "/usr/sbin/ax25rtctl -l ip | grep -i ' %s ' | /bin/grep 'v ' >/dev/null", User);
 
-							/* he's not a VC user? */
-							if (system(buf) != 0)
-								goto login;
+						/* he's not a VC user? */
+						if (system(buf) != 0)
+							goto login;
 
-							if (raxl->checkVC > 1) {
-								/* setproctitle("ax25d [%d]: rejecting, User);  */
-							} else {
-								/* setproctitle("ax25d [%d]: %s, User, (VCloginEnable ? "waiting" : "discarding")); */
+						if (raxl->checkVC > 1) {
+							/* setproctitle("ax25d [%d]: rejecting, User);  */
+						} else {
+							/* setproctitle("ax25d [%d]: %s, User, (VCloginEnable ? "waiting" : "discarding")); */
+						}
+
+						/* is a VC user. checkVC > 0? then reject now, or fork and wait for pid=textdata.. */
+						if (raxl->VCsendFailureMsg) {
+							sprintf(buf, "*** %s: NO MODE VC with %s\r", myAX25Name, myAX25Name);
+							write(new, buf, strlen(buf));
+							if (raxl->checkVC > 1)
+								sleep(1);
+						}
+
+						if (raxl->checkVC > 1) {
+							if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC))
+								syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO), "AX.25 %s (%s:%s) rejected - AX25.IP-VC entry found", User, Port, myAX25Name);
+							goto close_link;
+						}
+
+						/* checkVC == 1: wait for data */
+						if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC)) {
+							syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO), "AX.25 %s (%s:%s) AX25.IP-VC host connected. %s",
+								User, Port, myAX25Name,
+								(raxl->VCloginEnable ? "waiting for first PID=text packet for triggered login" : "discarding PID=text packets"));
+						}
+
+						*buf = 0;
+						mesg = 0;
+						while ((i = read(new, buf, (sizeof(buf)-1))) > 0) {
+							buf[i] = 0;
+							if (Logging && raxl->LoggingVC > 1) {
+								/* debug */
+								syslog((LOG_DEBUG), "DEBUG: AX.25 %s (%s:%s) AX25.IP-VC host said: >%s<", User, Port, myAX25Name, buf);
 							}
-
-							/* is a VC user. checkVC > 0? then reject now, or fork and wait for pid=textdata.. */
-							if (raxl->VCsendFailureMsg) {
-								sprintf(buf, "*** %s: NO MODE VC with %s\r", myAX25Name, myAX25Name);
-								write(new, buf, strlen(buf));
-								if (raxl->checkVC > 1)
-									sleep(1);
-							}
-
-							if (raxl->checkVC > 1) {
-								if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC))
-									syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO), "AX.25 %s (%s:%s) rejected - AX25.IP-VC entry found", User, Port, myAX25Name);
-								goto close_link;
-							}
-
-							/* checkVC == 1: wait for data */
-							if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC)) {
-								syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO), "AX.25 %s (%s:%s) AX25.IP-VC host connected. %s", 
-									User, Port, myAX25Name,
-									(raxl->VCloginEnable ? "waiting for first PID=text packet for triggered login" : "discarding PID=text packets"));
-							}
-
-							*buf = 0;
-							mesg = 0;
-							while ((i = read(new, buf, (sizeof(buf)-1))) > 0) {
-								buf[i] = 0;
-								if (Logging && raxl->LoggingVC > 1) {
-									/* debug */
-									syslog((LOG_DEBUG), "DEBUG: AX.25 %s (%s:%s) AX25.IP-VC host said: >%s<", User, Port, myAX25Name, buf); 
-								}
-							        /* skip leading mess */
-								for (p = buf; *p && (isspace(*p & 0xff) || *p == '\r'); p++) ;
-								if (raxl->VCdiscOnLinkfailureMsg && !strncmp(p, "***", 3)) {
-									/* format received line for debug purposes */
-									/* 1. skip "***" */
-									for (p += 3; *p && isspace(*p & 0xff); p++ ) ;
-									mesg = p;
-									/* 2. get rid off EOL delimiters */
-									while (*p) {
-										if (*p == '\r' || *p == '\n') {
-											*p = 0;
-											break;
-										}
-										p++;
+							/* skip leading mess */
+							for (p = buf; *p && (isspace(*p & 0xff) || *p == '\r'); p++) ;
+							if (raxl->VCdiscOnLinkfailureMsg && !strncmp(p, "***", 3)) {
+								/* format received line for debug purposes */
+								/* 1. skip "***" */
+								for (p += 3; *p && isspace(*p & 0xff); p++ ) ;
+								mesg = p;
+								/* 2. get rid off EOL delimiters */
+								while (*p) {
+									if (*p == '\r' || *p == '\n') {
+										*p = 0;
+										break;
 									}
-									/* end read loop */
-									break;
+									p++;
 								}
-								/* per default, we discard all messages,
-							 	 * because there's no useful combination
-							 	 * using VC and pidText togegther
-							 	 */
-								if (raxl->VCloginEnable)
-									goto login;
+								/* end read loop */
+								break;
 							}
+							/* per default, we discard all messages,
+							 * because there's no useful combination
+							 * using VC and pidText togegther
+							 */
+							if (raxl->VCloginEnable)
+								goto login;
+						}
 
-							if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC)) {
-								syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO),
-										"AX.25 %s (%s:%s) AX25.IP-VC host disconnected%s%s",
-										User,
-										Port,
-										myAX25Name,
-										(mesg ? ": " : "."),
-										(mesg ? mesg : ""));
-							}
-							/* point of no return */
+						if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC)) {
+							syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO),
+									"AX.25 %s (%s:%s) AX25.IP-VC host disconnected%s%s",
+									User,
+									Port,
+									myAX25Name,
+									(mesg ? ": " : "."),
+									(mesg ? mesg : ""));
+						}
+						/* point of no return */
 close_link:
-							/* close link */
-							/* setproctitle("ax25d [%s]: disconnecting", User); */
-							close(new);
-							exit(0);
-						}
+						/* close link */
+						/* setproctitle("ax25d [%s]: disconnecting", User); */
+						close(new);
+						exit(0);
+					}
 login:
-						/* setproctitle("ax25d [%s]: login", User); */
+					/* setproctitle("ax25d [%s]: login", User); */
 
-						SetupOptions(new, raxl);
-						WorkoutArgs(raxl->af_type, raxl->shell, &argc, argv);
+					SetupOptions(new, raxl);
+					WorkoutArgs(raxl->af_type, raxl->shell, &argc, argv);
 
-						if (Logging && !(paxl->flags & FLAG_NOLOGGING)) {
-							switch (paxl->af_type) {
-								case AF_AX25:
-									syslog(LOG_INFO, "AX.25 %s (%s) %s", User, Port, argv[0]);
-									break;
-								case AF_NETROM:
-									syslog(LOG_INFO, "NET/ROM %s@%s (%s) %s", User, Node, Port, argv[0]);
-									break;
-								case AF_ROSE:
-									syslog(LOG_INFO, "Rose %s@%s (%s) %s", User, Node, Port, argv[0]);
-									break;
-							}
+					if (Logging && !(paxl->flags & FLAG_NOLOGGING)) {
+						switch (paxl->af_type) {
+						case AF_AX25:
+						syslog(LOG_INFO, "AX.25 %s (%s) %s", User, Port, argv[0]);
+							break;
+						case AF_NETROM:
+							syslog(LOG_INFO, "NET/ROM %s@%s (%s) %s", User, Node, Port, argv[0]);
+							break;
+						case AF_ROSE:
+							syslog(LOG_INFO, "Rose %s@%s (%s) %s", User, Node, Port, argv[0]);
+							break;
 						}
+					}
 
-						dup2(new, STDIN_FILENO);
-						dup2(new, STDOUT_FILENO);
-						close(new);
+					dup2(new, STDIN_FILENO);
+					dup2(new, STDOUT_FILENO);
+					close(new);
 
-						/*
-						 * Might be more efficient if we just went down AXL,
-						 * we cleaned up our parents left overs on bootup.
-						 */
-						for (axltmp = AXL; axltmp != NULL; axltmp = axltmp->next)
-							close(axltmp->fd);
+					/*
+					 * Might be more efficient if we just went down AXL,
+					 * we cleaned up our parents left overs on bootup.
+					 */
+					for (axltmp = AXL; axltmp != NULL; axltmp = axltmp->next)
+						close(axltmp->fd);
 
-						if (Logging)
-							closelog();
+					if (Logging)
+						closelog();
 
-						/* Make root secure, before we exec() */
-						/* Strip any supplementary gid's */
-						if (setgroups(0, grps) == -1)
-							exit(1);
-						if (setgid(raxl->gid) == -1)
-							exit(1);
-						if (setuid(raxl->uid) == -1)
-							exit(1);
-						execve(raxl->exec, argv, NULL);
+					/* Make root secure, before we exec() */
+					/* Strip any supplementary gid's */
+					if (setgroups(0, grps) == -1)
 						exit(1);
+					if (setgid(raxl->gid) == -1)
+						exit(1);
+					if (setuid(raxl->uid) == -1)
+						exit(1);
+					execve(raxl->exec, argv, NULL);
+					exit(1);
 
-					default:
-						close(new);
-						break;
+				default:
+					close(new);
+					break;
 				}
 			}
 		}
@@ -645,7 +645,7 @@ static void SignalTERM(int code)
 		syslog(LOG_INFO, "terminating on SIGTERM\n");
 		closelog();
 	}
-	
+
 	exit(0);
 }
 
@@ -655,7 +655,7 @@ static void WorkoutArgs(int af_type, char *shell, int *argc, char **argv)
 	char *sp, *cp;
 	int cnt  = 0;
 	int args = 0;
-   
+
 	for (cp = shell; *cp != '\0'; cp++) {
 		if (isspace(*cp) && cnt != 0) {
 			buffer[cnt]  = '\0';
@@ -675,73 +675,73 @@ static void WorkoutArgs(int af_type, char *shell, int *argc, char **argv)
 		if (*cp == '%') {
 			cp++;
 
-			switch(*cp) {
-				case 'd':	/* portname */
-					for (sp = Port; *sp != '\0' && *sp != '-'; sp++)
-						buffer[cnt++] = *sp;
-					break;
+			switch (*cp) {
+			case 'd':	/* portname */
+				for (sp = Port; *sp != '\0' && *sp != '-'; sp++)
+					buffer[cnt++] = *sp;
+				break;
 
-				case 'U':	/* username in UPPER */
-					for (sp = User; *sp != '\0' && *sp != '-'; sp++)
+			case 'U':	/* username in UPPER */
+				for (sp = User; *sp != '\0' && *sp != '-'; sp++)
+					buffer[cnt++] = toupper(*sp);
+				break;
+
+			case 'u':	/* USERNAME IN lower */
+				for (sp = User; *sp != '\0' && *sp != '-'; sp++)
+					buffer[cnt++] = tolower(*sp);
+				break;
+
+			case 'S':	/* username in UPPER (with SSID) */
+				for (sp = User; *sp != '\0'; sp++)
+					buffer[cnt++] = toupper(*sp);
+				break;
+
+			case 's':	/* USERNAME IN lower (with SSID) */
+				for (sp = User; *sp != '\0'; sp++)
+					buffer[cnt++] = tolower(*sp);
+				break;
+
+			case 'P':	/* nodename in UPPER */
+				if (af_type == AF_NETROM) {
+					for (sp = Node; *sp != '\0' && *sp != '-'; sp++)
 						buffer[cnt++] = toupper(*sp);
-					break;
-
-				case 'u':	/* USERNAME IN lower */
-					for (sp = User; *sp != '\0' && *sp != '-'; sp++)
-						buffer[cnt++] = tolower(*sp);
-					break;
-
-				case 'S':	/* username in UPPER (with SSID) */
-					for (sp = User; *sp != '\0'; sp++)
-						buffer[cnt++] = toupper(*sp);
-					break;
-
-				case 's':	/* USERNAME IN lower (with SSID) */
-					for (sp = User; *sp != '\0'; sp++)
-						buffer[cnt++] = tolower(*sp);
-					break;
-
-				case 'P':	/* nodename in UPPER */
-					if (af_type == AF_NETROM) {
-						for (sp = Node; *sp != '\0' && *sp != '-'; sp++)
-							buffer[cnt++] = toupper(*sp);
-					} else {
-						buffer[cnt++] = '%';
-					}
-					break;
-
-				case 'p':	/* NODENAME IN lower */
-					if (af_type == AF_NETROM) {
-						for(sp = Node; *sp != '\0' && *sp != '-'; sp++)
-							buffer[cnt++] = tolower(*sp);
-					} else {
-						buffer[cnt++] = '%';
-					}
-					break;
-
-				case 'R':	/* nodename in UPPER (with SSID) */
-					if (af_type == AF_NETROM) {
-						for (sp = Node; *sp != '\0'; sp++)
-							buffer[cnt++] = toupper(*sp);
-					} else {
-						buffer[cnt++] = '%';
-					}
-					break;
-
-				case 'r':	/* NODENAME IN lower (with SSID) */
-					if (af_type == AF_NETROM) {
-						for (sp = Node; *sp != '\0'; sp++)
-							buffer[cnt++] = tolower(*sp);
-					} else {
-						buffer[cnt++] = '%';
-					}
-					break;
-
-				case '\0':
-				case '%':
-				default:
+				} else {
 					buffer[cnt++] = '%';
-					break;
+				}
+				break;
+
+			case 'p':	/* NODENAME IN lower */
+				if (af_type == AF_NETROM) {
+					for (sp = Node; *sp != '\0' && *sp != '-'; sp++)
+						buffer[cnt++] = tolower(*sp);
+				} else {
+					buffer[cnt++] = '%';
+				}
+				break;
+
+			case 'R':	/* nodename in UPPER (with SSID) */
+				if (af_type == AF_NETROM) {
+					for (sp = Node; *sp != '\0'; sp++)
+						buffer[cnt++] = toupper(*sp);
+				} else {
+					buffer[cnt++] = '%';
+				}
+				break;
+
+			case 'r':	/* NODENAME IN lower (with SSID) */
+				if (af_type == AF_NETROM) {
+					for (sp = Node; *sp != '\0'; sp++)
+						buffer[cnt++] = tolower(*sp);
+				} else {
+					buffer[cnt++] = '%';
+				}
+				break;
+
+			case '\0':
+			case '%':
+			default:
+				buffer[cnt++] = '%';
+				break;
 			}
 		} else {
 			buffer[cnt++] = *cp;
@@ -829,33 +829,33 @@ static int ReadConfig(void)
 
 		if (buffer[0] == '#')
 			continue;
-         
-		switch (buffer[0]) {
-			case '[':		/* AX25 port call */
-				af_type = AF_AX25;
-				hunt    = TRUE;
-				error   = FALSE;
-				iamdigi = FALSE;
-				break;
-   
-			case '<':		/* NETROM iface call */
-				af_type = AF_NETROM;
-				hunt    = TRUE;
-				error   = FALSE;
-				iamdigi = FALSE;
-				break;
 
-			case '{':		/* ROSE iface call */
-				af_type = AF_ROSE;
-				hunt    = TRUE;
-				error   = FALSE;
-				iamdigi = FALSE;
-				break;
-   
-			default:
-				if (hunt && !error)
-					goto BadLine;
-				break;
+		switch (buffer[0]) {
+		case '[':		/* AX25 port call */
+			af_type = AF_AX25;
+			hunt    = TRUE;
+			error   = FALSE;
+			iamdigi = FALSE;
+			break;
+
+		case '<':		/* NETROM iface call */
+			af_type = AF_NETROM;
+			hunt    = TRUE;
+			error   = FALSE;
+			iamdigi = FALSE;
+			break;
+
+		case '{':		/* ROSE iface call */
+			af_type = AF_ROSE;
+			hunt    = TRUE;
+			error   = FALSE;
+			iamdigi = FALSE;
+			break;
+
+		default:
+			if (hunt && !error)
+				goto BadLine;
+			break;
 		}
 
 		if (hunt) {	/* We've found a Iface entry */
@@ -863,104 +863,104 @@ static int ReadConfig(void)
 			memset(&axl_defaults, 0, sizeof(axl_defaults));
 
 			switch (af_type) {
-				case AF_AX25:
-					if ((s = strchr(buffer, ']')) == NULL)
-						goto BadLine;
-					*s = '\0';
-					if ((s = strtok(buffer + 1, " \t")) == NULL)
-						goto BadLine;
-					port = s;
-					call = NULL;
-					if ((s = strtok(NULL, " \t")) != NULL) {
-						if (strcasecmp(s, "VIA") == 0 || strcasecmp(s, "V") == 0) {
-							if ((s = strtok(NULL, " \t")) == NULL)
-								goto BadLine;
-						}
-
-						call = port;
-						port = s;
-
-						if ((s = strchr(call, '*')) != NULL) {
-							iamdigi = TRUE;
-							*s = '\0';
-						}
-					}
-					if (strcmp(port, "*") == 0 && call == NULL) {
-						fprintf(stderr, "ax25d: invalid port name\n");
-						continue;
-					}
-					if (strcmp(port, "*") != 0) {
-						if ((addr = ax25_config_get_addr(port)) == NULL) {
-							fprintf(stderr, "ax25d: invalid AX.25 port '%s'\n", port);
-							continue;
-						}
-					}
-					if (call == NULL) {
-						sockaddr.ax25.fsa_ax25.sax25_family = AF_AX25;
-						sockaddr.ax25.fsa_ax25.sax25_ndigis = 0;
-						ax25_aton_entry(addr, sockaddr.ax25.fsa_ax25.sax25_call.ax25_call);
-					} else {
-						sockaddr.ax25.fsa_ax25.sax25_family = AF_AX25;
-						sockaddr.ax25.fsa_ax25.sax25_ndigis = 1;
-						ax25_aton_entry(call, sockaddr.ax25.fsa_ax25.sax25_call.ax25_call);
-						if (strcmp(port, "*") != 0)
-							ax25_aton_entry(addr, sockaddr.ax25.fsa_digipeater[0].ax25_call);
-						else
-							sockaddr.ax25.fsa_digipeater[0] = null_ax25_address;
-					}
-					addrlen = sizeof(struct full_sockaddr_ax25);
-					break;
-
-				case AF_NETROM:
-					if ((s = strchr(buffer, '>')) == NULL)
-						goto BadLine;
-					*s = '\0';
-					port = buffer + 1;
-					if ((addr = nr_config_get_addr(port)) == NULL) {
-						fprintf(stderr, "ax25d: invalid NET/ROM port '%s'\n", port);
-						continue;
-					}
-					sockaddr.ax25.fsa_ax25.sax25_family = AF_NETROM;
-					sockaddr.ax25.fsa_ax25.sax25_ndigis = 0;
-					ax25_aton_entry(addr, sockaddr.ax25.fsa_ax25.sax25_call.ax25_call);
-					addrlen = sizeof(struct full_sockaddr_ax25);
-					break;
-
-				case AF_ROSE:
-					if ((s = strchr(buffer, '}')) == NULL)
-						goto BadLine;
-					*s = '\0';
-					if ((s = strtok(buffer + 1, " \t")) == NULL)
-						goto BadLine;
-					call = s;
-					if ((s = strtok(NULL, " \t")) == NULL)
-						goto BadLine;
+			case AF_AX25:
+				if ((s = strchr(buffer, ']')) == NULL)
+					goto BadLine;
+				*s = '\0';
+				if ((s = strtok(buffer + 1, " \t")) == NULL)
+					goto BadLine;
+				port = s;
+				call = NULL;
+				if ((s = strtok(NULL, " \t")) != NULL) {
 					if (strcasecmp(s, "VIA") == 0 || strcasecmp(s, "V") == 0) {
 						if ((s = strtok(NULL, " \t")) == NULL)
 							goto BadLine;
 					}
+
+					call = port;
 					port = s;
-					if ((addr = rs_config_get_addr(port)) == NULL) {
-						fprintf(stderr, "ax25d: invalid Rose port '%s'\n", port);
+
+					if ((s = strchr(call, '*')) != NULL) {
+						iamdigi = TRUE;
+						*s = '\0';
+					}
+				}
+				if (strcmp(port, "*") == 0 && call == NULL) {
+					fprintf(stderr, "ax25d: invalid port name\n");
+					continue;
+				}
+				if (strcmp(port, "*") != 0) {
+					if ((addr = ax25_config_get_addr(port)) == NULL) {
+						fprintf(stderr, "ax25d: invalid AX.25 port '%s'\n", port);
 						continue;
 					}
-					if (strcmp(call, "*") == 0) {
-						sockaddr.rose.srose_family = AF_ROSE;
-						sockaddr.rose.srose_ndigis = 0;
-						rose_aton(addr, sockaddr.rose.srose_addr.rose_addr);
-						sockaddr.rose.srose_call   = null_ax25_address;
-					} else {
-						sockaddr.rose.srose_family = AF_ROSE;
-						sockaddr.rose.srose_ndigis = 0;
-						rose_aton(addr, sockaddr.rose.srose_addr.rose_addr);
-						ax25_aton_entry(call,   sockaddr.rose.srose_call.ax25_call);
-					}
-					addrlen = sizeof(struct sockaddr_rose);
-					break;
+				}
+				if (call == NULL) {
+					sockaddr.ax25.fsa_ax25.sax25_family = AF_AX25;
+					sockaddr.ax25.fsa_ax25.sax25_ndigis = 0;
+					ax25_aton_entry(addr, sockaddr.ax25.fsa_ax25.sax25_call.ax25_call);
+				} else {
+					sockaddr.ax25.fsa_ax25.sax25_family = AF_AX25;
+					sockaddr.ax25.fsa_ax25.sax25_ndigis = 1;
+					ax25_aton_entry(call, sockaddr.ax25.fsa_ax25.sax25_call.ax25_call);
+					if (strcmp(port, "*") != 0)
+						ax25_aton_entry(addr, sockaddr.ax25.fsa_digipeater[0].ax25_call);
+					else
+						sockaddr.ax25.fsa_digipeater[0] = null_ax25_address;
+				}
+				addrlen = sizeof(struct full_sockaddr_ax25);
+				break;
 
-				default:
-					fprintf(stderr, "ax25d: unknown af_type=%d\n", af_type);
-					exit(1);
+			case AF_NETROM:
+				if ((s = strchr(buffer, '>')) == NULL)
+					goto BadLine;
+				*s = '\0';
+				port = buffer + 1;
+				if ((addr = nr_config_get_addr(port)) == NULL) {
+					fprintf(stderr, "ax25d: invalid NET/ROM port '%s'\n", port);
+					continue;
+				}
+				sockaddr.ax25.fsa_ax25.sax25_family = AF_NETROM;
+				sockaddr.ax25.fsa_ax25.sax25_ndigis = 0;
+				ax25_aton_entry(addr, sockaddr.ax25.fsa_ax25.sax25_call.ax25_call);
+				addrlen = sizeof(struct full_sockaddr_ax25);
+				break;
+
+			case AF_ROSE:
+				if ((s = strchr(buffer, '}')) == NULL)
+					goto BadLine;
+				*s = '\0';
+				if ((s = strtok(buffer + 1, " \t")) == NULL)
+					goto BadLine;
+				call = s;
+				if ((s = strtok(NULL, " \t")) == NULL)
+					goto BadLine;
+				if (strcasecmp(s, "VIA") == 0 || strcasecmp(s, "V") == 0) {
+					if ((s = strtok(NULL, " \t")) == NULL)
+						goto BadLine;
+				}
+				port = s;
+				if ((addr = rs_config_get_addr(port)) == NULL) {
+					fprintf(stderr, "ax25d: invalid Rose port '%s'\n", port);
+					continue;
+				}
+				if (strcmp(call, "*") == 0) {
+					sockaddr.rose.srose_family = AF_ROSE;
+					sockaddr.rose.srose_ndigis = 0;
+					rose_aton(addr, sockaddr.rose.srose_addr.rose_addr);
+					sockaddr.rose.srose_call   = null_ax25_address;
+				} else {
+					sockaddr.rose.srose_family = AF_ROSE;
+					sockaddr.rose.srose_ndigis = 0;
+					rose_aton(addr, sockaddr.rose.srose_addr.rose_addr);
+					ax25_aton_entry(call,   sockaddr.rose.srose_call.ax25_call);
+				}
+				addrlen = sizeof(struct sockaddr_rose);
+				break;
+
+			default:
+				fprintf(stderr, "ax25d: unknown af_type=%d\n", af_type);
+				exit(1);
 			}
 
 			if ((axl_port = calloc(1, sizeof(*axl_port))) == NULL) {
@@ -979,13 +979,13 @@ static int ReadConfig(void)
 				reload_timer(60);
 				continue;
 			}
-                        /* xlz - have to nuke this as this option is gone
-                         * what should be here?
+			/* xlz - have to nuke this as this option is gone
+			 * what should be here?
 			if (iamdigi) {
 				yes = 1;
 				setsockopt(axl_port->fd, SOL_AX25, AX25_IAMDIGI, &yes, sizeof(yes));
 			}
-                        */
+			*/
 
 			if (bind(axl_port->fd, (struct sockaddr *)&sockaddr, addrlen) < 0) {
 				fprintf(stderr, "ax25d: bind: %s on port %s\n", strerror(errno), axl_port->port);
@@ -1210,7 +1210,7 @@ ignore:
 					goto BadArgsFree;
 
 				axl_ent->flags = ParseFlags(s, line);
-            
+
 				if (!(axl_ent->flags & FLAG_LOCKOUT)) {
 					/* Get username */
 					if ((s = strtok(NULL, " \t")) == NULL)
@@ -1298,39 +1298,39 @@ static unsigned long ParseFlags(const char *kp, int line)
 
 	for (; *kp != '\0'; kp++) {
 		switch (*kp) {
-			case 'v':
-			case 'V':
-				flags |= FLAG_VALIDCALL;
-				break;
+		case 'v':
+		case 'V':
+			flags |= FLAG_VALIDCALL;
+			break;
 
-			case 'q':
-			case 'Q':
-				flags |= FLAG_NOLOGGING;
-				break;
+		case 'q':
+		case 'Q':
+			flags |= FLAG_NOLOGGING;
+			break;
 
-			case 'n':
-			case 'N':
-				flags |= FLAG_CHKNRN;
-				break;
+		case 'n':
+		case 'N':
+			flags |= FLAG_CHKNRN;
+			break;
 
-			case 'd':
-			case 'D':
-				flags |= FLAG_NODIGIS;
-				break;
+		case 'd':
+		case 'D':
+			flags |= FLAG_NODIGIS;
+			break;
 
-			case 'l':
-			case 'L':
-				flags |= FLAG_LOCKOUT;
-				break;
+		case 'l':
+		case 'L':
+			flags |= FLAG_LOCKOUT;
+			break;
 
-			case '0':
-			case '*':
-			case '-':		/* Be compatible and allow markers */
-				break;
+		case '0':
+		case '*':
+		case '-':		/* Be compatible and allow markers */
+			break;
 
-			default:
-				fprintf(stderr, "ax25d: config file line %d bad flag option '%c'.\n", line, *kp);
-				break;
+		default:
+			fprintf(stderr, "ax25d: config file line %d bad flag option '%c'.\n", line, *kp);
+			break;
 		}
 	}
 
@@ -1340,7 +1340,7 @@ static unsigned long ParseFlags(const char *kp, int line)
 static struct axlist *ClearList(struct axlist *list)
 {
 	struct axlist *tp1, *tp2, *tmp;
-   
+
 	for (tp1 = list; tp1 != NULL; ) {
 		for (tp2 = tp1->ents; tp2 != NULL; ) {
 			if (tp2->port != NULL)
@@ -1384,11 +1384,11 @@ static char *stripssid(const char *call)
 {
 	static char newcall[10];
 	char *s;
-	
+
 	strcpy(newcall, call);
 
 	if ((s = strchr(newcall, '-')) != NULL)
 		*s = '\0';
-	
+
 	return newcall;
 }

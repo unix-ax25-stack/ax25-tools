@@ -33,15 +33,15 @@
 #endif
 
 static char *callsign;
-static int  speed	= 0;
-static int  mtu		= 0;
+static int  speed;
+static int  mtu;
 static int  logging	= FALSE;
-static char *progname	= NULL;
-static char *kttyname	= NULL;
-static char *portname	= NULL;
-static char *inetaddr	= NULL;
-static int allow_broadcast = 0;
-static int i_am_unix98_pty_master = 0; /* unix98 ptmx support */
+static char *progname;
+static char *kttyname;
+static char *portname;
+static char *inetaddr;
+static int allow_broadcast;
+static int i_am_unix98_pty_master;		/* unix98 ptmx support */
 
 static char *kiss_basename(char *s)
 {
@@ -67,16 +67,16 @@ static int readconfig(char *port)
 	FILE *fp;
 	char buffer[90], *s;
 	int n = 0;
-	
+
 	if ((fp = fopen(CONF_AXPORTS_FILE, "r")) == NULL) {
-		fprintf(stderr, "%s: cannot open axports file %s\n", 
-                        progname, CONF_AXPORTS_FILE);
+		fprintf(stderr, "%s: cannot open axports file %s\n",
+			progname, CONF_AXPORTS_FILE);
 		return FALSE;
 	}
 
 	while (fgets(buffer, 90, fp) != NULL) {
 		n++;
-	
+
 		if ((s = strchr(buffer, '\n')) != NULL)
 			*s = '\0';
 
@@ -87,10 +87,10 @@ static int readconfig(char *port)
 			fprintf(stderr, "%s: unable to parse line %d of the axports file\n", progname, n);
 			return FALSE;
 		}
-		
+
 		if (strcmp(s, port) != 0)
 			continue;
-			
+
 		if ((s = strtok(NULL, " \t\r\n")) == NULL) {
 			fprintf(stderr, "%s: unable to parse line %d of the axports file\n", progname, n);
 			return FALSE;
@@ -118,14 +118,14 @@ static int readconfig(char *port)
 		}
 
 		fclose(fp);
-		
+
 		return TRUE;
 	}
-	
+
 	fclose(fp);
 
 	fprintf(stderr, "%s: cannot find port %s in axports\n", progname, port);
-	
+
 	return FALSE;
 }
 
@@ -136,7 +136,7 @@ static int setifcall(int fd, char *name)
 
 	if (ax25_aton_entry(name, call) == -1)
 		return FALSE;
-	
+
 	if (ioctl(fd, SIOCSIFHWADDR, call) != 0) {
 		close(fd);
 		fprintf(stderr, "%s: ", progname);
@@ -152,7 +152,7 @@ static int startiface(char *dev, struct hostent *hp)
 {
 	struct ifreq ifr;
 	int fd;
-	
+
 	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		fprintf(stderr, "%s: ", progname);
 		perror("socket");
@@ -160,10 +160,10 @@ static int startiface(char *dev, struct hostent *hp)
 	}
 
 	strcpy(ifr.ifr_name, dev);
-	
+
 	if (hp != NULL) {
 		ifr.ifr_addr.sa_family = AF_INET;
-		
+
 		ifr.ifr_addr.sa_data[0] = 0;
 		ifr.ifr_addr.sa_data[1] = 0;
 		ifr.ifr_addr.sa_data[2] = hp->h_addr_list[0][0];
@@ -206,15 +206,15 @@ static int startiface(char *dev, struct hostent *hp)
 		perror("SIOCSIFFLAGS");
 		return FALSE;
 	}
-	
+
 	close(fd);
-	
+
 	return TRUE;
 }
 
 static void usage(void)
 {
-        fprintf(stderr, "usage: %s [-b] [-l] [-m mtu] [-v] tty port [inetaddr]\n", progname);
+	fprintf(stderr, "usage: %s [-b] [-l] [-m mtu] [-v] tty port [inetaddr]\n", progname);
 }
 
 int main(int argc, char *argv[])
@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
 	char dev[64];
 	int  v = 4;
 	char *namepts = NULL;  /* name of the unix98 pts slave, which
-	                        * the client has to use */
+				* the client has to use */
 	struct hostent *hp = NULL;
 
 	progname = kiss_basename(argv[0]);
@@ -234,32 +234,32 @@ int main(int argc, char *argv[])
 
 	while ((fd = getopt(argc, argv, "b6i:lm:v")) != -1) {
 		switch (fd) {
-			case '6':
-				disc = N_6PACK;
-				break;
-			case 'b':
-				allow_broadcast = 1;
-				break;
-			case 'i':
-				fprintf(stderr, "%s: -i flag depreciated, use new command line format instead.\n", progname);
-				inetaddr = optarg;
-				break;
-			case 'l':
-				logging = TRUE;
-				break;
-			case 'm':
-				if ((mtu = atoi(optarg)) <= 0) {
-					fprintf(stderr, "%s: invalid mtu size - %s\n", progname, optarg);
-					return 1;
-				}
-				break;
-			case 'v':
-				printf("%s: %s\n", progname, VERSION);
-				return 0;
-			case ':':
-			case '?':
-				usage();
+		case '6':
+			disc = N_6PACK;
+			break;
+		case 'b':
+			allow_broadcast = 1;
+			break;
+		case 'i':
+			fprintf(stderr, "%s: -i flag depreciated, use new command line format instead.\n", progname);
+			inetaddr = optarg;
+			break;
+		case 'l':
+			logging = TRUE;
+			break;
+		case 'm':
+			if ((mtu = atoi(optarg)) <= 0) {
+				fprintf(stderr, "%s: invalid mtu size - %s\n", progname, optarg);
 				return 1;
+			}
+			break;
+		case 'v':
+			printf("%s: %s\n", progname, VERSION);
+			return 0;
+		case ':':
+		case '?':
+			usage();
+			return 1;
 		}
 	}
 
@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
 	if (!readconfig(portname))
 		return 1;
 
-        if (inetaddr && (hp = gethostbyname(inetaddr)) == NULL) {
+	if (inetaddr && (hp = gethostbyname(inetaddr)) == NULL) {
 		fprintf(stderr, "%s: invalid internet name/address - %s\n", progname, inetaddr);
 		return 1;
 	}
@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
 	if (ioctl(fd, TIOCSETD, &disc) == -1) {
 		fprintf(stderr, "%s: Error setting line discipline: ", progname);
 		perror("TIOCSETD");
-		fprintf(stderr, "Are you sure you have enabled %s support in the kernel\n", 
+		fprintf(stderr, "Are you sure you have enabled %s support in the kernel\n",
 			disc == N_AX25 ? "MKISS" : "6PACK");
 		fprintf(stderr, "or, if you made it a module, that the module is loaded?\n");
 		return 1;
@@ -349,7 +349,7 @@ int main(int argc, char *argv[])
 
 	/* ax25 ifaces should not really need to have an IP address assigned to */
 	if (!startiface(dev, hp))
-		return 1;		
+		return 1;
 
 	printf("AX.25 port %s bound to device %s\n", portname, dev);
 	if (i_am_unix98_pty_master) {

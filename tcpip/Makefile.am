@@ -10,11 +10,11 @@ installconf:
 
 sbin_PROGRAMS = rip98d ttylinkd
 
-man_MANS = rip98d.conf.5 rip98d.8 ttylinkd.conf.5 ttylinkd.8
+dist_man_MANS = rip98d.conf.5 rip98d.8 ttylinkd.conf.5 ttylinkd.8
 
-doc_DATA= ttylinkd.README ttylinkd.INSTALL
+dist_doc_DATA = ttylinkd.README ttylinkd.INSTALL
 
-EXTRA_DIST = $(man_MANS) $(etcfiles) $(doc_DATA)
+EXTRA_DIST = $(etcfiles)
 
 rip98d_SOURCES = 	\
 	rip98d.c	\
@@ -25,8 +25,7 @@ rip98d_SOURCES = 	\
 rip98d_LDADD = $(AX25_LIB)
 
 INCLUDES = -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" \
-	   -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\" 
+	   -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\"
 
 AX25_SYSCONFDIR=${sysconfdir}/ax25/
 AX25_LOCALSTATEDIR=${localstatedir}/ax25/
-

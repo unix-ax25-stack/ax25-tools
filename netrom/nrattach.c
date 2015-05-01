@@ -28,14 +28,14 @@
 #include "../pathnames.h"
 
 char *callsign;
-int  mtu   = 0;
+int  mtu;
 
 int readconfig(char *port)
 {
 	FILE *fp;
 	char buffer[90], *s;
 	int n = 0;
-	
+
 	if ((fp = fopen(CONF_NRPORTS_FILE, "r")) == NULL) {
 		fprintf(stderr, "nrattach: cannot open nrports file\n");
 		return FALSE;
@@ -43,7 +43,7 @@ int readconfig(char *port)
 
 	while (fgets(buffer, 90, fp) != NULL) {
 		n++;
-	
+
 		if ((s = strchr(buffer, '\n')) != NULL)
 			*s = '\0';
 
@@ -54,10 +54,10 @@ int readconfig(char *port)
 			fprintf(stderr, "nrattach: unable to parse line %d of the nrports file\n", n);
 			return FALSE;
 		}
-		
+
 		if (strcmp(s, port) != 0)
 			continue;
-			
+
 		if ((s = strtok(NULL, " \t\r\n")) == NULL) {
 			fprintf(stderr, "nrattach: unable to parse line %d of the nrports file\n", n);
 			return FALSE;
@@ -83,14 +83,14 @@ int readconfig(char *port)
 		}
 
 		fclose(fp);
-		
+
 		return TRUE;
 	}
-	
+
 	fclose(fp);
 
 	fprintf(stderr, "nrattach: cannot find port %s in nrports\n", port);
-	
+
 	return FALSE;
 }
 
@@ -99,7 +99,7 @@ int getfreedev(char *dev)
 	struct ifreq ifr;
 	int fd;
 	int i;
-	
+
 	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		perror("nrattach: socket");
 		return FALSE;
@@ -108,7 +108,7 @@ int getfreedev(char *dev)
 	for (i = 0; i < INT_MAX; i++) {
 		sprintf(dev, "nr%d", i);
 		strcpy(ifr.ifr_name, dev);
-	
+
 		if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0) {
 			perror("nrattach: SIOCGIFFLAGS");
 			return FALSE;
@@ -130,17 +130,17 @@ int startiface(char *dev, struct hostent *hp)
 	struct ifreq ifr;
 	char call[7];
 	int fd;
-	
+
 	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		perror("nrattach: socket");
 		return FALSE;
 	}
 
 	strcpy(ifr.ifr_name, dev);
-	
+
 	if (hp != NULL) {
 		ifr.ifr_addr.sa_family = AF_INET;
-		
+
 		ifr.ifr_addr.sa_data[0] = 0;
 		ifr.ifr_addr.sa_data[1] = 0;
 		ifr.ifr_addr.sa_data[2] = hp->h_addr_list[0][0];
@@ -160,7 +160,7 @@ int startiface(char *dev, struct hostent *hp)
 
 	ifr.ifr_hwaddr.sa_family = ARPHRD_NETROM;
 	memcpy(ifr.ifr_hwaddr.sa_data, call, 7);
-	
+
 	if (ioctl(fd, SIOCSIFHWADDR, &ifr) != 0) {
 		perror("nrattach: SIOCSIFHWADDR");
 		return FALSE;
@@ -186,12 +186,12 @@ int startiface(char *dev, struct hostent *hp)
 		perror("nrattach: SIOCSIFFLAGS");
 		return FALSE;
 	}
-	
+
 	close(fd);
-	
+
 	return TRUE;
 }
-	
+
 
 int main(int argc, char *argv[])
 {
@@ -201,28 +201,28 @@ int main(int argc, char *argv[])
 
 	while ((fd = getopt(argc, argv, "i:m:v")) != -1) {
 		switch (fd) {
-			case 'i':
-				if ((hp = gethostbyname(optarg)) == NULL) {
-					fprintf(stderr, "nrattach: invalid internet name/address - %s\n", optarg);
-					return 1;
-				}
-				break;
-			case 'm':
-				if ((mtu = atoi(optarg)) <= 0) {
-					fprintf(stderr, "nrattach: invalid mtu size - %s\n", optarg);
-					return 1;
-				}
-				break;
-			case 'v':
-				printf("nrattach: %s\n", VERSION);
-				return 0;
-			case ':':
-			case '?':
-				fprintf(stderr, "usage: nrattach [-i inetaddr] [-m mtu] [-v] port\n");
+		case 'i':
+			if ((hp = gethostbyname(optarg)) == NULL) {
+				fprintf(stderr, "nrattach: invalid internet name/address - %s\n", optarg);
 				return 1;
+			}
+			break;
+		case 'm':
+			if ((mtu = atoi(optarg)) <= 0) {
+				fprintf(stderr, "nrattach: invalid mtu size - %s\n", optarg);
+				return 1;
+			}
+			break;
+		case 'v':
+			printf("nrattach: %s\n", VERSION);
+			return 0;
+		case ':':
+		case '?':
+			fprintf(stderr, "usage: nrattach [-i inetaddr] [-m mtu] [-v] port\n");
+			return 1;
 		}
 	}
-	
+
 	if ((argc - optind) != 1) {
 		fprintf(stderr, "usage: nrattach [-i inetaddr] [-m mtu] [-v] port\n");
 		return 1;
@@ -235,11 +235,11 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "nrattach: cannot find free NET/ROM device\n");
 		return 1;
 	}
-	
+
 	if (!startiface(dev, hp))
-		return 1;		
+		return 1;
 
 	printf("NET/ROM port %s bound to device %s\n", argv[optind], dev);
-		
+
 	return 0;
 }

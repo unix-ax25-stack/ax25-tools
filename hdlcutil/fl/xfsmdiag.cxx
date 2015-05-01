@@ -52,36 +52,36 @@ Fl_Window* create_the_forms() {
     { Fl_Group* o = scopemode = new Fl_Group(550, 10, 140, 130);
       o->align(FL_ALIGN_CENTER);
       { Fl_Box* o = new Fl_Box(550, 10, 140, 130);
-        o->box(FL_DOWN_BOX);
+	o->box(FL_DOWN_BOX);
       }
       { Fl_Check_Button* o = sm_off = new Fl_Check_Button(560, 20, 120, 20, "Off");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)cb_mode, (void*)(0));
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)cb_mode, (void*)(0));
       }
       { Fl_Check_Button* o = sm_input = new Fl_Check_Button(560, 40, 120, 20, "Input");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)cb_mode, (void*)(1));
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)cb_mode, (void*)(1));
       }
       { Fl_Check_Button* o = sm_demod = new Fl_Check_Button(560, 60, 120, 20, "Demodulator");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)cb_mode, (void*)(2));
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)cb_mode, (void*)(2));
       }
       { Fl_Check_Button* o = sm_constell = new Fl_Check_Button(560, 80, 120, 20, "Constellation");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)cb_mode, (void*)(3));
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)cb_mode, (void*)(3));
       }
       { Fl_Check_Button* o = sm_dcd = new Fl_Check_Button(560, 110, 120, 20, "Gated with DCD");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)cb_mode, (void*)(256));
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)cb_mode, (void*)(256));
       }
       o->end();
     }

@@ -28,14 +28,14 @@
  *            callsign didn't match (and the frame wasn't echoed anywhere).
  *
  * *** 20021206 dl9sau:
- * 	      - fixed a bug preventing echo to multible ports; it may also
+ *            - fixed a bug preventing echo to multible ports; it may also
  *              lead to retransmission on the interface where it came from
  *            - fixed problem that frames via sendto(...,alen) had a wrong
  *              protocol (because alen became larger than the size of
  *              struct sockaddr).
  *            - sockaddr_pkt is the right struct for recvfrom/sendto on
  *              type SOCK_PACKET family AF_INET sockets.
- *	      - added support for new PF_PACKET family with sockaddr_ll
+ *            - added support for new PF_PACKET family with sockaddr_ll
  *
  * ***
  *
@@ -136,7 +136,7 @@ static void terminate(int sig)
 		syslog(LOG_INFO, "terminating on SIGTERM\n");
 		closelog();
 	}
-	
+
 	exit(0);
 }
 
@@ -238,7 +238,7 @@ static struct config *readconfig(void)
 }
 
 /*
- *	Slightly modified from linux/include/net/ax25.h and 
+ *	Slightly modified from linux/include/net/ax25.h and
  *	linux/net/ax25/ax25_subr.c:
  */
 
@@ -264,13 +264,13 @@ typedef struct {
 static unsigned char *ax25_parse_addr(unsigned char *buf, int len, ax25_address *src, ax25_address *dest, ax25_digi *digi)
 {
 	int d = 0;
-	
+
 	if (len < 14) return NULL;
-		
+
 #if 0
 	if (flags != NULL) {
 		*flags = 0;
-	
+
 		if (buf[6] & LAPB_C) {
 			*flags = C_COMMAND;
 		}
@@ -279,16 +279,16 @@ static unsigned char *ax25_parse_addr(unsigned char *buf, int len, ax25_address 
 			*flags = C_RESPONSE;
 		}
 	}
-		
-	if (dama != NULL) 
+
+	if (dama != NULL)
 		*dama = ~buf[13] & DAMA_FLAG;
 #endif
-		
+
 	/* Copy to, from */
-	if (dest != NULL) 
+	if (dest != NULL)
 		memcpy(dest, buf + 0, AX25_ADDR_LEN);
 
-	if (src != NULL)  
+	if (src != NULL)
 		memcpy(src,  buf + 7, AX25_ADDR_LEN);
 
 	buf += 2 * AX25_ADDR_LEN;
@@ -296,7 +296,7 @@ static unsigned char *ax25_parse_addr(unsigned char *buf, int len, ax25_address 
 
 	digi->lastrepeat = -1;
 	digi->ndigi      = 0;
-	
+
 	while (!(buf[-1] & LAPB_E)) {
 		if (d >= AX25_MAX_DIGIS)  return NULL;	/* Max of 6 digis */
 		if (len < 7) return NULL;		/* Short packet */
@@ -382,15 +382,15 @@ int main(int argc, char **argv)
 
 	while ((s = getopt(argc, argv, "lv")) != -1) {
 		switch (s) {
-			case 'l':
-				logging = TRUE;
-				break;
-			case 'v':
-				printf("rxecho: %s\n", VERSION);
-				return 0;
-			default:
-				fprintf(stderr, "usage: rxecho [-l] [-v]\n");
-				return 1;
+		case 'l':
+			logging = TRUE;
+			break;
+		case 'v':
+			printf("rxecho: %s\n", VERSION);
+			return 0;
+		default:
+			fprintf(stderr, "usage: rxecho [-l] [-v]\n");
+			return 1;
 		}
 	}
 
@@ -455,7 +455,7 @@ int main(int argc, char **argv)
 	}
 
 	for (;;) {
- 		alen = sa_len;
+		alen = sa_len;
 
 		if ((size = recvfrom(s, buf, 1500, 0, psa, &alen)) == -1) {
 			if (logging) {
@@ -479,11 +479,11 @@ int main(int argc, char **argv)
 
 		for (p = list; p != NULL; p = p->next)
 #ifdef	USE_SOCKADDR_SLL
- 			if (p->from_idx == from_idx && (check_calls(p, buf, size) == 0)) {
- 				sll.sll_ifindex = p->to_idx;
+			if (p->from_idx == from_idx && (check_calls(p, buf, size) == 0)) {
+				sll.sll_ifindex = p->to_idx;
 #else
- 			if ((strcmp(p->from, from_dev_name) == 0) && (check_calls(p, buf, size) == 0)) {
- 				strcpy(psa->sa_data, p->to);
+			if ((strcmp(p->from, from_dev_name) == 0) && (check_calls(p, buf, size) == 0)) {
+				strcpy(psa->sa_data, p->to);
 #endif
 				/*
 				 * cave: alen (set by recvfrom()) may > salen

@@ -71,70 +71,70 @@ Fl_Window* create_form_ad1848() {
     { Fl_Group* o = ad1848_srcr = new Fl_Group(180, 150, 100, 120);
       o->align(FL_ALIGN_CENTER);
       { Fl_Box* o = new Fl_Box(180, 150, 100, 120);
-        o->box(FL_DOWN_BOX);
+	o->box(FL_DOWN_BOX);
       }
       { Fl_Check_Button* o = ad1848_srcr_line = new Fl_Check_Button(190, 180, 60, 20, "Line");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ad1848);
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ad1848);
       }
       { Fl_Check_Button* o = ad1848_srcr_aux1 = new Fl_Check_Button(190, 200, 60, 20, "Aux1");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ad1848);
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ad1848);
       }
       { Fl_Check_Button* o = ad1848_srcr_mic = new Fl_Check_Button(190, 220, 60, 20, "Mic");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ad1848);
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ad1848);
       }
       { Fl_Check_Button* o = ad1848_srcr_dac = new Fl_Check_Button(190, 240, 60, 20, "DAC");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ad1848);
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ad1848);
       }
       { Fl_Box* o = new Fl_Box(190, 160, 60, 20, "Right source");
-        o->box(FL_FLAT_BOX);
-        o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+	o->box(FL_FLAT_BOX);
+	o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
       }
       o->end();
     }
     { Fl_Group* o = ad1848_srcl = new Fl_Group(180, 20, 100, 120);
       o->align(FL_ALIGN_CENTER);
       { Fl_Box* o = new Fl_Box(180, 20, 100, 120);
-        o->box(FL_DOWN_BOX);
+	o->box(FL_DOWN_BOX);
       }
       { Fl_Box* o = new Fl_Box(190, 30, 60, 20, "Left source");
-        o->box(FL_FLAT_BOX);
-        o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+	o->box(FL_FLAT_BOX);
+	o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
       }
       { Fl_Check_Button* o = ad1848_srcl_line = new Fl_Check_Button(190, 50, 60, 20, "Line");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ad1848);
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ad1848);
       }
       { Fl_Check_Button* o = ad1848_srcl_aux1 = new Fl_Check_Button(190, 70, 60, 20, "Aux1");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ad1848);
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ad1848);
       }
       { Fl_Check_Button* o = ad1848_srcl_mic = new Fl_Check_Button(190, 90, 60, 20, "Mic");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ad1848);
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ad1848);
       }
       { Fl_Check_Button* o = ad1848_srcl_dac = new Fl_Check_Button(190, 110, 60, 20, "DAC");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ad1848);
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ad1848);
       }
       o->end();
     }
@@ -216,29 +216,29 @@ Fl_Window* create_form_ct1345() {
     { Fl_Group* o = ct1345_src = new Fl_Group(100, 20, 70, 100);
       o->align(FL_ALIGN_CENTER);
       { Fl_Box* o = new Fl_Box(100, 20, 70, 100);
-        o->box(FL_DOWN_BOX);
+	o->box(FL_DOWN_BOX);
       }
       { Fl_Check_Button* o = ct1345_src_mic = new Fl_Check_Button(110, 50, 50, 20, "Mic");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1345);
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1345);
       }
       { Fl_Check_Button* o = ct1345_src_cd = new Fl_Check_Button(110, 70, 50, 20, "CD");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1345);
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1345);
       }
       { Fl_Check_Button* o = ct1345_src_line = new Fl_Check_Button(110, 90, 50, 20, "Line");
-        o->type(102);
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1345);
+	o->type(102);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1345);
       }
       { Fl_Box* o = new Fl_Box(110, 30, 50, 20, "Source");
-        o->box(FL_FLAT_BOX);
-        o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+	o->box(FL_FLAT_BOX);
+	o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
       }
       o->end();
     }
@@ -342,92 +342,92 @@ Fl_Window* create_form_ct1745() {
     { Fl_Group* o = ct1745_srcl = new Fl_Group(180, 20, 110, 180);
       o->align(FL_ALIGN_CENTER);
       { Fl_Box* o = new Fl_Box(180, 20, 110, 180);
-        o->box(FL_DOWN_BOX);
+	o->box(FL_DOWN_BOX);
       }
       { Fl_Box* o = new Fl_Box(191, 29, 89, 18, "Left source");
-        o->box(FL_FLAT_BOX);
-        o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+	o->box(FL_FLAT_BOX);
+	o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
       }
       { Fl_Check_Button* o = ct1745_srcl_mic = new Fl_Check_Button(190, 50, 90, 20, "Mic");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcl_cdl = new Fl_Check_Button(190, 70, 90, 20, "CD left");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcl_cdr = new Fl_Check_Button(190, 90, 90, 20, "CD right");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcl_linel = new Fl_Check_Button(190, 110, 90, 20, "Line left");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcl_midil = new Fl_Check_Button(190, 150, 90, 20, "MIDI left");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcl_midir = new Fl_Check_Button(190, 170, 90, 20, "MIDI right");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcl_liner = new Fl_Check_Button(190, 130, 90, 20, "Line right");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       o->end();
     }
     { Fl_Group* o = ct1745_srcr = new Fl_Group(300, 20, 110, 180);
       o->align(FL_ALIGN_CENTER);
       { Fl_Box* o = new Fl_Box(300, 20, 110, 180);
-        o->box(FL_DOWN_BOX);
+	o->box(FL_DOWN_BOX);
       }
       { Fl_Box* o = new Fl_Box(311, 29, 89, 18, "Right source");
-        o->box(FL_FLAT_BOX);
-        o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+	o->box(FL_FLAT_BOX);
+	o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
       }
       { Fl_Check_Button* o = ct1745_srcr_mic = new Fl_Check_Button(310, 50, 90, 20, "Mic");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcr_cdl = new Fl_Check_Button(310, 70, 90, 20, "CD left");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcr_cdr = new Fl_Check_Button(310, 90, 90, 20, "CD right");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcr_linel = new Fl_Check_Button(310, 110, 90, 20, "Line left");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcr_midil = new Fl_Check_Button(310, 150, 90, 20, "MIDI left");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcr_midir = new Fl_Check_Button(310, 170, 90, 20, "MIDI right");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       { Fl_Check_Button* o = ct1745_srcr_liner = new Fl_Check_Button(310, 130, 90, 20, "Line right");
-        o->down_box(FL_DIAMOND_DOWN_BOX);
-        o->selection_color(3);
-        o->callback((Fl_Callback*)update_ct1745);
+	o->down_box(FL_DIAMOND_DOWN_BOX);
+	o->selection_color(3);
+	o->callback((Fl_Callback*)update_ct1745);
       }
       o->end();
     }

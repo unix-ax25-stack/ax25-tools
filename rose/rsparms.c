@@ -89,7 +89,7 @@ void nodes(int s, int argc, char *argv[])
 			exit(1);
 		}
 
-		while(fgets(buff,80,fn)) {
+		while (fgets(buff,80,fn)) {
 			args=sscanf(buff,"%10s %4s %*s %9s %9s %9s",address, rmask, neigh1, neigh2, neigh3);
 			if (strcmp(address,"address")==0)
 				continue;
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
 {
 	ax25_address rose_call;
 	int s = 0;
-	
+
 	if (argc == 1) {
 		fprintf(stderr, "usage: rsparms -call|-nodes|-version ...\n");
 		return 1;
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
 			perror("rsparms: socket");
 			return 1;
 		}
-		
+
 		if (ioctl(s, SIOCRSL2CALL, &rose_call) == -1) {
 			perror("rsparms: ioctl");
 			close(s);
@@ -251,8 +251,8 @@ int main(int argc, char *argv[])
 	}
 
 	fprintf(stderr, "usage: rsparms -call|-nodes|-version ...\n");
-	
+
 	close(s);
-	
+
 	return 1;
 }

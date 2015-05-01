@@ -30,13 +30,13 @@
 
 struct dest_struct dest_list[50];
 
-int dest_count = 0;
+int dest_count;
 
 int debug            = FALSE;
 int route_restrict   = FALSE;
 int logging          = FALSE;
 
-struct route_struct *first_route = NULL;
+struct route_struct *first_route;
 
 static struct mask_struct {
 	unsigned long int mask;
@@ -83,14 +83,14 @@ static void terminate(int sig)
 		syslog(LOG_INFO, "terminating on SIGTERM\n");
 		closelog();
 	}
-	
+
 	exit(0);
 }
 
 unsigned int mask2bits(unsigned long int mask)
 {
 	struct mask_struct *t;
-	
+
 	for (t = mask_table; t->mask != 0; t++)
 		if (mask == t->mask)
 			return t->bits;
@@ -101,7 +101,7 @@ unsigned int mask2bits(unsigned long int mask)
 unsigned long int bits2mask(unsigned int bits)
 {
 	struct mask_struct *t;
-	
+
 	for (t = mask_table; t->mask != 0; t++)
 		if (bits == t->bits)
 			return htonl(t->mask);
@@ -168,7 +168,7 @@ static int read_routes(void)
 
 	if (first_route != NULL) {
 		route = first_route;
-		
+
 		while (route != NULL) {
 			temp = route->next;
 			free(route);
@@ -177,7 +177,7 @@ static int read_routes(void)
 
 		first_route = NULL;
 	}
-	
+
 	if ((fp = fopen(PROC_IP_ROUTE_FILE, "r")) == NULL) {
 		if (logging)
 			syslog(LOG_ERR, "error cannot open %s\n", PROC_IP_ROUTE_FILE);
@@ -196,7 +196,7 @@ static int read_routes(void)
 		netmask        = mask2bits(hex2intrev(mask_addr));
 
 		network = inet_netof(address);
-		
+
 		if (network == 0 || network == 127) {
 			if (debug && logging)
 				syslog(LOG_DEBUG, "rejecting route to %s/%ld - should not be propogated\n", inet_ntoa(address), netmask);
@@ -225,9 +225,9 @@ static int read_routes(void)
 		route->next = first_route;
 		first_route = route;
 	}
-	
+
 	fclose(fp);
-	
+
 	return TRUE;
 }
 
@@ -236,12 +236,12 @@ static int load_dests(void)
 	struct hostent *host;
 	char buffer[255], *s;
 	FILE *fp;
-	
+
 	if ((fp = fopen(CONF_RIP98D_FILE, "r")) == NULL) {
 		fprintf(stderr, "rip98d: cannot open config file\n");
 		return FALSE;
 	}
-		
+
 	while (fgets(buffer, 255, fp) != NULL) {
 		if ((s = strchr(buffer, '\n')) != NULL) *s = '\0';
 
@@ -254,12 +254,12 @@ static int load_dests(void)
 		memcpy((char *)&dest_list[dest_count].dest_addr, host->h_addr, host->h_length);
 		dest_count++;
 	}
-	
+
 	fclose(fp);
 
 	if (dest_count == 0)
 		return FALSE;
-	
+
 	return TRUE;
 }
 
@@ -279,31 +279,31 @@ int main(int argc, char **argv)
 
 	while ((i = getopt(argc, argv, "dlrt:v")) != -1) {
 		switch (i) {
-			case 'd':
-				debug = TRUE;
-				break;
-			case 'l':
-				logging = TRUE;
-				break;
-			case 'r':
-				route_restrict = TRUE;
-				break; 
-			case 't':
-				interval = atoi(optarg) * 60;
-				if (interval < 60 || interval > 7200) {
-					fprintf(stderr, "rip98d: invalid time interval\n");
-					return 1;
-				}
-				break;
-			case 'v':
-				printf("rip98d: %s\n", VERSION);
-				return 0;
-			case ':':
+		case 'd':
+			debug = TRUE;
+			break;
+		case 'l':
+			logging = TRUE;
+			break;
+		case 'r':
+			route_restrict = TRUE;
+			break;
+		case 't':
+			interval = atoi(optarg) * 60;
+			if (interval < 60 || interval > 7200) {
 				fprintf(stderr, "rip98d: invalid time interval\n");
 				return 1;
-			case '?':
-				fprintf(stderr, "usage: rip98d [-d] [-l] [-r] [-t interval] [-v]\n");
-				return 1;
+			}
+			break;
+		case 'v':
+			printf("rip98d: %s\n", VERSION);
+			return 0;
+		case ':':
+			fprintf(stderr, "rip98d: invalid time interval\n");
+			return 1;
+		case '?':
+			fprintf(stderr, "usage: rip98d [-d] [-l] [-r] [-t interval] [-v]\n");
+			return 1;
 		}
 	}
 
@@ -317,7 +317,7 @@ int main(int argc, char **argv)
 	memset((char *)&loc_addr, 0, sizeof(loc_addr));
 	loc_addr.sin_family      = AF_INET;
 	loc_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	loc_addr.sin_port        = htons(RIP_PORT);	
+	loc_addr.sin_port        = htons(RIP_PORT);
 
 	if (bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr)) < 0) {
 		perror("rip98d: bind");
@@ -342,7 +342,7 @@ int main(int argc, char **argv)
 
 		timeout.tv_sec  = 60;
 		timeout.tv_usec = 0;
-	
+
 		select(s + 1, &fdset, NULL, NULL, &timeout);
 
 		if (!read_routes()) {

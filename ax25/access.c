@@ -32,7 +32,7 @@ static void char_to_hex(char *c, char *h, int n);
 int conv_rand(void)
 {
 	seed = (1103515245L * seed + 12345) & CONV_RAND_MAX;
-	return ((int) (seed & 077777));
+	return (int) (seed & 077777);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -46,7 +46,7 @@ void conv_randomize(void)
 
 int conv_random(int num, int base)
 {
-	return (((long) (conv_rand() * time(0)) & CONV_RAND_MAX) % num + base);
+	return ((long) (conv_rand() * time(0)) & CONV_RAND_MAX) % num + base;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -82,23 +82,23 @@ char *generate_rand_pw(int len)
 	if (len > PASSSIZE)
 		len = PASSSIZE;
 
-        for (i = 0; i < len; i++) {
-                j = conv_random(10+26*2, 0);
-                if (j < 10) {
-                        pass[i] = j + '0';
-                        continue;
-                }
-                j -= 10;
-                if (j < 26) {
-                        pass[i] = j + 'A';
+	for (i = 0; i < len; i++) {
+		j = conv_random(10+26*2, 0);
+		if (j < 10) {
+			pass[i] = j + '0';
 			continue;
-                }
-                j -= 26;
-                pass[i] = j + 'a';
-        }
-        pass[len] = 0;
+		}
+		j -= 10;
+		if (j < 26) {
+			pass[i] = j + 'A';
+			continue;
+		}
+		j -= 26;
+		pass[i] = j + 'a';
+	}
+	pass[len] = 0;
 
-        return pass;
+	return pass;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -178,28 +178,28 @@ void ask_pw_md5(char *prompt, char *pass_want, char *pw)
 
 void calc_md5_pw (const char *MD5prompt, const char *MD5pw, char *MD5result)
 {
-  MD5_CTX context;
-  short i, n, len;
-  char buffer[1024];
+	MD5_CTX context;
+	short i, n, len;
+	char buffer[1024];
 
-  strncpy(buffer, MD5prompt, 10);
-  buffer[10] = 0;
-  strcat(buffer, MD5pw);
+	strncpy(buffer, MD5prompt, 10);
+	buffer[10] = 0;
+	strcat(buffer, MD5pw);
 
-  MD5Init(&context);
+	MD5Init(&context);
 
-  len = strlen(buffer);
-  for (i= 0; i < len; i += 16) {
-    n = (len - i) > 16 ? 16 : (len - i);
-    MD5Update(&context, buffer+i, n);
-  }
+	len = strlen(buffer);
+	for (i= 0; i < len; i += 16) {
+		n = (len - i) > 16 ? 16 : (len - i);
+		MD5Update(&context, buffer+i, n);
+	}
 
-  MD5Final(&context);
+	MD5Final(&context);
 
-  MD5result[0] = '\0';
-  for (i = 0; i < 16; i++) {
-    MD5result[i] = context.digest[i];
-  }
+	MD5result[0] = '\0';
+	for (i = 0; i < 16; i++) {
+		MD5result[i] = context.digest[i];
+	}
 }
 
 /*--------------------------------------------------------------------------*/
@@ -214,14 +214,14 @@ void write_example_passwd(char *pwfile, char pwlocation, struct passwd *pw) {
 	close(i);
 	if ( ! (f = fopen(pwfile, "w")) )
 		return;
-	fprintf(f, "# %s Password file for axspawn\n", (pwlocation == SYSTEMPW ? "System" : "User")); 
+	fprintf(f, "# %s Password file for axspawn\n", (pwlocation == SYSTEMPW ? "System" : "User"));
 	if (pwlocation == SYSTEMPW) {
 		fprintf(f, "# disable user self-administered passwords in $HOME/.%s\n", PWFILE);
 		fprintf(f, "# with the line \"systempasswordonly\"\n");
 		fprintf(f, "# systempasswordonly\n");
 	}
 	fprintf(f, "# Examples (sys and md5 passwords may differ):\n");
-	fprintf(f, "# md5 standard (secure) - length: >= %d and <= %d characters\n", MINPWLEN_MD5, PASSSIZE); 
+	fprintf(f, "# md5 standard (secure) - length: >= %d and <= %d characters\n", MINPWLEN_MD5, PASSSIZE);
 	fprintf(f, "# %smd5:%s\n", (pwlocation == SYSTEMPW ? "username:" : ""), generate_rand_pw(MINPWLEN_MD5));
 	fprintf(f, "# sys/baycom standard (not very secure) - length: >= %d and <= %d characters\n", MINPWLEN_SYS, PASSSIZE);
 	fprintf(f, "# %ssys:%s\n", (pwlocation == SYSTEMPW ? "username:" : ""), generate_rand_pw(MINPWLEN_SYS));
@@ -357,7 +357,7 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 			for (p = pass; *p && !isspace(*p & 0xff); p++) ;
 			*p = 0;
 
-        		if ( (*pwtype & PW_MD5) && !Strcasecmp(p_buf, "md5") ) {
+			if ( (*pwtype & PW_MD5) && !Strcasecmp(p_buf, "md5") ) {
 				fclose(f);
 				*pwtype = PW_MD5;
 				goto found;
@@ -373,7 +373,7 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 		}
 	}
 found:
-	
+
 	if (!pass || !*pwtype)
 		goto end;
 
@@ -391,6 +391,6 @@ found:
 
 end:
 	*pwtype = (((*pwtype) & PW_CLEARTEXT) ? PW_CLEARTEXT : 0);
-	           /*         ^ may allow cleartext? - then cleartext, else deny */
+		   /*         ^ may allow cleartext? - then cleartext, else deny */
 	return 0;
 }

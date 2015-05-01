@@ -64,12 +64,12 @@ void nodes(int s, char *nodecall, char *op, char *ident, int quality, int count,
 		close(s);
 		exit(1);
 	}
-		
+
 	if (strcmp(ident, "*") != 0) {
 		for (p = ident, q = nr_node.mnemonic; *p != '\0'; p++, q++)
 			*q = toupper(*p);
 		*q = '\0';
-		
+
 		if (strspn(nr_node.mnemonic, "&#-_/ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") != strlen(nr_node.mnemonic)) {
 			fprintf(stderr, "nrparms: nodes: invalid ident %s\n", ident);
 			close(s);
@@ -101,7 +101,7 @@ void nodes(int s, char *nodecall, char *op, char *ident, int quality, int count,
 	}
 
 	strcpy(nr_node.device, dev);
-	
+
 	nr_node.quality   = quality;
 	nr_node.obs_count = count;
 
@@ -192,7 +192,7 @@ void routes(int s, char *port, char *nodecall, char *rest[])
 int main(int argc, char *argv[])
 {
 	int s;
-	
+
 	if (argc == 1) {
 		fprintf(stderr, "usage: nrparms -nodes|-routes|-version ...\n");
 		return 1;
@@ -202,12 +202,12 @@ int main(int argc, char *argv[])
 		printf("nrparms: %s\n", VERSION);
 		return 0;
 	}
-	
+
 	if ((s = socket(AF_NETROM, SOCK_SEQPACKET, 0)) < 0) {
 		perror("nrparms: socket");
 		return 1;
 	}
-	
+
 	if (strncmp(argv[1], "-n", 2) == 0) {
 		if (argc < 9) {
 			fprintf(stderr, nodes_usage);
@@ -231,8 +231,8 @@ int main(int argc, char *argv[])
 	}
 
 	fprintf(stderr, "usage: nrparms -nodes|-routes|-version ...\n");
-	
+
 	close(s);
-	
+
 	return 1;
 }

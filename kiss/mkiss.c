@@ -32,7 +32,7 @@
  * 1.06 23/11/96 Tomi Manninen - Added simple support for polled kiss.
  *
  * 1.07 12/24/97 Deti Fliegl - Added Flexnet/BayCom CRC mode with commandline
- * parameter -f    
+ * parameter -f
  *
  * 1.08 xx/xx/99 Tom Mazouch - Adjustable poll interval
  */
@@ -78,9 +78,9 @@
 static unsigned char ibuf[SIZE];	/* buffer for input operations	*/
 static unsigned char obuf[SIZE];	/* buffer for kiss_tx()		*/
 
-static int crc_errors		= 0;
-static int invalid_ports	= 0;
-static int return_polls		= 0;
+static int crc_errors;
+static int invalid_ports;
+static int return_polls	;
 
 static char *usage_string	= "usage: mkiss [-p interval] [-c] [-f] [-h] [-l] [-s speed] [-v] [-x <num_ptmx_devices>] ttyinterface pty ..\n";
 
@@ -89,7 +89,7 @@ static int dump_report		= FALSE;
 static int logging              = FALSE;
 static int crcflag		= FALSE;
 static int hwflag		= FALSE;
-static int pollspeed		= 0;
+static int pollspeed;
 
 /* CRC-stuff */
 typedef unsigned short int u16;
@@ -111,12 +111,12 @@ struct iface
 	unsigned long	rxbytes;	/* RX bytes count		*/
 	unsigned long	txbytes;	/* TX bytes count		*/
 	char		namepts[PATH_MAX];  /* name of the unix98 pts slaves, which
-				       * the client has to use */
+					 * the client has to use */
 };
 
-static struct iface *tty	= NULL;
-static struct iface *pty[16]	= { NULL };
-static int numptys		= 0;
+static struct iface *tty;
+static struct iface *pty[16];
+static int numptys;
 
 static void init_crc(void)
 {
@@ -143,7 +143,7 @@ static void init_crc(void)
 static int poll(int fd, int ports)
 {
 	char buffer[3];
-	static int port = 0;
+	static int port;
 
 	buffer[0] = FEND;
 	buffer[1] = POLL | (port << 4);
@@ -158,14 +158,14 @@ static int poll(int fd, int ports)
 }
 
 static int put_ubyte(unsigned char* s, u16* crc, unsigned char c, int usecrc)
-{ 
-  	int len = 1;
+{
+	int len = 1;
 
-  	if (c == FEND) { 
+	if (c == FEND) {
 		*s++ = FESC;
 		*s++ = TFEND;
 		len++;
-  	} else { 
+	} else {
 		*s++ = c;
 		if (c == FESC) {
 			*s++ = TFESC;
@@ -205,7 +205,7 @@ static int kiss_tx(int fd, int port, unsigned char *s, int len, int usecrc)
 	 */
 	*ptr++ = FEND;
 
-    	if (usecrc == FLEX_CRC) {
+	if (usecrc == FLEX_CRC) {
 		crc = 0xffff;
 		ptr += put_ubyte(ptr, &crc, CRCTYP, usecrc);
 		c = *s++;
@@ -214,12 +214,12 @@ static int kiss_tx(int fd, int port, unsigned char *s, int len, int usecrc)
 		c = (c & 0x0F) | (port << 4);
 		ptr += put_ubyte(ptr, &crc, c, usecrc);
 	}
-	
+
 	/*
 	 * For each byte in the packet, send the appropriate
 	 * character sequence, according to the SLIP protocol.
 	 */
-	for(i = 0; i < len - 1; i++)
+	for (i = 0; i < len - 1; i++)
 		ptr += put_ubyte(ptr, &crc, s[i], usecrc);
 
 	/*
@@ -238,7 +238,7 @@ static int kiss_tx(int fd, int port, unsigned char *s, int len, int usecrc)
 		}
 		break;
 	}
-	
+
 	*ptr++ = FEND;
 	return write(fd, obuf, ptr - obuf);
 }
@@ -255,7 +255,7 @@ static int kiss_rx(struct iface *ifp, unsigned char c, int usecrc)
 			len = 0;		/* ...drop frame	*/
 			ifp->errors++;
 		}
-		
+
 		if (len != 0) {
 			switch (usecrc) {
 			case G8BPQ_CRC:
@@ -334,7 +334,7 @@ static int kiss_rx(struct iface *ifp, unsigned char c, int usecrc)
 	*ifp->optr++ = c;
 
 	switch (usecrc) {
-	case G8BPQ_CRC:	
+	case G8BPQ_CRC:
 		ifp->crc ^= c;
 		break;
 	case FLEX_CRC:
@@ -393,7 +393,7 @@ static void report(void)
 	       crcflag == G8BPQ_CRC ? "en" : "dis");
 	syslog(LOG_INFO, "FLEX checksumming %sabled.",
 	       crcflag == FLEX_CRC ? "en" : "dis");
-	       
+
 	syslog(LOG_INFO, "polling %sabled.",
 	       pollspeed ? "en" : "dis");
 	if (pollspeed)
@@ -418,7 +418,6 @@ static void report(void)
 		       pty[i]->rxpackets, pty[i]->rxbytes,
 		       pty[i]->errors);
 	}
-	return;
 }
 
 int main(int argc, char *argv[])
@@ -445,13 +444,13 @@ int main(int argc, char *argv[])
 			hwflag = TRUE;
 			break;
 		case 'l':
-		        logging = TRUE;
-		        break;
+			logging = TRUE;
+			break;
 		case 'p':
 			pollspeed = atoi(optarg);
 			pollinterval.tv_sec = pollspeed / 10;
 			pollinterval.tv_usec = (pollspeed % 10) * 100000L;
-		        break;
+			break;
 		case 's':
 			speed = atoi(optarg);
 			break;
@@ -482,7 +481,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-        numptys = argc - optind - 1;
+	numptys = argc - optind - 1;
 	if ((numptys + ptmxdevices) > 16) {
 		fprintf(stderr, "mkiss: max 16 pty interfaces allowed.\n");
 		return 1;
