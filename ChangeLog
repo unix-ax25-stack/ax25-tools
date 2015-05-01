@@ -18,7 +18,7 @@ ax25-tools (0.0.10)
  -- Ralf Baechle DL5RB <ralf@linux-mips.org>  Sat, 6 Jun 2009 17:36:01 +0100
 
 ax25-tools (0.0.9)
-	* Fix for mkiss pid problem 
+	* Fix for mkiss pid problem
 	* Removed inline statesment in hdrvcomm.c
 	* Added remaining missing sys/time.h
 	* Netromd now uses PF_SOCKET
@@ -36,7 +36,7 @@ ax25-tools (0.0.8)
 	* netromd was printing raw callsigns, now use ax25_ntoa()
 	* synced dmascc_cfg to Klauss' latest
 
- -- Craig Small <csmall@small.dropbear.id.au>  
+ -- Craig Small <csmall@small.dropbear.id.au>
 
 ax25-tools (0.0.7)
 	* Fixed automake/autoconf stuff to sort out FLTK tools.
@@ -59,7 +59,7 @@ ax25-tools (0.0.5)
  -- Craig Small <csmall@small.dropbear.id.au>  Mon, 23 Aug 1999 12:41:12 +1000
 
 ax25-tools (0.0.4)
-	
+
 	* Changed kissattach so that it demands an IP address
 	* The hdlc stuff now has -i in it
 	* mheardd.c patch for old glibc headers

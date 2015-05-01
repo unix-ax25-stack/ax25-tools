@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 			return 1;
 		}
 		axconnect.fsa_digipeater[n].ax25_call[6] |= AX25_HBIT;
-		n++;		
+		n++;
 	}
 
 	/*
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	axconnect.fsa_digipeater[n].ax25_call[6] |= AX25_HBIT;
-	n++;		
+	n++;
 
 	/*
 	 *	And my local ROSE callsign.
@@ -198,26 +198,26 @@ int main(int argc, char **argv)
 	 */
 	if (connect(s, (struct sockaddr *)&axconnect, addrlen) != 0) {
 		switch (errno) {
-			case ECONNREFUSED:
-				strcpy(buffer, "*** Connection refused\r");
-				break;
-			case ENETUNREACH:
-				strcpy(buffer, "*** No known route\r");
-				break;
-			case EINTR:
-				strcpy(buffer, "*** Connection timed out\r");
-				break;
-			default:
-				sprintf(buffer, "ERROR: cannot connect to AX.25 callsign, %s\r", strerror(errno));
-				break;
+		case ECONNREFUSED:
+			strcpy(buffer, "*** Connection refused\r");
+			break;
+		case ENETUNREACH:
+			strcpy(buffer, "*** No known route\r");
+			break;
+		case EINTR:
+			strcpy(buffer, "*** Connection timed out\r");
+			break;
+		default:
+			sprintf(buffer, "ERROR: cannot connect to AX.25 callsign, %s\r", strerror(errno));
+			break;
 		}
 
 		close(s);
 
 		write(STDOUT_FILENO, buffer, strlen(buffer));
-		
+
 		sleep(20);
-		
+
 		return 0;
 	}
 
@@ -236,7 +236,7 @@ int main(int argc, char **argv)
 		FD_ZERO(&read_fd);
 		FD_SET(STDIN_FILENO, &read_fd);
 		FD_SET(s, &read_fd);
-		
+
 		select(s + 1, &read_fd, NULL, NULL, NULL);
 
 		if (FD_ISSET(s, &read_fd)) {

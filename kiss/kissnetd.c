@@ -8,7 +8,7 @@
  *
  * F1OAT 960804 - Frederic RIBLE
  */
- 
+
 #include <stdio.h>
 #define __USE_XOPEN
 #include <stdlib.h>
@@ -25,7 +25,7 @@
 #include <limits.h>
 
 static char *Version = "1.5";
-static int VerboseMode = 0;
+static int VerboseMode;
 static int MaxFrameSize = 512;
 
 #define REOPEN_TIMEOUT	30	/* try tio reopen every 10 s */
@@ -36,14 +36,14 @@ struct PortDescriptor {
 	unsigned char	*FrameBuffer;
 	int		BufferIndex;
 	time_t		TimeLastOpen;
-	char		namepts[PATH_MAX];  /* name of the unix98 pts slaves, which
-				       * the client has to use */
+	char		namepts[PATH_MAX];	/* name of the unix98 pts slaves, which
+						 * the client has to use */
 	int		is_active;
 };
 
 static struct PortDescriptor *PortList[FD_SETSIZE];
 
-static int NbPort = 0;
+static int NbPort;
 
 static void Usage(void)
 {
@@ -52,7 +52,7 @@ static void Usage(void)
 	fprintf(stderr, " -f size  : Set max frame size to size bytes (default 512)\n");
 	fprintf(stderr, " -p num   : Number of /dev/ptmx-master-devices has to open\n");
 	exit(1);
-} 
+}
 
 static void Banner(int Small)
 {
@@ -64,7 +64,7 @@ static void Banner(int Small)
 		printf("* Network broadcast between kiss ports *\n");
 		printf("*      ATEPRA FPAC/Linux Project       *\n");
 		printf("****************************************\n");
-		printf("*         kissnetd Version %-4s        *\n", Version); 
+		printf("*         kissnetd Version %-4s        *\n", Version);
 		printf("*        by Frederic RIBLE F1OAT       *\n");
 		printf("****************************************\n");
 	}
@@ -73,23 +73,23 @@ static void Banner(int Small)
 static void NewPort(char *Name)
 {
 	struct PortDescriptor *MyPort;
-	
+
 	if (VerboseMode) {
 		printf("Opening port %s\n", Name);
 	}
-	
+
 	if (NbPort == FD_SETSIZE) {
 		fprintf(stderr, "Cannot handle %s : too many ports\n", Name);
 		exit(1);
 	}
-	
+
 	MyPort = calloc(sizeof(struct PortDescriptor), 1);
 	if (MyPort) MyPort->FrameBuffer = calloc(sizeof (unsigned char), MaxFrameSize);
 	if (!MyPort || !MyPort->FrameBuffer) {
 		perror("cannot allocate port descriptor");
 		exit(1);
 	}
-	
+
 	strncpy(MyPort->Name, Name, PATH_MAX-1);
 	MyPort->Name[PATH_MAX-1] = '\0';
 	MyPort->Fd = -1;
@@ -104,17 +104,17 @@ static void ReopenPort(int PortNumber)
 {
 	char MyString[80];
 	PortList[PortNumber]->TimeLastOpen = time(NULL);
-		
+
 	if (VerboseMode) {
 		printf("Reopening port %d\n", PortNumber);
 	}
-	
+
 	if (PortList[PortNumber]->namepts[0] == '\0') {
-		
+
 		syslog(LOG_WARNING, "kissnetd : Opening port %s\n", PortList[PortNumber]->Name);
 		PortList[PortNumber]->Fd = open(PortList[PortNumber]->Name, O_RDWR | O_NONBLOCK);
 		if (PortList[PortNumber]->Fd < 0) {
-			syslog(LOG_WARNING, "kissnetd : Error opening port %s : %s\n", 
+			syslog(LOG_WARNING, "kissnetd : Error opening port %s : %s\n",
 				PortList[PortNumber]->Name, strerror(errno));
 			if (VerboseMode) {
 				sprintf(MyString, "cannot reopen %s", PortList[PortNumber]->Name);
@@ -128,7 +128,7 @@ static void ReopenPort(int PortNumber)
 			/* get name of pts-device */
 			if ((npts = ptsname(PortList[PortNumber]->Fd)) == NULL) {
 				sprintf(MyString, "Cannot get name of pts-device.\n");
-				syslog(LOG_WARNING, "kissnetd : Cannot get name of pts-device\n"); 
+				syslog(LOG_WARNING, "kissnetd : Cannot get name of pts-device\n");
 				exit(1);
 			}
 			strncpy(PortList[PortNumber]->namepts, npts, PATH_MAX-1);
@@ -144,16 +144,16 @@ static void ReopenPort(int PortNumber)
 		}
 	} else {
 		if (PortList[PortNumber]->Fd == -1) {
-			syslog(LOG_WARNING, "kissnetd : Cannot reopen port ptmx (slave %s) : not supported by ptmx-device\n", 
-		       	PortList[PortNumber]->namepts);
+			syslog(LOG_WARNING, "kissnetd : Cannot reopen port ptmx (slave %s) : not supported by ptmx-device\n",
+			PortList[PortNumber]->namepts);
 			if (VerboseMode) {
 				sprintf(MyString, "cannot reopen ptmx (slave %s).", PortList[PortNumber]->namepts);
 				perror(MyString);
 			}
 			return;
 		}
-		syslog(LOG_WARNING, "kissnetd : Trying to poll port ptmx (slave %s).\n", 
-		       	PortList[PortNumber]->namepts);
+		syslog(LOG_WARNING, "kissnetd : Trying to poll port ptmx (slave %s).\n",
+			PortList[PortNumber]->namepts);
 		PortList[PortNumber]->is_active = 1;
 	}
 }
@@ -161,14 +161,14 @@ static void ReopenPort(int PortNumber)
 static void TickReopen(void)
 {
 	int i;
-	static int wrote_info = 0;
+	static int wrote_info;
 	time_t CurrentTime = time(NULL);
-	
+
 	for (i=0; i<NbPort; i++) {
 		if (PortList[i]->Fd >= 0 &&  PortList[i]->is_active == 1) continue;
 		if ( (CurrentTime - PortList[i]->TimeLastOpen) > REOPEN_TIMEOUT ) ReopenPort(i);
 	}
-	
+
 	if (!wrote_info) {
 		for (i=0; i<NbPort; i++) {
 			if (PortList[i]->namepts[0] != '\0') {
@@ -197,37 +197,37 @@ static void Broadcast(int InputPort)
 {
 	int i;
 	int rc;
-	
+
 	/* Broadcast only info frames */
-	
+
 	if (PortList[InputPort]->FrameBuffer[1] != 0x00 && \
 	    PortList[InputPort]->FrameBuffer[1] != 0x20 && \
 	    PortList[InputPort]->FrameBuffer[1] != 0x80)
 		return;
-	
+
 	for (i=0; i<NbPort; i++) {
 		int offset = 0;
 		if (i == InputPort) continue;
 		if (PortList[i]->Fd < 0 || PortList[i]->is_active == 0) continue;
 again:
-		rc = write(PortList[i]->Fd, 
-			   PortList[InputPort]->FrameBuffer+offset, 
+		rc = write(PortList[i]->Fd,
+			   PortList[InputPort]->FrameBuffer+offset,
 			   PortList[InputPort]->BufferIndex-offset);
 		if (rc < 0) {
 			if (errno == EAGAIN) {
 				if (PortList[i]->namepts[0] == '\0')
-					syslog(LOG_WARNING, "kissnetd : write buffer full on port %s. dropping frame. %s", 
+					syslog(LOG_WARNING, "kissnetd : write buffer full on port %s. dropping frame. %s",
 						PortList[i]->Name, strerror(errno));
 				else
-					syslog(LOG_WARNING, "kissnetd : write buffer full on ptmx port %s. dropping frame. %s", 
+					syslog(LOG_WARNING, "kissnetd : write buffer full on ptmx port %s. dropping frame. %s",
 						PortList[i]->namepts, strerror(errno));
 				continue;
 			}
 			if (PortList[i]->namepts[0] == '\0')
-				syslog(LOG_WARNING, "kissnetd : Error writing to port %s : %s\n", 
+				syslog(LOG_WARNING, "kissnetd : Error writing to port %s : %s\n",
 					PortList[i]->Name, strerror(errno));
 			else
-				syslog(LOG_WARNING, "kissnetd : Error writing to port ptmx (slave %s) : %s\n", 
+				syslog(LOG_WARNING, "kissnetd : Error writing to port ptmx (slave %s) : %s\n",
 					PortList[i]->namepts, strerror(errno));
 			if (VerboseMode) perror("write");
 			PortList[i]->is_active = 0;
@@ -241,7 +241,7 @@ again:
 			printf("Sending %d bytes on port %d : rc=%d\n",
 				PortList[InputPort]->BufferIndex,
 				i, rc);
-		}	   
+		}
 		if (rc < PortList[InputPort]->BufferIndex-offset) {
 			offset += rc;
 			goto again;
@@ -255,7 +255,7 @@ static void ProcessInput(int PortNumber)
 	int Length;
 	int i;
 	struct PortDescriptor *MyPort = PortList[PortNumber];
-	
+
 	Length = read(MyPort->Fd, MyBuffer, sizeof(MyBuffer));
 	if (VerboseMode) {
 		printf("Read port %d : rc=%d\n", PortNumber, Length);
@@ -265,10 +265,10 @@ static void ProcessInput(int PortNumber)
 		if (errno == EAGAIN)
 			return;
 		if (MyPort->namepts[0] == '\0')
-			syslog(LOG_WARNING, "kissnetd : Error reading from port %s : %s\n", 
+			syslog(LOG_WARNING, "kissnetd : Error reading from port %s : %s\n",
 				PortList[PortNumber]->Name, strerror(errno));
 		else
-			syslog(LOG_WARNING, "kissnetd : Error reading from port ptmx (slave %s) : %s\n", 
+			syslog(LOG_WARNING, "kissnetd : Error reading from port ptmx (slave %s) : %s\n",
 				PortList[PortNumber]->namepts, strerror(errno));
 		if (VerboseMode) perror("read");
 		MyPort->is_active = 0;
@@ -285,11 +285,11 @@ static void ProcessInput(int PortNumber)
 				MyPort->BufferIndex = 1;
 			}
 		}
-		else {		
+		else {
 			MyPort->FrameBuffer[MyPort->BufferIndex++] = MyBuffer[i];
 			if (MyBuffer[i] == 0xC0) {
 				Broadcast(PortNumber);
-				MyPort->BufferIndex = 1; 
+				MyPort->BufferIndex = 1;
 			}
 		}
 	}
@@ -300,19 +300,19 @@ static void ProcessPortList(void)
 	static fd_set MyFdSet;
 	int i, rc;
 	struct timeval Timeout;
-	
+
 	Timeout.tv_sec = 1;
 	Timeout.tv_usec = 0;
-	
+
 	FD_ZERO(&MyFdSet);
 	for (i=0; i<NbPort; i++) {
 		if (PortList[i]->Fd >= 0 && PortList[i]->is_active) FD_SET(PortList[i]->Fd, &MyFdSet);
 	}
 	rc = select(FD_SETSIZE, &MyFdSet, NULL, NULL, &Timeout);
-	
+
 	if (VerboseMode) printf("select : rc=%d\n", rc);
 	if (!rc ) TickReopen();
-	
+
 	if (rc > 0) {
 		for (i=0; i<NbPort && rc; i++) {
 			if (PortList[i]->Fd < 0) continue;
@@ -321,7 +321,7 @@ static void ProcessPortList(void)
 				rc--;
 			}
 		}
-	}	
+	}
 }
 
 static void ProcessArgv(int argc, char *argv[])
@@ -329,7 +329,7 @@ static void ProcessArgv(int argc, char *argv[])
 	int opt;
 	int i=0;
 	int ptmxdevices = 0;
-	
+
 	while ((opt = getopt(argc, argv, "vf:p:")) != -1) {
 		switch (opt) {
 		case 'v':
@@ -353,7 +353,7 @@ static void ProcessArgv(int argc, char *argv[])
 			exit(1);
 		}
 	}
-		
+
 	while (optind < argc)
 		NewPort(argv[optind++]);
 
@@ -364,7 +364,7 @@ static void ProcessArgv(int argc, char *argv[])
 }
 
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
 	if (argc < 2) {
 		Banner(0);
@@ -373,8 +373,8 @@ int main(int argc, char *argv[])
 	else {
 		Banner(1);
 	}
-	
+
 	ProcessArgv(argc, argv);
 	while (1) ProcessPortList();
-	return 0;	
+	return 0;
 }

@@ -1,4 +1,4 @@
-/* Hey Emacs! this is -*- linux-c -*- 
+/* Hey Emacs! this is -*- linux-c -*-
  * from /usr/src/linux/Documentation/CodingStyle
  *
  * m6pack.c
@@ -67,7 +67,7 @@ typedef enum {data, command} frame_t;
 static __u8 ibuf[SIZE];	/* buffer for input operations */
 static __u8 obuf[SIZE];	/* buffer for sixpack_tx() */
 
-static int invalid_ports = 0;
+static int invalid_ports;
 
 static char *usage_string = "usage: m6pack [-l] [-s speed] [-x num_ptmx_devices] [-v] tyinterface pty ..\n";
 
@@ -95,7 +95,7 @@ struct iface
 	unsigned long	rxbytes;	/* RX bytes count		*/
 	unsigned long	txbytes;	/* TX bytes count		*/
 	char		namepts[PATH_MAX];  /* name of the unix98 pts slaves, which
-				       * the client has to use */
+					 * the client has to use */
 };
 
 #define PTY_ID_TTY (-1)
@@ -152,7 +152,7 @@ static int sixpack_rx(struct iface *ifp, __u8 c, __u8 *tnc_addr, frame_t *type)
 {
 	int i, len;
 	__u8 checksum;
-	
+
 	/* Is it a data octect?
 	 */
 	if (SIXP_IS_DATA(c)) {
@@ -164,20 +164,20 @@ static int sixpack_rx(struct iface *ifp, __u8 c, __u8 *tnc_addr, frame_t *type)
 			*ifp->optr = (c & 0x3F);
 			break;
 		case 1:
-			*ifp->optr++ |= (c & 0x30) << 2; 
+			*ifp->optr++ |= (c & 0x30) << 2;
 			*ifp->optr = (c & 0x0F);
 			break;
 		case 2:
-			*ifp->optr++ |= (c & 0x3C) << 2; 
+			*ifp->optr++ |= (c & 0x3C) << 2;
 			*ifp->optr = (c & 0x03);
 			break;
 		default:
-			*ifp->optr++ |= (c & 0x3F) << 2; 
+			*ifp->optr++ |= (c & 0x3F) << 2;
 		}
 		ifp->sixp_cnt++;
 		return 0;
 	}
-	
+
 	/* Nope, it's a command octect. See which kind of command.
 	 * Anything but a SEOF command is a one-octect command, so
 	 * process it immediately and return.
@@ -222,7 +222,7 @@ static int sixpack_rx(struct iface *ifp, __u8 c, __u8 *tnc_addr, frame_t *type)
 		*type = command;
 		return 1;
 	}
-	
+
 	/* We're dealing with a SEOF command.
 	 */
 	len = ifp->optr - ifp->databuf;
@@ -234,9 +234,9 @@ static int sixpack_rx(struct iface *ifp, __u8 c, __u8 *tnc_addr, frame_t *type)
 			 */
 			goto error_reset_state;
 		}
-		
+
 		/* Now that we've decoded 6PACK octects,
-		 * check the checksum of the frame. 
+		 * check the checksum of the frame.
 		 */
 		checksum = 0;
 		for (i = 0; i < len; i++) {
@@ -247,13 +247,13 @@ static int sixpack_rx(struct iface *ifp, __u8 c, __u8 *tnc_addr, frame_t *type)
 		 */
 		*tnc_addr = SIXP_ADDR(ifp->seof);
 		checksum += *tnc_addr;
-		
+
 		if (checksum != SIXP_CHKSUM) {
 			/* Signal error and reset state.
 			 */
 			goto error_reset_state;
 		}
-		
+
 		/* Now remove checksum from the frame (this makes
 		 * sixpack_tx easier).
 		 */
@@ -271,8 +271,8 @@ static int sixpack_rx(struct iface *ifp, __u8 c, __u8 *tnc_addr, frame_t *type)
 	ifp->seof = c;
 	ifp->sixp_cnt = 0;
 	ifp->decod_cnt = 0;
-	return len;  
-	
+	return len;
+
  error_reset_state:
 	ifp->errors++;
 	ifp->optr = ifp->databuf;
@@ -345,7 +345,7 @@ static void sixpack_tx(int fd, __u8 tnc_addr, __u8 *ibuf, int len, frame_t type)
 
 	count = ptr - obuf;
 	written = 0;
-	ptr = obuf; 
+	ptr = obuf;
 	while (count > 0) {
 		written = write (fd, ptr, count);
 		count -= written;
@@ -356,16 +356,16 @@ static void sixpack_tx(int fd, __u8 tnc_addr, __u8 *ibuf, int len, frame_t type)
 static void sigterm_handler(int sig)
 {
 	int i;
-	
+
 	if (logging) {
 		syslog(LOG_INFO, "terminating on SIGTERM\n");
 		closelog();
 	}
-	
+
 	tty_unlock(tty->name);
 	close(tty->fd);
 	free(tty);
-	
+
 	for (i = 0; i < numptys; i++) {
 		tty_unlock(pty[i]->name);
 		close(pty[i]->fd);
@@ -408,7 +408,6 @@ static void report(struct iface *tty, struct iface **pty, int numptys)
 		       pty[i]->rxpackets, pty[i]->rxbytes,
 		       pty[i]->errors);
 	}
-	return;
 }
 
 int main(int argc, char *argv[])
@@ -459,7 +458,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-        numptys = argc - optind - 1;
+	numptys = argc - optind - 1;
 
 	if (numptys + ptmxdevices > MAX_PTYS) {
 		fprintf(stderr, "m6pack: max %d pty interfaces allowed.\n",
@@ -620,7 +619,7 @@ int main(int argc, char *argv[])
 		 * A character has arrived on the ttyinterface.
 		 */
 		if (FD_ISSET(tty->fd, &readfd)) {
-			if ((size = read(tty->fd, ibuf, SIZE)) < 0 
+			if ((size = read(tty->fd, ibuf, SIZE)) < 0
 			    && errno != EINTR) {
 				if (logging)
 					syslog(LOG_ERR, "tty->fd: %m");
@@ -633,8 +632,8 @@ int main(int argc, char *argv[])
 					if (tnc_addr <= numptys) {
 						sixpack_tx(pty[tnc_addr]->fd,
 							   0,
-							   (type == data) ? 
-							   tty->databuf : 
+							   (type == data) ?
+							   tty->databuf :
 							   tty->cmdbuf,
 							   len,
 							   type);

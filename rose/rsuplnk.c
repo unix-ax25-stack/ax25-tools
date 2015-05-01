@@ -102,21 +102,21 @@ int main(int argc, char **argv)
 
 	for (n = 0; n < ax25peer.fsa_ax25.sax25_ndigis; n++) {
 		addr = ax25_ntoa(&ax25peer.fsa_digipeater[n]);
-		
+
 		if (strspn(addr, "0123456789-") == strlen(addr)) {
 			if ((p = strchr(addr, '-')) != NULL)
 				*p = '\0';
 			switch (strlen(addr)) {
-				case 4:
-					memcpy(rose_address + 0, addr, 4);
-					dnicindex = n;
-					break;
-				case 6:
-					memcpy(rose_address + 4, addr, 6);
-					addrindex = n;
-					break;
-				default:
-					break;
+			case 4:
+				memcpy(rose_address + 0, addr, 4);
+				dnicindex = n;
+				break;
+			case 6:
+				memcpy(rose_address + 4, addr, 6);
+				addrindex = n;
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -208,18 +208,18 @@ int main(int argc, char **argv)
 	 */
 	if (connect(s, (struct sockaddr *)&roseconnect, addrlen) != 0) {
 		switch (errno) {
-			case ECONNREFUSED:
-				strcpy(buffer, "*** Disconnected - 0100 - Number Busy\r");
-				break;
-			case ENETUNREACH:
-				strcpy(buffer, "*** Disconnected - 0D00 - Not Obtainable\r");
-				break;
-			case EINTR:
-				strcpy(buffer, "*** Disconnected - 3900 - Ship Absent\r");
-				break;
-			default:
-				sprintf(buffer, "*** Disconnected - %d - %s\r", errno, strerror(errno));
-				break;
+		case ECONNREFUSED:
+			strcpy(buffer, "*** Disconnected - 0100 - Number Busy\r");
+			break;
+		case ENETUNREACH:
+			strcpy(buffer, "*** Disconnected - 0D00 - Not Obtainable\r");
+			break;
+		case EINTR:
+			strcpy(buffer, "*** Disconnected - 3900 - Ship Absent\r");
+			break;
+		default:
+			sprintf(buffer, "*** Disconnected - %d - %s\r", errno, strerror(errno));
+			break;
 		}
 
 		close(s);
@@ -249,7 +249,7 @@ int main(int argc, char **argv)
 		FD_ZERO(&read_fd);
 		FD_SET(STDIN_FILENO, &read_fd);
 		FD_SET(s, &read_fd);
-		
+
 		select(s + 1, &read_fd, NULL, NULL, NULL);
 
 		if (FD_ISSET(s, &read_fd)) {

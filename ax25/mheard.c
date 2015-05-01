@@ -35,23 +35,23 @@ static char *types[] = {
 	"UI",
 	"????"};
 
-static struct PortRecord *PortList = NULL;
+static struct PortRecord *PortList;
 
 static void PrintHeader(int data)
 {
 	switch (data) {
-		case 0:
-			printf("Callsign  Port Packets   Last Heard\n");
-			break;
-		case 1:
-			printf("Callsign                                                              Port\n");
-			break;
-		case 2:
-			printf("Callsign  Port      #I    #S    #U  First Heard          Last Heard\n");
-			break;
-		case 3:
-			printf("Callsign  Port Packets  Type  PIDs\n");
-			break;
+	case 0:
+		printf("Callsign  Port Packets   Last Heard\n");
+		break;
+	case 1:
+		printf("Callsign                                                              Port\n");
+		break;
+	case 2:
+		printf("Callsign  Port      #I    #S    #U  First Heard          Last Heard\n");
+		break;
+	case 3:
+		printf("Callsign  Port Packets  Type  PIDs\n");
+		break;
 	}
 }
 
@@ -62,81 +62,81 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 	int i;
 
 	switch (data) {
-		case 0:
-			strcpy(lh, ctime(&pr->entry.last_heard));
-			lh[19] = 0;
-			call =  ax25_ntoa(&pr->entry.from_call);
-			if ((s = strstr(call, "-0")) != NULL)
-				*s = '\0';
-			printf("%-10s %-5s %5d   %s\n",
-				call, pr->entry.portname, pr->entry.count, lh);
-			break;
-		case 1:
-			buffer[0] = '\0';
-			call = ax25_ntoa(&pr->entry.from_call);
+	case 0:
+		strcpy(lh, ctime(&pr->entry.last_heard));
+		lh[19] = 0;
+		call =  ax25_ntoa(&pr->entry.from_call);
+		if ((s = strstr(call, "-0")) != NULL)
+			*s = '\0';
+		printf("%-10s %-5s %5d   %s\n",
+			call, pr->entry.portname, pr->entry.count, lh);
+		break;
+	case 1:
+		buffer[0] = '\0';
+		call = ax25_ntoa(&pr->entry.from_call);
+		if ((s = strstr(call, "-0")) != NULL)
+			*s = '\0';
+		strcat(buffer, call);
+		call = ax25_ntoa(&pr->entry.to_call);
+		if ((s = strstr(call, "-0")) != NULL)
+			*s = '\0';
+		strcat(buffer, ">");
+		strcat(buffer, call);
+		for (i = 0; i < pr->entry.ndigis && i < 4; i++) {
+			strcat(buffer, ",");
+			call = ax25_ntoa(&pr->entry.digis[i]);
 			if ((s = strstr(call, "-0")) != NULL)
 				*s = '\0';
 			strcat(buffer, call);
-			call = ax25_ntoa(&pr->entry.to_call);
-			if ((s = strstr(call, "-0")) != NULL)
-				*s = '\0';
-			strcat(buffer, ">");
-			strcat(buffer, call);
-			for (i = 0; i < pr->entry.ndigis && i < 4; i++) {
-				strcat(buffer, ",");
-				call = ax25_ntoa(&pr->entry.digis[i]);
-				if ((s = strstr(call, "-0")) != NULL)
-					*s = '\0';
-				strcat(buffer, call);
-			}
-			if (pr->entry.ndigis >= 4)
-				strcat(buffer, ",...");
-			printf("%-70s %-5s\n",
-				buffer, pr->entry.portname);
-			break;
-		case 2:
-			strcpy(lh, ctime(&pr->entry.last_heard));
-			lh[19] = 0;
-			strcpy(fh, ctime(&pr->entry.first_heard));
-			fh[19] = 0;
-			call = ax25_ntoa(&pr->entry.from_call);
-			if ((s = strstr(call, "-0")) != NULL)
-				*s = '\0';
-			printf("%-10s %-5s %5d %5d %5d  %s  %s\n",
-				call, pr->entry.portname, pr->entry.iframes, pr->entry.sframes, pr->entry.uframes, fh, lh);
-			break;
-		case 3:
-			call = ax25_ntoa(&pr->entry.from_call);
-			if ((s = strstr(call, "-0")) != NULL)
-				*s = '\0';
-			printf("%-10s %-5s %5d %5s ",
-				call, pr->entry.portname, pr->entry.count, types[pr->entry.type]);
-			if (pr->entry.mode & MHEARD_MODE_ARP)
-				printf(" ARP");
-			if (pr->entry.mode & MHEARD_MODE_FLEXNET)
-				printf(" FlexNet");
-			if (pr->entry.mode & MHEARD_MODE_IP_DG)
-				printf(" IP-DG");
-			if (pr->entry.mode & MHEARD_MODE_IP_VC)
-				printf(" IP-VC");
-			if (pr->entry.mode & MHEARD_MODE_NETROM)
-				printf(" NET/ROM");
-			if (pr->entry.mode & MHEARD_MODE_ROSE)
-				printf(" Rose");
-			if (pr->entry.mode & MHEARD_MODE_SEGMENT)
-				printf(" Segment");
-			if (pr->entry.mode & MHEARD_MODE_TEXNET)
-				printf(" TexNet");
-			if (pr->entry.mode & MHEARD_MODE_TEXT)
-				printf(" Text");
-			if (pr->entry.mode & MHEARD_MODE_PSATFT)
-				printf(" PacsatFT");
-			if (pr->entry.mode & MHEARD_MODE_PSATPB)
-				printf(" PacsatPB");
-			if (pr->entry.mode & MHEARD_MODE_UNKNOWN)
-				printf(" Unknown");
-			printf("\n");
-			break;
+		}
+		if (pr->entry.ndigis >= 4)
+			strcat(buffer, ",...");
+		printf("%-70s %-5s\n",
+			buffer, pr->entry.portname);
+		break;
+	case 2:
+		strcpy(lh, ctime(&pr->entry.last_heard));
+		lh[19] = 0;
+		strcpy(fh, ctime(&pr->entry.first_heard));
+		fh[19] = 0;
+		call = ax25_ntoa(&pr->entry.from_call);
+		if ((s = strstr(call, "-0")) != NULL)
+			*s = '\0';
+		printf("%-10s %-5s %5d %5d %5d  %s  %s\n",
+			call, pr->entry.portname, pr->entry.iframes, pr->entry.sframes, pr->entry.uframes, fh, lh);
+		break;
+	case 3:
+		call = ax25_ntoa(&pr->entry.from_call);
+		if ((s = strstr(call, "-0")) != NULL)
+			*s = '\0';
+		printf("%-10s %-5s %5d %5s ",
+			call, pr->entry.portname, pr->entry.count, types[pr->entry.type]);
+		if (pr->entry.mode & MHEARD_MODE_ARP)
+			printf(" ARP");
+		if (pr->entry.mode & MHEARD_MODE_FLEXNET)
+			printf(" FlexNet");
+		if (pr->entry.mode & MHEARD_MODE_IP_DG)
+			printf(" IP-DG");
+		if (pr->entry.mode & MHEARD_MODE_IP_VC)
+			printf(" IP-VC");
+		if (pr->entry.mode & MHEARD_MODE_NETROM)
+			printf(" NET/ROM");
+		if (pr->entry.mode & MHEARD_MODE_ROSE)
+			printf(" Rose");
+		if (pr->entry.mode & MHEARD_MODE_SEGMENT)
+			printf(" Segment");
+		if (pr->entry.mode & MHEARD_MODE_TEXNET)
+			printf(" TexNet");
+		if (pr->entry.mode & MHEARD_MODE_TEXT)
+			printf(" Text");
+		if (pr->entry.mode & MHEARD_MODE_PSATFT)
+			printf(" PacsatFT");
+		if (pr->entry.mode & MHEARD_MODE_PSATPB)
+			printf(" PacsatPB");
+		if (pr->entry.mode & MHEARD_MODE_UNKNOWN)
+			printf(" Unknown");
+		printf("\n");
+		break;
 	}
 }
 
@@ -286,7 +286,7 @@ static void SortByFrame(void)
 		p = n;
 	}
 }
-		
+
 int main(int argc, char *argv[])
 {
 	int headers = TRUE;
@@ -296,64 +296,64 @@ int main(int argc, char *argv[])
 
 	while ((c = getopt(argc, argv, "d:no:v")) != -1) {
 		switch (c) {
-			case 'd':
-				switch (*optarg) {
-					case 'c':
-						data = 1;
-						break;
-					case 'm':
-						data = 3;
-						break;
-					case 'n':
-						data = 0;
-						break;
-					case 's':
-						data = 2;
-						break;
-					default:
-						fprintf(stderr, "mheard: invalid display type '%s'\n", optarg);
-						return 1;
-				}
+		case 'd':
+			switch (*optarg) {
+			case 'c':
+				data = 1;
+				break;
+			case 'm':
+				data = 3;
 				break;
 			case 'n':
-				headers = FALSE;
+				data = 0;
 				break;
-			case 'o':
-				switch (*optarg) {
-					case 'c':
-						mode = 2;
-						break;
-					case 'f':
-						mode = 3;
-						break;
-					case 'p':
-						mode = 1;
-						break;
-					case 't':
-						mode = 0;
-						break;
-					default:
-						fprintf(stderr, "mheard: invalid ordering type '%s'\n", optarg);
-						return 1;
-				}
+			case 's':
+				data = 2;
 				break;
-			case 'v':
-				printf("mheard: %s\n", VERSION);
-				return 0;
-			case '?':
-			case ':':
-				fprintf(stderr, "Usage: %s [-d cmns] [-n] [-o cfpt] [-v] [port ...]\n", argv[0]);
+			default:
+				fprintf(stderr, "mheard: invalid display type '%s'\n", optarg);
 				return 1;
+			}
+			break;
+		case 'n':
+			headers = FALSE;
+			break;
+		case 'o':
+			switch (*optarg) {
+			case 'c':
+				mode = 2;
+				break;
+			case 'f':
+				mode = 3;
+				break;
+			case 'p':
+				mode = 1;
+				break;
+			case 't':
+				mode = 0;
+				break;
+			default:
+				fprintf(stderr, "mheard: invalid ordering type '%s'\n", optarg);
+				return 1;
+			}
+			break;
+		case 'v':
+			printf("mheard: %s\n", VERSION);
+			return 0;
+		case '?':
+		case ':':
+			fprintf(stderr, "Usage: %s [-d cmns] [-n] [-o cfpt] [-v] [port ...]\n", argv[0]);
+			return 1;
 		}
 	}
-	
+
 	LoadPortData();
 
 	switch (mode) {
-		case 0: SortByTime();  break;
-		case 1: SortByPort();  break;
-		case 2: SortByCall();  break;
-		case 3: SortByFrame(); break;
+	case 0: SortByTime();  break;
+	case 1: SortByPort();  break;
+	case 2: SortByCall();  break;
+	case 3: SortByFrame(); break;
 	}
 
 	if (argc == optind) {

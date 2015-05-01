@@ -69,7 +69,7 @@ static const char *if_name = "bcsf0";
 static char *prg_name;
 static int fd = -1;
 static struct ifreq ifr_h;
-static int promisc = 0;
+static int promisc;
 static int afpacket = 1;
 static int msqid = -1;
 
@@ -130,7 +130,7 @@ int hdrvc_recvpacket(char *pkt, int maxlen)
 				}
 			} else {
 				struct sockaddr sa;
-			
+
 				strcpy(sa.sa_data, if_name);
 				sa.sa_family = AF_INET;
 				if (bind(fd, &sa, sizeof(sa)) < 0) {
@@ -196,7 +196,7 @@ void hdrvc_args(int *argc, char *argv[], const char *def_if)
 			if (i < ac)
 				memmove(argv+i, argv+i+2, (ac-i) * sizeof(void *));
 			i--;
-		} else 
+		} else
 #endif /* HDRVC_KERNEL */
 			if (!strcmp(argv[i], "-u")) {
 #ifdef HDRVC_KERNEL
@@ -229,24 +229,24 @@ void hdrvc_init(void)
 				close(fd);
 			afpacket = 0;
 			if ((fd = socket(PF_INET, SOCK_PACKET, htons(ETH_P_AX25))) < 0) {
-				fprintf(stderr, "%s: Error %s (%i), cannot open %s\n", prg_name, 
+				fprintf(stderr, "%s: Error %s (%i), cannot open %s\n", prg_name,
 					strerror(errno), errno, if_name);
 				exit(-1);
 			}
 			if (ioctl(fd, SIOCGIFFLAGS, &ifr_h) < 0) {
-				fprintf(stderr, "%s: Error %s (%i), cannot ioctl SIOCGIFFLAGS %s\n", prg_name, 
+				fprintf(stderr, "%s: Error %s (%i), cannot ioctl SIOCGIFFLAGS %s\n", prg_name,
 					strerror(errno), errno, if_name);
 				exit(-1);
 			}
 		}
 		strcpy(ifr.ifr_name, if_name);
 		if (ioctl(fd, SIOCGIFHWADDR, &ifr) < 0 ) {
-			fprintf(stderr, "%s: Error %s (%i), cannot ioctl SIOCGIFHWADDR %s\n", prg_name, 
+			fprintf(stderr, "%s: Error %s (%i), cannot ioctl SIOCGIFHWADDR %s\n", prg_name,
 				strerror(errno), errno, if_name);
 			exit(-1);
-                }
+		}
 		if (ifr.ifr_hwaddr.sa_family != ARPHRD_AX25) {
-			fprintf(stderr, "%s: Error, interface %s not AX25 (%i)\n", prg_name, 
+			fprintf(stderr, "%s: Error, interface %s not AX25 (%i)\n", prg_name,
 				if_name, ifr.ifr_hwaddr.sa_family);
 			exit(-1);
 		}
@@ -255,12 +255,12 @@ void hdrvc_init(void)
 #endif /* HDRVC_KERNEL */
 	k = ftok(if_name, USERSM_KEY_PROJ);
 	if (k == (key_t)-1) {
-		fprintf(stderr, "%s: Error %s (%i), cannot ftok on %s\n", prg_name, 
+		fprintf(stderr, "%s: Error %s (%i), cannot ftok on %s\n", prg_name,
 			strerror(errno), errno, if_name);
 		exit(-1);
 	}
 	if ((msqid = msgget(k, 0700)) < 0) {
-		fprintf(stderr, "%s: Error %s (%i), cannot msgget %d\n", prg_name, 
+		fprintf(stderr, "%s: Error %s (%i), cannot msgget %d\n", prg_name,
 			strerror(errno), errno, k);
 		exit(-1);
 	}
@@ -276,7 +276,7 @@ void hdrvc_sendmsg(struct usersmmsg *msg, int len)
 	}
 }
 
-int hdrvc_recvmsg(struct usersmmsg *msg, int maxlen, long type) 
+int hdrvc_recvmsg(struct usersmmsg *msg, int maxlen, long type)
 {
 	int len;
 
@@ -286,15 +286,15 @@ int hdrvc_recvmsg(struct usersmmsg *msg, int maxlen, long type)
 	}
 #if 0
 	for (;;) {
-		if ((len = msgrcv(msqid, (struct msgbuf *)msg, maxlen-sizeof(long), type, IPC_NOWAIT|MSG_NOERROR)) >= 0) 
+		if ((len = msgrcv(msqid, (struct msgbuf *)msg, maxlen-sizeof(long), type, IPC_NOWAIT|MSG_NOERROR)) >= 0)
 			return len+sizeof(long);
-		if (errno != ENOMSG) { 
+		if (errno != ENOMSG) {
 			perror("msgrcv");
 			exit(1);
 		}
 		usleep(250000);
 	}
-#endif 
+#endif
 	return len+sizeof(long);
 }
 
@@ -305,7 +305,7 @@ int hdrvc_recvmsg(struct usersmmsg *msg, int maxlen, long type)
 int hdrvc_hdlcdrv_ioctl(int cmd, struct hdlcdrv_ioctl *par)
 {
 	struct ifreq ifr = ifr_h;
-	
+
 	if (!kernel_mode) {
 		errno = EINVAL;
 		return -1;
@@ -320,7 +320,7 @@ int hdrvc_hdlcdrv_ioctl(int cmd, struct hdlcdrv_ioctl *par)
 int hdrvc_sm_ioctl(int cmd, struct sm_ioctl *par)
 {
 	struct ifreq ifr = ifr_h;
-	
+
 	if (!kernel_mode) {
 		errno = EINVAL;
 		return -1;
@@ -335,7 +335,7 @@ int hdrvc_sm_ioctl(int cmd, struct sm_ioctl *par)
 int hdrvc_baycom_ioctl(int cmd, struct baycom_ioctl *par)
 {
 	struct ifreq ifr = ifr_h;
-	
+
 	if (!kernel_mode) {
 		errno = EINVAL;
 		return -1;
@@ -410,11 +410,11 @@ int hdrvc_get_samples(void)
 {
 	int ret;
 	struct hdlcdrv_ioctl bi;
-	
+
 #ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_GETSAMPLES, &bi);
-		if (ret < 0) 
+		if (ret < 0)
 			return ret;
 		return bi.data.bits & 0xff;
 	}
@@ -429,11 +429,11 @@ int hdrvc_get_bits(void)
 {
 	int ret;
 	struct hdlcdrv_ioctl bi;
-	
+
 #ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_GETBITS, &bi);
-		if (ret < 0) 
+		if (ret < 0)
 			return ret;
 		return bi.data.bits & 0xff;
 	}
@@ -490,11 +490,11 @@ int hdrvc_set_channel_access_param(struct hdrvc_channel_params par)
 {
 	int ret;
 	struct usersmmsg msg;
-	
+
 #ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		struct hdlcdrv_ioctl hi;
-		
+
 		hi.data.cp.tx_delay = par.tx_delay;
 		hi.data.cp.tx_tail = par.tx_tail;
 		hi.data.cp.slottime = par.slottime;
@@ -513,7 +513,7 @@ int hdrvc_set_channel_access_param(struct hdrvc_channel_params par)
 	msg.data.cp.ppersist = par.ppersist;
 	msg.data.cp.fulldup = par.fulldup;
 	hdrvc_sendmsg(&msg, sizeof(msg.data.cp));
-	return 0;	
+	return 0;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -585,16 +585,16 @@ int hdrvc_get_channel_state(struct hdrvc_channel_state *st)
 
 /* ---------------------------------------------------------------------- */
 
-int hdrvc_diag2(unsigned int mode, unsigned int flags, short *data, 
+int hdrvc_diag2(unsigned int mode, unsigned int flags, short *data,
 		unsigned int maxdatalen, unsigned int *samplesperbit)
 {
 	int ret;
 	struct usersmmsg msg;
 	static unsigned int modeconvusersm[4] = {
-		USERSM_DIAGMODE_OFF, USERSM_DIAGMODE_INPUT, USERSM_DIAGMODE_DEMOD, 
+		USERSM_DIAGMODE_OFF, USERSM_DIAGMODE_INPUT, USERSM_DIAGMODE_DEMOD,
 		USERSM_DIAGMODE_CONSTELLATION
 	};
-	
+
 	if (mode > HDRVC_DIAGMODE_CONSTELLATION) {
 		errno = EINVAL;
 		return -1;

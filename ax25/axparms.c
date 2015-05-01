@@ -79,17 +79,17 @@ int routes(int s, int argc, char *argv[], ax25_address *callsign)
 					return 1;
 				}
 				switch (*argv[i]) {
-					case 'd':
-					case 'D':
-						ip_mode = 'D';
-						break;
-					case 'v':
-					case 'V':
-						ip_mode = 'V';
-						break;
-					default:
-						ip_mode = ' ';
-						break;
+				case 'd':
+				case 'D':
+					ip_mode = 'D';
+					break;
+				case 'v':
+				case 'V':
+					ip_mode = 'V';
+					break;
+				default:
+					ip_mode = ' ';
+					break;
 				}
 			} else {
 				if (ax25_aton_entry(argv[i], (char *)&ax25_route.digi_addr[j]) == -1)
@@ -103,18 +103,18 @@ int routes(int s, int argc, char *argv[], ax25_address *callsign)
 			perror("axparms: SIOCADDRT");
 			return 1;
 		}
-		
+
 		ax25_opt.port_addr = *callsign;
 		ax25_opt.dest_addr = ax25_route.dest_addr;
 		ax25_opt.cmd = AX25_SET_RT_IPMODE;
 		ax25_opt.arg = ip_mode;
-		
+
 		if (ioctl(s, SIOCAX25OPTRT, &ax25_opt) != 0) {
 			perror("axparms: SIOCAX25OPTRT");
 			return 1;
 		}
 	}
-	
+
 	if (strcmp(argv[2], "del") == 0) {
 		ax25_route.port_addr  = *callsign;
 		ax25_route.digi_count = 0;
@@ -150,14 +150,14 @@ int setifcall(int s, char *ifn, char *name)
 {
 	char call[7];
 	struct ifreq ifr;
-	
+
 	if (ax25_aton_entry(name, call) == -1)
 		return 1;
 
 	strcpy(ifr.ifr_name, ifn);
 	memcpy(ifr.ifr_hwaddr.sa_data, call, 7);
 	ifr.ifr_hwaddr.sa_family = AF_AX25;
-	
+
 	if (ioctl(s, SIOCSIFHWADDR, &ifr) != 0) {
 		perror("axparms: SIOCSIFHWADDR");
 		return 1;
@@ -174,7 +174,7 @@ int associate(int s, int argc, char *argv[])
 	int opt;
 	FILE *fp;
 
-	
+
 	if (strcmp(argv[2], "show") == 0) {
 		if (argc < 3) {
 			usageassoc();
@@ -239,7 +239,7 @@ int associate(int s, int argc, char *argv[])
 		usageassoc();
 		exit(1);
 	}
-	
+
 	if (ax25_aton_entry(argv[2], (char *)&sax25.sax25_call) == -1) {
 		fprintf(stderr, "axparms: associate: invalid callsign %s\n", argv[2]);
 		return 1;
@@ -260,7 +260,7 @@ int associate(int s, int argc, char *argv[])
 	}
 
 	sax25.sax25_uid = pw->pw_uid;
-		
+
 	if (ioctl(s, SIOCAX25ADDUID, &sax25) == -1) {
 		perror("axparms: SIOCAX25ADDUID");
 		return 1;
@@ -319,7 +319,7 @@ int forward(int s, int argc, char *argv[])
 		return 1;
 	}
 #else
-        fprintf(stderr, "axparms: Not compiled in with forwarding option.\n");
+	fprintf(stderr, "axparms: Not compiled in with forwarding option.\n");
 #endif /* HAVE_AX25_FWD_STRUCT */
 
 	return 0;
@@ -383,7 +383,7 @@ int main(int argc, char **argv)
 			usageroute();
 			return 1;
 		}
-		
+
 		if (strcmp(argv[2], "add") != 0 && strcmp(argv[2], "del") != 0 && strcmp(argv[2], "list") != 0) {
 			usageroute();
 			return 1;
@@ -393,7 +393,7 @@ int main(int argc, char **argv)
 			usageroute();
 			return 1;
 		}
-		
+
 		if (ax25_config_load_ports() == 0) {
 			fprintf(stderr, "axparms: no AX.25 port data configured\n");
 			return 1;
@@ -415,7 +415,7 @@ int main(int argc, char **argv)
 		n = routes(s, argc, argv, &callsign);
 
 		close(s);
-		
+
 		return n;
 	}
 
@@ -424,7 +424,7 @@ int main(int argc, char **argv)
 			usagesetcall();
 			return 1;
 		}
-	
+
 		if ((s = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 			perror("axparms: socket");
 			return 1;

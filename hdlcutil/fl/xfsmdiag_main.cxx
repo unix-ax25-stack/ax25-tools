@@ -53,12 +53,12 @@
 /* ---------------------------------------------------------------------- */
 
 static char *progname;
-static unsigned int drawflags = 0;
+static unsigned int drawflags;
 
 /* ---------------------------------------------------------------------- */
 
 scope::scope(int x, int y, int w, int h, const char *l)
-	: Fl_Box(x, y, w, h, l) 
+	: Fl_Box(x, y, w, h, l)
 {
 	box(FL_DOWN_FRAME);
 	X = x+3;
@@ -94,7 +94,7 @@ void scope::resize(int xx, int yy, int ww, int hh)
 void scope::draw()
 {
 	GC gc;
-        XGCValues gcv;
+	XGCValues gcv;
 
 	/* cannot use draw_box(); as it clears the whole window -> flicker */
 	/* from fl_boxtype.C, fl_down_frame */
@@ -178,17 +178,17 @@ void scope::mode(int dmode)
 void scope::clear(void)
 {
 	GC gc;
-        XGCValues gcv;
+	XGCValues gcv;
 
 	if (!pixmalloc)
 		return;
 	gcv.line_width = 1;
-        gcv.line_style = LineSolid;
+	gcv.line_style = LineSolid;
 	gcv.fill_style = FillSolid;
-        gc = XCreateGC(fl_display, pixmap, GCLineWidth | GCLineStyle | GCFillStyle, &gcv);
-        XSetState(fl_display, gc, col_background, col_background, GXcopy, AllPlanes);
+	gc = XCreateGC(fl_display, pixmap, GCLineWidth | GCLineStyle | GCFillStyle, &gcv);
+	XSetState(fl_display, gc, col_background, col_background, GXcopy, AllPlanes);
 	XFillRectangle(fl_display, pixmap, gc, 0, 0, W, H);
-        XFreeGC(fl_display, gc);
+	XFreeGC(fl_display, gc);
 	redraw();
 }
 
@@ -201,17 +201,17 @@ void scope::clear(void)
 void scope::drawdata(short data[], int len, int xm)
 {
 	int cnt;
-        GC gc;
-        XGCValues gcv;
+	GC gc;
+	XGCValues gcv;
 
 	mode();
-	if (!pixmalloc || (drawmode != HDRVC_DIAGMODE_CONSTELLATION && 
-			   drawmode != HDRVC_DIAGMODE_INPUT && 
+	if (!pixmalloc || (drawmode != HDRVC_DIAGMODE_CONSTELLATION &&
+			   drawmode != HDRVC_DIAGMODE_INPUT &&
 			   drawmode != HDRVC_DIAGMODE_DEMOD))
 		return;
 	gcv.line_width = 1;
-        gcv.line_style = LineSolid;
-        gc = XCreateGC(fl_display, pixmap, GCLineWidth | GCLineStyle, &gcv);
+	gcv.line_style = LineSolid;
+	gc = XCreateGC(fl_display, pixmap, GCLineWidth | GCLineStyle, &gcv);
 	if (drawmode == HDRVC_DIAGMODE_CONSTELLATION) {
 #define XCOORD(x) ((SHRT_MAX - (int)(x)) * W / USHRT_MAX)
 #define YCOORD(y) ((SHRT_MAX - (int)(y)) * H / USHRT_MAX)
@@ -241,7 +241,7 @@ void scope::drawdata(short data[], int len, int xm)
 #undef XCOORD
 #undef YCOORD
 	}
-        XFreeGC(fl_display, gc);
+	XFreeGC(fl_display, gc);
 	redraw();
 }
 
@@ -268,7 +268,7 @@ void cb_mode(Fl_Check_Button *, long which)
 	case 256:
 		drawflags ^= HDRVC_DIAGFLAG_DCDGATE;
 		break;
-		
+
 	case 0:
 		scdisp->mode(HDRVC_DIAGMODE_OFF);
 		drawflags = 0;
@@ -298,7 +298,7 @@ void cb_quit(Fl_Button *, long)
 {
 	struct sm_diag_data diag;
 	short data;
-	
+
 	diag.mode = HDRVC_DIAGMODE_OFF;
 	diag.flags = 0;
 	diag.datalen = 1;
@@ -330,7 +330,7 @@ void cb_timer(void *)
 	/*
 	 * draw scope
 	 */
-	if ((ret = hdrvc_diag2(scdisp->mode(), drawflags, data, sizeof(data) / sizeof(short), 
+	if ((ret = hdrvc_diag2(scdisp->mode(), drawflags, data, sizeof(data) / sizeof(short),
 			       &samplesperbit)) < 0) {
 		perror("hdrvc_diag2");
 		exit(1);
@@ -341,7 +341,7 @@ void cb_timer(void *)
 
 /* ---------------------------------------------------------------------- */
 
-static const char *usage_str = 
+static const char *usage_str =
 "[-i smif]\n"
 "  -i: specify the name of the baycom kernel driver interface\n\n";
 
@@ -349,7 +349,7 @@ static const char *usage_str =
 
 int main(int argc, char *argv[])
 {
-        int c, i;
+	int c, i;
 	int ret;
 	unsigned int ifflags;
 	char name[64];
@@ -396,13 +396,13 @@ int main(int argc, char *argv[])
 	if (ret < 0) {
 		perror("hdrvc_get_mode_name");
 		modename->hide();
-	} else 
+	} else
 		modename->value(name);
 	ret = hdrvc_get_driver_name(name, sizeof(name));
 	if (ret < 0) {
 		perror("hdrvc_get_driver_name");
 		drivername->hide();
-	} else 
+	} else
 		drivername->value(name);
 	Fl::add_timeout(0.1, cb_timer);
 	scopewindow->show();

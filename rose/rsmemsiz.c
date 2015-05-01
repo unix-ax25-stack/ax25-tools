@@ -54,7 +54,7 @@ static char buf[300];
 
 int uptime(double *uptime_secs, double *idle_secs) {
     double up=0, idle=0;
-    
+
     FILE_TO_BUF(UPTIME_FILE)
     if (sscanf(buf, "%lf %lf", &up, &idle) < 2) {
 	fprintf(stdout, "ERROR: Bad data in %s\r", UPTIME_FILE);
@@ -67,7 +67,7 @@ int uptime(double *uptime_secs, double *idle_secs) {
 
 int loadavg(double *av1, double *av5, double *av15) {
     double avg_1=0, avg_5=0, avg_15=0;
-    
+
     FILE_TO_BUF(LOADAVG_FILE)
     if (sscanf(buf, "%lf %lf %lf", &avg_1, &avg_5, &avg_15) < 3) {
 	fprintf(stdout, "ERROR: Bad data in %s\r", LOADAVG_FILE);
@@ -83,7 +83,7 @@ int loadavg(double *av1, double *av5, double *av15) {
    [ <label> ... ]				# header lines
    [ <label> ] <num> [ <num> ... ]		# table rows
    [ repeats of above line ]
-   
+
    Any lines with fewer <num>s than <label>s get trailing <num>s set to zero.
    The return value is a NULL terminated unsigned** which is the table of
    numbers without labels.  Convenient enumeration constants for the major and
@@ -96,35 +96,35 @@ int loadavg(double *av1, double *av5, double *av15) {
 #define MAX_COL 7
 
 unsigned** meminfo(void) {
-    static unsigned *row[MAX_ROW + 1];		/* row pointers */
-    static unsigned num[MAX_ROW * MAX_COL];	/* number storage */
-    char *p;
-    int i, j, k, l;
-    
-    FILE_TO_BUF(MEMINFO_FILE)
-    if (!row[0])				/* init ptrs 1st time through */
+	static unsigned *row[MAX_ROW + 1];	/* row pointers */
+	static unsigned num[MAX_ROW * MAX_COL];	/* number storage */
+	char *p;
+	int i, j, k, l;
+
+	FILE_TO_BUF(MEMINFO_FILE)
+	if (!row[0])				/* init ptrs 1st time through */
 	for (i=0; i < MAX_ROW; i++)		/* std column major order: */
-	    row[i] = num + MAX_COL*i;		/* A[i][j] = A + COLS*i + j */
-    p = buf;
-    for (i=0; i < MAX_ROW; i++)			/* zero unassigned fields */
-	for (j=0; j < MAX_COL; j++)
-	    row[i][j] = 0;
-    for (i=0; i < MAX_ROW && *p; i++) {		/* loop over rows */
-	while(*p && !isdigit(*p)) p++;		/* skip chars until a digit */
-	for (j=0; j < MAX_COL && *p; j++) {	/* scanf column-by-column */
-	    l = sscanf(p, "%u%n", row[i] + j, &k);
-	    p += k;				/* step over used buffer */
-	    if (*p == '\n' || l < 1)		/* end of line/buffer */
-		break;
-	}
-    }
+		row[i] = num + MAX_COL*i;	/* A[i][j] = A + COLS*i + j */
+	p = buf;
+	for (i=0; i < MAX_ROW; i++)		/* zero unassigned fields */
+		for (j=0; j < MAX_COL; j++)
+			row[i][j] = 0;
+	for (i=0; i < MAX_ROW && *p; i++) {	/* loop over rows */
+		while (*p && !isdigit(*p)) p++;	/* skip chars until a digit */
+		for (j=0; j < MAX_COL && *p; j++) {	/* scanf column-by-column */
+		l = sscanf(p, "%u%n", row[i] + j, &k);
+		p += k;				/* step over used buffer */
+		if (*p == '\n' || l < 1)	/* end of line/buffer */
+			break;
+		}
+    	}
 /*    row[i+1] = NULL;	terminate the row list, currently unnecessary */
-    return row;					/* NULL return ==> error */
+	return row;				/* NULL return ==> error */
 }
 
 
 /*
- * by Heikki Hannikainen <oh7lzb@sral.fi> 
+ * by Heikki Hannikainen <oh7lzb@sral.fi>
  * The following was mostly learnt from the procps package and the
  * gnu sh-utils (mainly uname).
  */
@@ -163,7 +163,7 @@ int main(int argc, char **argv)
 	upminutes = upminutes % 60;
 	fprintf(stdout, "Uptime:            ");
 
-  	if (updays)
+	if (updays)
 		fprintf(stdout, "%d day%s, ", updays, (updays != 1) ? "s" : "");
 
 	if (uphours)
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
 	fprintf(stdout, "%d minute%s\r", upminutes, (upminutes != 1) ? "s" : "");
 
 	loadavg(&av[0], &av[1], &av[2]);
-  	fprintf(stdout, "Load average:      %.2f, %.2f, %.2f\r", av[0], av[1], av[2]);
+	fprintf(stdout, "Load average:      %.2f, %.2f, %.2f\r", av[0], av[1], av[2]);
 
 	if (!(mem = meminfo()) || mem[meminfo_main][meminfo_total] == 0) {
 		/* cannot normalize mem usage */
@@ -180,10 +180,10 @@ int main(int argc, char **argv)
 		fprintf(stdout, "Memory:            %5d KB available, %5d KB used, %5d KB free\r",
 			mem[meminfo_main][meminfo_total]    >> 10,
 			(mem[meminfo_main][meminfo_used] -
-		 	mem[meminfo_main][meminfo_buffers] -
+			mem[meminfo_main][meminfo_buffers] -
 			mem[meminfo_total][meminfo_cached]) >> 10,
 			(mem[meminfo_main][meminfo_free] +
-		 	mem[meminfo_main][meminfo_buffers] +
+			mem[meminfo_main][meminfo_buffers] +
 			mem[meminfo_total][meminfo_cached]) >> 10);
 
 		fprintf(stdout, "Swap:              %5d KB available, %5d KB used, %5d KB free\r",

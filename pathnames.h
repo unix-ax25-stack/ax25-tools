@@ -24,5 +24,3 @@
 #define PROC_AX25_CALLS_FILE	"/proc/net/ax25_calls"
 #define PROC_NR_NEIGH_FILE	"/proc/net/nr_neigh"
 #define PROC_NR_NODES_FILE	"/proc/net/nr_nodes"
-
-
