@@ -1046,7 +1046,6 @@ void new_user(char *newuser)
 {
 	struct passwd pw, *pwp;
 	uid_t uid;
-	char command[1024];
 	FILE *fp;
 	char username[80];
 	char homedir[256], userdir[256];
