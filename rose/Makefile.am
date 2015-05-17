@@ -1,3 +1,4 @@
+installconf:
 
 sbin_PROGRAMS = rsattach rsdwnlnk rsmemsiz rsparms rsuplnk
 
