@@ -1,4 +1,4 @@
-# /usr/local/etc/ax25/ax25d.conf
+# @SYSCONFDIR@/ax25/ax25d.conf
 #
 # ax25d Configuration File.
 #
@@ -8,42 +8,42 @@
 #
 [OH2BNS VIA 1]
 NOCALL   * * * * * *  L
-default  * * * * * *  -	root  /usr/local/sbin/ttylinkd	ttylinkd
+default  * * * * * *  -	root  @SBINDIR@/ttylinkd	ttylinkd
 #parameters_extAX25 VC-wait-login VC-disc-on-linkfailure-msg VC-log-connections
 #
 #
 [OH2BNS-2 VIA 1]
 NOCALL   * * * * * *  L
-default  * * * * * *  -	root  /usr/local/sbin/node	node
+default  * * * * * *  -	root  @SBINDIR@	node
 #
 #
 [OH2BNS VIA 2]
 NOCALL   * * * * * *  L
-default  * * * * * *  -	root  /usr/local/sbin/ttylinkd	ttylinkd
+default  * * * * * *  -	root  @SBINDIR@/ttylinkd	ttylinkd
 #
 [OH2BNS-2 VIA 2]
 NOCALL   * * * * * *  L
-default  * * * * * *  -	root  /usr/local/sbin/node	node
+default  * * * * * *  -	root  @SBINDIR@	node
 #
 [OH2BNS-3 VIA 2]
 NOCALL   * * * * * *  L
-default  * * * * * *  -	root  /usr/local/sbin/axwrapper	axwrapper /usr/bin/finger finger
+default  * * * * * *  -	root  @SBINDIR@/axwrapper	axwrapper /usr/bin/finger finger
 #
 #[OH2BNS-9]
 #NOCALL  * * * * * *  L
-#default * * * * * *  -	root  /usr/local/sbin/node	node
+#default * * * * * *  -	root  @SBINDIR@	node
 #
 # NET/ROM Ports begin with a '<'.
 #
 #<netrom>
 #NOCALL  * * * * * *  L
-#default * * * * * *  -	root  /usr/local/sbin/ttylinkd	ttylinkd
+#default * * * * * *  -	root  @SBINDIR@/ttylinkd	ttylinkd
 #
 <netrom>
 NOCALL   * * * * * *  L
-default  * * * * * *  -	root  /usr/local/sbin/node	node
+default  * * * * * *  -	root  @SBINDIR@	node
 #
 #<netrom>
 #NOCALL  * * * * * *  L
-#default * * * * * *  -	root  /usr/local/sbin/node	node
+#default * * * * * *  -	root  @SBINDIR@	node
 #

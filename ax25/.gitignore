@@ -3,6 +3,7 @@
 Makefile
 Makefile.in
 ax25d
+/ax25d.conf
 axctl
 axparms
 axspawn
