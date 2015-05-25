@@ -1,7 +1,16 @@
 SUBDIRS = axgetput
 
 etcfiles = ax25.profile ax25d.conf axspawn.conf rxecho.conf
+etcsrcfiles = ax25.profile ax25d.conf.in axspawn.conf rxecho.conf
+noinst_DATA = $(etcfiles)
 varfiles = mheard.dat
+
+subst_path = sed -e 's|[@]SBINDIR[@]|$(sbindir)|' \
+		 -e 's|[@]SYSCONFDIR[@]|$(sysconfdir)|'
+
+ax25d.conf: ax25d.conf.in
+	$(subst_path) < $(srcdir)/ax25d.conf.in > ax25d.conf.tmp
+	mv ax25d.conf.tmp ax25d.conf
 
 installconf:
 	$(mkinstalldirs) $(DESTDIR)$(AX25_SYSCONFDIR)
@@ -36,7 +45,8 @@ dist_man_MANS = ax25.4 ax25d.conf.5 axspawn.conf.5 rxecho.conf.5 \
 
 
 
-EXTRA_DIST = $(etcfiles) $(varfiles)
+CLEANFILES = ax25d.conf
+EXTRA_DIST = $(etcsrcfiles) $(varfiles)
 
 ax25d_SOURCES = ax25d.c
 axctl_SOURCES = axctl.c
