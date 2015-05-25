@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 		switch (len) {
 		case 'p':
 			paclen = atoi(optarg);
-                        break;
+			break;
 		case ':':
 		case '?':
 			USAGE();
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
 		FD_SET(pipe_out[0], &fdset);
 		FD_SET(pipe_err[0], &fdset);
 		tv.tv_sec = 0;
-                tv.tv_usec = FLUSHTIMEOUT;
+		tv.tv_usec = FLUSHTIMEOUT;
 
 		len = select(256, &fdset, 0, 0, &tv);
 		if (len == -1) {
