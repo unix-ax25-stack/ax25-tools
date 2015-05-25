@@ -23,6 +23,7 @@ line programs; the GUI programs are contained in ax25-tools-x package.
  * axctl - configure/Kill running AX.25 connections
  * axparms - configure AX.25 interfaces
  * axspawn - allow automatic login to a Linux system
+ * axwrapper - run non-ax.25-aware programs from ax25d
  * beacon - transmit periodic messages on an AX.25 port
  * bpqparms - configure BPQ ethernet devices
  * mheardd - display AX.25 calls recently heard
@@ -108,6 +109,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/axctl
 %{_sbindir}/axparms
 %{_sbindir}/axspawn
+%{_sbindir}/axwrapper
 %{_sbindir}/beacon
 %{_sbindir}/bpqparms
 %{_sbindir}/dmascc_cfg

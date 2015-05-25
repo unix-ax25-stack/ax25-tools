@@ -14,6 +14,7 @@ ax25-tools (0.0.10)
 	  2.2.1.  In the unexpected case somebody should still need them the
 	  patches can be found in older releases and the source archive.
 	* Add support for building rpm packages.
+	* Add Tomi Manninen OH2BNS's axwrapper program.
 
  -- Ralf Baechle DL5RB <ralf@linux-mips.org>  Sat, 6 Jun 2009 17:36:01 +0100
 
