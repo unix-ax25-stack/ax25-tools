@@ -72,18 +72,18 @@ ax25-tools (0.0.4)
 
 ax25-tools (0.0.3)
 
-  * Fixed configure.in so it doesn't check for libax25io
-  * Added dmascc configuration program
-  * Added spattach
-  * Added yamcfg
-  * Removed nrports, axports and rsports, they are in the library
-  * Had another crack at getting config locations portable
+	* Fixed configure.in so it doesn't check for libax25io
+	* Added dmascc configuration program
+	* Added spattach
+	* Added yamcfg
+	* Removed nrports, axports and rsports, they are in the library
+	* Had another crack at getting config locations portable
 
  -- Craig Small <csmall@small.dropbear.id.au> 30 June 1999
 
 ax25-tools (0.0.2)
 
-  * First public release
+	* First public release
 
  -- Craig Small <csmall@small.dropbear.id.au> 21 April 1999
 
