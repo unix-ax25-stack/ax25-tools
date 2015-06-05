@@ -14,7 +14,7 @@ default  * * * * * *  -	root  @SBINDIR@/ttylinkd	ttylinkd
 #
 [OH2BNS-2 VIA 1]
 NOCALL   * * * * * *  L
-default  * * * * * *  -	root  @SBINDIR@	node
+default  * * * * * *  -	root  @SBINDIR@/node	node
 #
 #
 [OH2BNS VIA 2]
@@ -23,7 +23,7 @@ default  * * * * * *  -	root  @SBINDIR@/ttylinkd	ttylinkd
 #
 [OH2BNS-2 VIA 2]
 NOCALL   * * * * * *  L
-default  * * * * * *  -	root  @SBINDIR@	node
+default  * * * * * *  -	root  @SBINDIR@/node	node
 #
 [OH2BNS-3 VIA 2]
 NOCALL   * * * * * *  L
@@ -31,7 +31,7 @@ default  * * * * * *  -	root  @SBINDIR@/axwrapper	axwrapper /usr/bin/finger fing
 #
 #[OH2BNS-9]
 #NOCALL  * * * * * *  L
-#default * * * * * *  -	root  @SBINDIR@	node
+#default * * * * * *  -	root  @SBINDIR@/node	node
 #
 # NET/ROM Ports begin with a '<'.
 #
@@ -41,9 +41,9 @@ default  * * * * * *  -	root  @SBINDIR@/axwrapper	axwrapper /usr/bin/finger fing
 #
 <netrom>
 NOCALL   * * * * * *  L
-default  * * * * * *  -	root  @SBINDIR@	node
+default  * * * * * *  -	root  @SBINDIR@/node	node
 #
 #<netrom>
 #NOCALL  * * * * * *  L
-#default * * * * * *  -	root  @SBINDIR@	node
+#default * * * * * *  -	root  @SBINDIR@/node	node
 #
