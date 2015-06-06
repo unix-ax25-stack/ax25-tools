@@ -25,7 +25,7 @@ void alarm_handler(int sig)
 
 int main(int argc, char **argv)
 {
-	unsigned char buffer[512], *addr;
+	char buffer[512], *addr;
 	fd_set read_fd;
 	int n = 0, s, yes = 1;
 	struct full_sockaddr_ax25 axbind, axconnect;
