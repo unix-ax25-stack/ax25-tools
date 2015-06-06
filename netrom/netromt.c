@@ -23,7 +23,7 @@
 #include "../pathnames.h"
 #include "netromd.h"
 
-static int build_header(unsigned char *message)
+static int build_header(char *message)
 {
 	message[0] = NODES_SIG;
 
@@ -35,7 +35,7 @@ static int build_header(unsigned char *message)
 
 static void build_mine(int s, struct full_sockaddr_ax25 *dest, int dlen, int localval, int pause)
 {
-	unsigned char message[100];
+	char message[100];
 	char buffer[255], *port, *p;
 	FILE *fp;
 	int len;
@@ -94,7 +94,7 @@ static void build_mine(int s, struct full_sockaddr_ax25 *dest, int dlen, int loc
 
 static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, int dlen, int port, int pause)
 {
-	unsigned char message[300];
+	char message[300];
 	FILE *fpnodes, *fpneigh;
 	char nodes_buffer[90];
 	char neigh_buffer[90];
