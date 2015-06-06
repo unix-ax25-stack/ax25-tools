@@ -583,8 +583,8 @@ int encstathuf(char *src, int srclen, char *dest, int *destlen)
 
 int decstathuf(char *src, char *dest, int srclen, int *destlen)
 {
-	unsigned char *srcptr;
-	unsigned char *destptr;
+	char *srcptr;
+	char *destptr;
 	int wrklen;
 	unsigned char bitmask;
 	unsigned short decod;
@@ -659,7 +659,7 @@ int _write_ax25(const char *s, int len)
 	return i > 0 ? i : 0;	/* on error, -1 is returned  */
 }
 
-int read_ax25(unsigned char *s, int size)
+int read_ax25(char *s, int size)
 {
 	int len;
 	int k;
@@ -1052,7 +1052,7 @@ void new_user(char *newuser)
 	char buf[4096];
 	char subdir[4];
 	int cnt;
-	unsigned char *q;
+	char *q;
 	char *p;
 	struct stat fst;
 	int fd_a, fd_b, fd_l;
