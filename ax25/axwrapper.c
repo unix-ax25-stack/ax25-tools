@@ -70,7 +70,8 @@ void convert_lf_cr(unsigned char *buf, int len)
 
 int main(int argc, char **argv)
 {
-	unsigned char buf[4096], *stdoutbuf;
+	unsigned char buf[4096];
+	char *stdoutbuf;
 	int pipe_in[2];
 	int pipe_out[2];
 	int pipe_err[2];
