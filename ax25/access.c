@@ -191,7 +191,7 @@ void calc_md5_pw (const char *MD5prompt, const char *MD5pw, char *MD5result)
 	len = strlen(buffer);
 	for (i= 0; i < len; i += 16) {
 		n = (len - i) > 16 ? 16 : (len - i);
-		MD5Update(&context, buffer+i, n);
+		MD5Update(&context, (unsigned char *) buffer+i, n);
 	}
 
 	MD5Final(&context);
