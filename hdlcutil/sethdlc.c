@@ -52,7 +52,7 @@ static char *progname;
 
 /* ---------------------------------------------------------------------- */
 
-static void display_packet(unsigned char *bp, unsigned int len)
+static void display_packet(char *bp, unsigned int len)
 {
 	unsigned char v1=1,cmd=0;
 	unsigned char i,j;
@@ -481,7 +481,7 @@ int main(int argc, char *argv[])
 	struct sm_ioctl bsi;
 	struct baycom_ioctl bbi;
 	struct hdrvc_channel_state chst;
-	unsigned char pktbuf[2048];
+	char pktbuf[2048];
 
 	progname = *argv;
 	printf("%s: Version 0.5; (C) 1996-1997 by Thomas Sailer HB9JNX/AE4WA\n", *argv);
