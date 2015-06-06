@@ -810,7 +810,6 @@ static int ReadConfig(void)
 	int af_type = 0;	/* Keep GCC happy */
 	int line = 0;
 	int hunt = TRUE, error = FALSE;
-	int iamdigi = FALSE;
 	int parameters = 0;
 
 	signal(SIGALRM, SIG_IGN);
@@ -835,21 +834,18 @@ static int ReadConfig(void)
 			af_type = AF_AX25;
 			hunt    = TRUE;
 			error   = FALSE;
-			iamdigi = FALSE;
 			break;
 
 		case '<':		/* NETROM iface call */
 			af_type = AF_NETROM;
 			hunt    = TRUE;
 			error   = FALSE;
-			iamdigi = FALSE;
 			break;
 
 		case '{':		/* ROSE iface call */
 			af_type = AF_ROSE;
 			hunt    = TRUE;
 			error   = FALSE;
-			iamdigi = FALSE;
 			break;
 
 		default:
@@ -881,7 +877,6 @@ static int ReadConfig(void)
 					port = s;
 
 					if ((s = strchr(call, '*')) != NULL) {
-						iamdigi = TRUE;
 						*s = '\0';
 					}
 				}
@@ -979,13 +974,6 @@ static int ReadConfig(void)
 				reload_timer(60);
 				continue;
 			}
-			/* xlz - have to nuke this as this option is gone
-			 * what should be here?
-			if (iamdigi) {
-				yes = 1;
-				setsockopt(axl_port->fd, SOL_AX25, AX25_IAMDIGI, &yes, sizeof(yes));
-			}
-			*/
 
 			if (bind(axl_port->fd, (struct sockaddr *)&sockaddr, addrlen) < 0) {
 				fprintf(stderr, "ax25d: bind: %s on port %s\n", strerror(errno), axl_port->port);
