@@ -89,7 +89,7 @@ static struct mheard_list_struct *mheard_list;
 static int    mheard_list_size = MHEARD_LIST_SIZE/10;
 static int    logging = FALSE;
 
-static int ftype(unsigned char *, int *, int);
+static int ftype(char *, int *, int);
 static struct mheard_list_struct *findentry(ax25_address *, char *);
 
 static void terminate(int sig)
@@ -105,7 +105,8 @@ static void terminate(int sig)
 int main(int argc, char **argv)
 {
 	struct mheard_list_struct *mheard;
-	unsigned char buffer[1500], *data;
+	char buffer[1500];
+	char *data;
 	int size, s;
 	char *port = NULL;
 	struct sockaddr sa;
@@ -349,7 +350,9 @@ int main(int argc, char **argv)
 		size -= ctlen;
 
 		if (type == I || type == UI) {
-			switch (*data) {
+			unsigned char pid = *data;
+
+			switch (pid) {
 			case PID_TEXT:
 				mheard->entry.mode |= MHEARD_MODE_TEXT;
 				break;
@@ -412,7 +415,7 @@ int main(int argc, char **argv)
 	}
 }
 
-static int ftype(unsigned char *data, int *type, int extseq)
+static int ftype(char *data, int *type, int extseq)
 {
 	if (extseq) {
 		if ((*data & 0x01) == 0) {	/* An I frame is an I-frame ... */
