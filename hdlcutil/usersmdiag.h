@@ -110,7 +110,7 @@ struct usersmmsg {
 			short samples[DIAGDATALEN];
 		} diag_out;
 
-		unsigned char by[0];
+		char by[0];
 	} data;
 };
 
