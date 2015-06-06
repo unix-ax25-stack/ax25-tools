@@ -45,7 +45,7 @@ int in4hex(char *ptr)
 
 int main(int ac, char *av[])
 {
-	int nb, add, type, i;
+	int nb, type, i;
 	int first = 1;
 	time_t temps;
 	FILE *fptr;
@@ -82,7 +82,6 @@ int main(int ac, char *av[])
 	while (fgets(buf, sizeof(buf), fptr))
 	{
 		nb   = in2hex(buf+1);
-		add  = in4hex(buf+3);
 		type = in2hex(buf+7);
 
 		if (type != 0)
