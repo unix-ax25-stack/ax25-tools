@@ -24,7 +24,7 @@ void alarm_handler(int sig)
 
 int main(int argc, char **argv)
 {
-	unsigned char buffer[512], *addr, *p;
+	char buffer[512], *addr, *p;
 	char rose_address[11];
 	fd_set read_fd;
 	int n, s, dnicindex = -1, addrindex = -1;
