@@ -303,7 +303,7 @@ static void kiss_unesc(unsigned char *buffer, int len)
 
 int main(int argc, char *argv[])
 {
-	static char buffer[512];
+	static unsigned char buffer[512];
 	unsigned int speed = 0;
 	fd_set read_fd;
 	int c, n;
