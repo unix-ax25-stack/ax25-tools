@@ -99,7 +99,7 @@ static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, in
 	char nodes_buffer[90];
 	char neigh_buffer[90];
 	char *callsign, *mnemonic, *neighbour;
-	int  which, number, quality, neigh_no, obs_count;
+	int  quality, neigh_no, obs_count;
 	int  olen, len;
 
 	if ((fpnodes = fopen(PROC_NR_NODES_FILE, "r")) == NULL) {
@@ -123,8 +123,8 @@ static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, in
 		while (fgets(nodes_buffer, 90, fpnodes) != NULL) {
 			callsign  = strtok(nodes_buffer, " ");
 			mnemonic  = strtok(NULL, " ");
-			which     = atoi(strtok(NULL, " "));
-			number    = atoi(strtok(NULL, " "));
+			(void) strtok(NULL, " ");	/* skip which field */
+			(void) strtok(NULL, " ");	/* skip number field */
 			quality   = atoi(strtok(NULL, " "));
 			obs_count = atoi(strtok(NULL, " "));
 			neigh_no  = atoi(strtok(NULL, " "));
