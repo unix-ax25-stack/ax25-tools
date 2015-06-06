@@ -140,7 +140,7 @@ void receive_nodes(unsigned char *buffer, int length, ax25_address *neighbour, i
 	FILE *fp;
 	int s;
 	int quality, obs_count, qual, lock;
-	char *addr, *callsign, *device;
+	char *callsign, *device;
 
 	if (!validcallsign(neighbour)) {
 		if (debug && logging)
@@ -185,7 +185,7 @@ void receive_nodes(unsigned char *buffer, int length, ax25_address *neighbour, i
 	quality = port_list[index].default_qual;
 
 	while (fgets(neigh_buffer, 90, fp) != NULL) {
-		addr     = strtok(neigh_buffer, " ");
+		(void) strtok(neigh_buffer, " ");	/* skip addr field */
 		callsign = strtok(NULL, " ");
 		device   = strtok(NULL, " ");
 		qual     = atoi(strtok(NULL, " "));
