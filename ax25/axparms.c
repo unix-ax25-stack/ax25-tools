@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -168,9 +169,10 @@ int setifcall(int s, char *ifn, char *name)
 
 int associate(int s, int argc, char *argv[])
 {
-	char buffer[80], *u, *c;
+	char buffer[80], *u, *c, *endp;
 	struct sockaddr_ax25 sax25;
 	struct passwd *pw;
+	uid_t uid;
 	int opt;
 	FILE *fp;
 
@@ -254,12 +256,25 @@ int associate(int s, int argc, char *argv[])
 		return 0;
 	}
 
-	if ((pw = getpwnam(argv[3])) == NULL) {
-		fprintf(stderr, "axparms: associate: unknown username %s\n", argv[3]);
-		return 1;
-	}
+	/*
+	 * Tolerate spaces following a UID, it may happen in scripts
+	 */
+	errno = 0;
+	uid = strtol(argv[3], &endp, 0);
+	if (!errno && (*endp == '\0' || isspace(*endp))) {
+		sax25.sax25_uid = uid;
+	} else {
+		pw = getpwnam(argv[3]);
 
-	sax25.sax25_uid = pw->pw_uid;
+		if (pw == NULL) {
+			fprintf(stderr,
+				"axparms: associate: unknown username %s\n",
+				argv[3]);
+			return 1;
+		}
+
+		sax25.sax25_uid = pw->pw_uid;
+	}
 
 	if (ioctl(s, SIOCAX25ADDUID, &sax25) == -1) {
 		perror("axparms: SIOCAX25ADDUID");
