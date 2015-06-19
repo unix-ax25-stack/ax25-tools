@@ -18,6 +18,7 @@ ax25-tools (0.0.10)
 	* Fix build issues with modern autoconf, automake and GCC.
 	* For the tarball release Regenerate generates files with most
 	  recent autoconf and automake.
+	* axparms --assoc now also accepts a numeric user id.
 
  -- Ralf Baechle DL5RB <ralf@linux-mips.org>  Sat, 6 Jun 2015 14:29:07 +0200
 
