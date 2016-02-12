@@ -206,7 +206,7 @@ int bput(void)
 		}
 
 		if (msg_crc)
-			crc = calc_crc(buf, len, 0);
+			crc = calc_crc(buf, len, crc);
 
 		if (buf[len-1] == '\r') {
 			if (last_line_had_CR) {
@@ -336,7 +336,7 @@ int bget(void) {
 
 		/* compute crc  */
 		while ((len = read(fddata, buf, BLOCKSIZ)) > 0) {
-			crc = calc_crc(buf, len, 0);
+			crc = calc_crc(buf, len, crc);
 			file_size += len;
 		}
 		if (len < 0) {
@@ -351,33 +351,33 @@ int bget(void) {
 			return 1;
 		}
 		sprintf(buf, "\r#BIN#%ld#|%d#$%s#%s\r", file_size, crc, unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, file_size, crc, 1));
-		} else {
-			file_time = time(0);
-			if (!is_stream || do_crc_only) {
-				sprintf(err_msg, "error: not enough memory\n");
-				while ((len = read(fddata, buf, sizeof(buf))) > 0) {
-					crc = calc_crc(buf, len, 0);
-					file_size += len;
-					if (!do_crc_only)
-						store_line(buf, len);
-				}
-				if (len < 0) {
-					sprintf(err_msg, "error: read failed (%s)\n", strerror(errno));
-					close(fddata);
-					return 1;
-				}
-				*err_msg = 0;
-				sprintf(buf, "\r#BIN#%ld#|%d#$%s#%s\r", file_size, crc, unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, file_size, crc, 1));
-			} else {
-				sprintf(buf, "\r#BIN###$%s#%s\r", unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, 0, 0, 1));
+	} else {
+		file_time = time(0);
+		if (!is_stream || do_crc_only) {
+			sprintf(err_msg, "error: not enough memory\n");
+			while ((len = read(fddata, buf, sizeof(buf))) > 0) {
+				crc = calc_crc(buf, len, crc);
+				file_size += len;
+				if (!do_crc_only)
+					store_line(buf, len);
 			}
-			/*
-			 * hack: check for #ABORT# from fdout (fd 1), because fddata (fd 0) is
-			 * our pipe we read the data from, which we actually tx.
-			 * believe me, it does work.
-			 */
-			fdin = fdout;
+			if (len < 0) {
+				sprintf(err_msg, "error: read failed (%s)\n", strerror(errno));
+				close(fddata);
+				return 1;
+			}
+			*err_msg = 0;
+			sprintf(buf, "\r#BIN#%ld#|%d#$%s#%s\r", file_size, crc, unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, file_size, crc, 1));
+		} else {
+			sprintf(buf, "\r#BIN###$%s#%s\r", unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, 0, 0, 1));
 		}
+		/*
+		 * hack: check for #ABORT# from fdout (fd 1), because fddata (fd 0) is
+		 * our pipe we read the data from, which we actually tx.
+		 * believe me, it does work.
+		 */
+		fdin = fdout;
+	}
 
 	if (do_crc_only) {
 		printf("File information for %s:\n", get_fixed_filename(filename, file_size, crc, 1));

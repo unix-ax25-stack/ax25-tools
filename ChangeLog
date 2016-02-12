@@ -19,8 +19,12 @@ ax25-tools (0.0.10)
 	* For the tarball release Regenerate generates files with most
 	  recent autoconf and automake.
 	* axparms --assoc now also accepts a numeric user id.
+	* Some programs need FLTK-libraries (otherwise they're skipped on
+	  compile).
+        * Fixed regression in axgetput (bget/bput crc was calculated wrong)
 
  -- Ralf Baechle DL5RB <ralf@linux-mips.org>  Sat, 6 Jun 2015 14:29:07 +0200
+ -- Thomas Osterried <ax25@x-berg.in-berlin.de>  Fri, 12 Feb 2016 14:31:33 +0100
 
 ax25-tools (0.0.9)
 	* Fix for mkiss pid problem
