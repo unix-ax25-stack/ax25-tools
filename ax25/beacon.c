@@ -5,6 +5,7 @@
 #include <syslog.h>
 #include <signal.h>
 #include <string.h>
+#include <time.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -20,7 +21,7 @@ static int logging = FALSE;
 static int mail = FALSE;
 static int single = FALSE;
 
-#define STR_USAGE "usage: beacon [-c <src_call>] [-d <dest_call>] [-f] [-l] [-m] [-s] [-t interval] [-v] <port> <message>\n"
+#define STR_USAGE "usage: beacon [-c <src_call>] [-d <dest_call>] [-f] [-H] [-l] [-m] [-s] [-t interval] [-v] <port> <message>\n"
 
 static void terminate(int sig)
 {
@@ -36,12 +37,14 @@ int main(int argc, char *argv[])
 {
 	struct full_sockaddr_ax25 dest;
 	struct full_sockaddr_ax25 src;
-	int s, n, dlen, len, interval = 30;
+	int s, n, dlen, len;
 	char *addr, *port, *message, *portcall;
 	char *srccall = NULL, *destcall = NULL;
 	int dofork = 1;
+	time_t interval = 30;
+	int interval_relative = 0;
 
-	while ((n = getopt(argc, argv, "c:d:flmst:v")) != -1) {
+	while ((n = getopt(argc, argv, "c:d:fHlmst:v")) != -1) {
 		switch (n) {
 		case 'c':
 			srccall = optarg;
@@ -51,6 +54,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'f':
 			dofork = 0;
+			break;
+		case 'H':
+			interval_relative = 1;
 			break;
 		case 'l':
 			logging = TRUE;
@@ -62,7 +68,7 @@ int main(int argc, char *argv[])
 			single = TRUE;
 			break;
 		case 't':
-			interval = atoi(optarg);
+			interval = (time_t ) atoi(optarg);
 			if (interval < 1) {
 				fprintf(stderr, "beacon: interval must be greater than on minute\n");
 				return 1;
@@ -76,6 +82,11 @@ int main(int argc, char *argv[])
 			fprintf(stderr, STR_USAGE);
 			return 1;
 		}
+	}
+
+	if (interval_relative && interval > 60L) {
+		fprintf(stderr, "beacon: can't align interval > 60min to an hour\n");
+		return 1;
 	}
 
 	signal(SIGTERM, terminate);
@@ -141,7 +152,17 @@ int main(int argc, char *argv[])
 		syslog(LOG_INFO, "starting");
 	}
 
+	/* interval has a one minute resolution */
+	interval *= 60L;
+
 	for (;;) {
+
+		if (interval_relative) {
+			time_t t_sleep = interval - (time(NULL) % interval);
+			if (t_sleep > 0)
+				sleep(t_sleep);
+		}
+
 		if ((s = socket(AF_AX25, SOCK_DGRAM, 0)) == -1) {
 			if (logging) {
 				syslog(LOG_ERR, "socket: %m");
@@ -168,10 +189,11 @@ int main(int argc, char *argv[])
 
 		close(s);
 
-		if (!single)
-			sleep(interval * 60);
-		else
+		if (single)
 			break;
+
+		if (!interval_relative)
+			sleep(interval);
 	}
 
 	return 0;
