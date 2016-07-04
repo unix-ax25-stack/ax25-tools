@@ -20,6 +20,8 @@ static int logging = FALSE;
 static int mail = FALSE;
 static int single = FALSE;
 
+#define STR_USAGE "usage: beacon [-c <src_call>] [-d <dest_call>] [-f] [-l] [-m] [-s] [-t interval] [-v] <port> <message>\n"
+
 static void terminate(int sig)
 {
 	if (logging) {
@@ -37,14 +39,18 @@ int main(int argc, char *argv[])
 	int s, n, dlen, len, interval = 30;
 	char *addr, *port, *message, *portcall;
 	char *srccall = NULL, *destcall = NULL;
+	int dofork = 1;
 
-	while ((n = getopt(argc, argv, "c:d:lmst:v")) != -1) {
+	while ((n = getopt(argc, argv, "c:d:flmst:v")) != -1) {
 		switch (n) {
 		case 'c':
 			srccall = optarg;
 			break;
 		case 'd':
 			destcall = optarg;
+			break;
+		case 'f':
+			dofork = 0;
 			break;
 		case 'l':
 			logging = TRUE;
@@ -67,7 +73,7 @@ int main(int argc, char *argv[])
 			return 0;
 		case '?':
 		case ':':
-			fprintf(stderr, "usage: beacon [-c <src_call>] [-d <dest_call>] [-l] [-m] [-s] [-t interval] [-v] <port> <message>\n");
+			fprintf(stderr, STR_USAGE);
 			return 1;
 		}
 	}
@@ -75,7 +81,7 @@ int main(int argc, char *argv[])
 	signal(SIGTERM, terminate);
 
 	if (optind == argc || optind == argc - 1) {
-		fprintf(stderr, "usage: beacon [-c <src_call>] [-d <dest_call>] [-l] [-m] [-s] [-t interval] [-v] <port> <message>\n");
+		fprintf(stderr, STR_USAGE);
 		return 1;
 	}
 
@@ -123,7 +129,7 @@ int main(int argc, char *argv[])
 	}
 	if (addr != NULL) free(addr); addr = NULL;
 
-	if (!single) {
+	if (!single && dofork) {
 		if (!daemon_start(FALSE)) {
 			fprintf(stderr, "beacon: cannot become a daemon\n");
 			return 1;
