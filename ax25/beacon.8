@@ -2,7 +2,7 @@
 .SH NAME
 beacon \- transmit periodic messages on an AX.25 port.
 .SH SYNOPSIS
-.B beacon [-c <src_call>] [-d <dest_call>[digi ..]] [-f] [-l] [-m] [-s] [-t interval] [-v] port \(lqmessage\(rq
+.B beacon [-c <src_call>] [-d <dest_call>[digi ..]] [-f] [-H] [-l] [-m] [-s] [-t interval] [-v] port \(lqmessage\(rq
 .SH DESCRIPTION
 .LP
 .B Beacon
@@ -28,6 +28,9 @@ Do not fork into the background.
 .TP 16
 .BI \-l
 Enables the logging of errors to the system log, the default is off.
+.TP 16
+.BI \-H
+Start interval relative to the hour.
 .TP 16
 .BI \-m
 Changes the destination address to \(lqMAIL\(rq and sends the message text
