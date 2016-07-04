@@ -41,16 +41,19 @@ static void PrintHeader(int data)
 {
 	switch (data) {
 	case 0:
-		printf("Callsign  Port Packets   Last Heard\n");
+		printf("Callsign   Port Packets   Last Heard\n");
 		break;
 	case 1:
-		printf("Callsign                                                              Port\n");
+		printf("Callsign                                                               Port\n");
 		break;
 	case 2:
-		printf("Callsign  Port      #I    #S    #U  First Heard          Last Heard\n");
+		printf("Callsign   Port      #I    #S    #U  First Heard          Last Heard\n");
 		break;
 	case 3:
-		printf("Callsign  Port Packets  Type  PIDs\n");
+		printf("Callsign   Port Packets  Type  PIDs\n");
+		break;
+	case 4:
+		printf("Callsign   Port      #I    #S    #U  First Heard          Last Heard           Packets Type  PIDs     Targets\n");
 		break;
 	}
 }
@@ -68,7 +71,7 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 		call =  ax25_ntoa(&pr->entry.from_call);
 		if ((s = strstr(call, "-0")) != NULL)
 			*s = '\0';
-		printf("%-10s %-5s %5d   %s\n",
+		printf("%-9s  %-5s  %5d   %s\n",
 			call, pr->entry.portname, pr->entry.count, lh);
 		break;
 	case 1:
@@ -102,14 +105,14 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 		call = ax25_ntoa(&pr->entry.from_call);
 		if ((s = strstr(call, "-0")) != NULL)
 			*s = '\0';
-		printf("%-10s %-5s %5d %5d %5d  %s  %s\n",
+		printf("%-9s  %-5s  %5d %5d %5d  %s  %s\n",
 			call, pr->entry.portname, pr->entry.iframes, pr->entry.sframes, pr->entry.uframes, fh, lh);
 		break;
 	case 3:
 		call = ax25_ntoa(&pr->entry.from_call);
 		if ((s = strstr(call, "-0")) != NULL)
 			*s = '\0';
-		printf("%-10s %-5s %5d %5s ",
+		printf("%-9s  %-5s  %5d %5s ",
 			call, pr->entry.portname, pr->entry.count, types[pr->entry.type]);
 		if (pr->entry.mode & MHEARD_MODE_ARP)
 			printf(" ARP");
@@ -136,6 +139,55 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 		if (pr->entry.mode & MHEARD_MODE_UNKNOWN)
 			printf(" Unknown");
 		printf("\n");
+		break;
+	case 4:
+		strcpy(lh, ctime(&pr->entry.last_heard));
+		lh[19] = 0;
+		strcpy(fh, ctime(&pr->entry.first_heard));
+		fh[19] = 0;
+		call = ax25_ntoa(&pr->entry.from_call);
+		if ((s = strstr(call, "-0")) != NULL)
+			*s = '\0';
+		printf("%-9s  %-5s  %5d %5d %5d  %s  %s",
+			call, pr->entry.portname, pr->entry.iframes, pr->entry.sframes, pr->entry.uframes, fh, lh);
+		printf("%5d    %5s ", pr->entry.count, types[pr->entry.type]);
+		if (pr->entry.mode & MHEARD_MODE_ARP)
+			printf(" ARP      ");
+		if (pr->entry.mode & MHEARD_MODE_FLEXNET)
+			printf(" FlexNet  ");
+		if (pr->entry.mode & MHEARD_MODE_IP_DG)
+			printf(" IP-DG    ");
+		if (pr->entry.mode & MHEARD_MODE_IP_VC)
+			printf(" IP-VC    ");
+		if (pr->entry.mode & MHEARD_MODE_NETROM)
+			printf(" NET/ROM  ");
+		if (pr->entry.mode & MHEARD_MODE_ROSE)
+			printf(" Rose     ");
+		if (pr->entry.mode & MHEARD_MODE_SEGMENT)
+			printf(" Segment  ");
+		if (pr->entry.mode & MHEARD_MODE_TEXNET)
+			printf(" TexNet   ");
+		if (pr->entry.mode & MHEARD_MODE_TEXT)
+			printf(" Text     ");
+		if (pr->entry.mode & MHEARD_MODE_PSATFT)
+			printf(" PacsatFT ");
+		if (pr->entry.mode & MHEARD_MODE_PSATPB)
+			printf(" PacsatPB ");
+		if (pr->entry.mode & MHEARD_MODE_UNKNOWN)
+			printf(" Unknown  ");
+		if (pr->entry.mode == 0)
+			printf("          ");
+		
+		buffer[0] = '\0';
+		for (i = 0; i < pr->entry.ndigis; i++) {
+			if (i)
+				strcat(buffer, ",");
+			call = ax25_ntoa(&pr->entry.digis[i]);
+			if ((s = strstr(call, "-0")) != NULL)
+				*s = '\0';
+			strcat(buffer, call);
+		}
+		printf("%s\n", buffer);
 		break;
 	}
 }
@@ -310,6 +362,9 @@ int main(int argc, char *argv[])
 			case 's':
 				data = 2;
 				break;
+			case 'a':
+				data = 4; /* s + c */
+				break;
 			default:
 				fprintf(stderr, "mheard: invalid display type '%s'\n", optarg);
 				return 1;
@@ -342,7 +397,7 @@ int main(int argc, char *argv[])
 			return 0;
 		case '?':
 		case ':':
-			fprintf(stderr, "Usage: %s [-d cmns] [-n] [-o cfpt] [-v] [port ...]\n", argv[0]);
+			fprintf(stderr, "Usage: %s [-d cmnsa] [-n] [-o cfpt] [-v] [port ...]\n", argv[0]);
 			return 1;
 		}
 	}
