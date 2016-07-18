@@ -41,38 +41,51 @@ static void PrintHeader(int data)
 {
 	switch (data) {
 	case 0:
-		printf("Callsign   Port Packets   Last Heard\n");
+		printf("Callsign   Port    Packets   Last Heard\n");
 		break;
 	case 1:
 		printf("Callsign                                                               Port\n");
 		break;
 	case 2:
-		printf("Callsign   Port      #I    #S    #U  First Heard          Last Heard\n");
+		printf("Callsign   Port         #I       #S       #U  First Heard               Last Heard\n");
 		break;
 	case 3:
-		printf("Callsign   Port Packets  Type  PIDs\n");
+		printf("Callsign   Port    Packets  Type  PIDs\n");
 		break;
 	case 4:
-		printf("Callsign   Port      #I    #S    #U  First Heard          Last Heard           Packets Type  PIDs     Targets\n");
+		printf("Callsign   Port         #I       #S       #U  First Heard               Last Heard                 Packets  Type  PIDs     Targets\n");
 		break;
 	}
 }
 
 static void PrintPortEntry(struct PortRecord *pr, int data)
 {
-	char lh[30], fh[30], *call, *s;
+	char *lh, *fh, *call, *s;
 	char buffer[80];
 	int i;
 
+	/* port record data can be garbled. We cannot trust the data.
+	   i.e., ctime() returns NULL at time_t 2^33 (72057594037927936).
+	   char lh[] was size 30. This is not enough for year > 999999999.
+	   also assure that pr->entry.type is < sizeof(types), and in 'case 4:',
+           only up to 8 digipeaters are copied.
+         */
+
 	switch (data) {
 	case 0:
-		strcpy(lh, ctime(&pr->entry.last_heard));
-		lh[19] = 0;
+		if (!pr->entry.count)
+			return;
+		if (pr->entry.last_heard < 0)
+			return;
+		if ((lh = strndup(ctime(&pr->entry.last_heard), 33)) == NULL)
+ 			return;
+		if (*lh) lh[strlen(lh)-1] = '\0';
 		call =  ax25_ntoa(&pr->entry.from_call);
 		if ((s = strstr(call, "-0")) != NULL)
 			*s = '\0';
-		printf("%-9s  %-5s  %5d   %s\n",
+		printf("%-9s  %-5s  %8u   %s\n",
 			call, pr->entry.portname, pr->entry.count, lh);
+		free(lh);
 		break;
 	case 1:
 		buffer[0] = '\0';
@@ -98,21 +111,33 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			buffer, pr->entry.portname);
 		break;
 	case 2:
-		strcpy(lh, ctime(&pr->entry.last_heard));
-		lh[19] = 0;
-		strcpy(fh, ctime(&pr->entry.first_heard));
-		fh[19] = 0;
+		if (pr->entry.last_heard < 0 || pr->entry.first_heard < 0)
+			return;
+		if ((lh = strndup(ctime(&pr->entry.last_heard), 33)) == NULL)
+ 			return;
+		if (*lh) lh[strlen(lh)-1] = '\0';
+		if ((fh = strndup(ctime(&pr->entry.first_heard), 33)) == NULL) {
+			free(lh);
+ 			return;
+		}
+		if (*fh) fh[strlen(fh)-1] = '\0';
 		call = ax25_ntoa(&pr->entry.from_call);
 		if ((s = strstr(call, "-0")) != NULL)
 			*s = '\0';
-		printf("%-9s  %-5s  %5d %5d %5d  %s  %s\n",
+		printf("%-9s  %-5s  %8u %8u %8u  %s  %s\n",
 			call, pr->entry.portname, pr->entry.iframes, pr->entry.sframes, pr->entry.uframes, fh, lh);
+		free(lh);
+		free(fh);
 		break;
 	case 3:
+		if (!pr->entry.count)
+			return;
 		call = ax25_ntoa(&pr->entry.from_call);
 		if ((s = strstr(call, "-0")) != NULL)
 			*s = '\0';
-		printf("%-9s  %-5s  %5d %5s ",
+		if (pr->entry.type < 0 || pr->entry.type > sizeof(types))
+			return;
+		printf("%-9s  %-5s  %8u %5s ",
 			call, pr->entry.portname, pr->entry.count, types[pr->entry.type]);
 		if (pr->entry.mode & MHEARD_MODE_ARP)
 			printf(" ARP");
@@ -141,16 +166,25 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 		printf("\n");
 		break;
 	case 4:
-		strcpy(lh, ctime(&pr->entry.last_heard));
-		lh[19] = 0;
-		strcpy(fh, ctime(&pr->entry.first_heard));
-		fh[19] = 0;
+		if (!pr->entry.count)
+			return;
+		if (pr->entry.type < 0 || pr->entry.type > sizeof(types))
+			return;
+		if (pr->entry.last_heard < 0 || pr->entry.first_heard < 0)
+			return;
+		if ((lh = strndup(ctime(&pr->entry.last_heard), 33)) == NULL)
+ 			return;
+		if (*lh) lh[strlen(lh)-1] = '\0';
+		if ((fh = strndup(ctime(&pr->entry.first_heard), 33)) == NULL) {
+			free(lh);
+ 			return;
+		}
+		if (*fh) fh[strlen(fh)-1] = '\0';
 		call = ax25_ntoa(&pr->entry.from_call);
 		if ((s = strstr(call, "-0")) != NULL)
 			*s = '\0';
-		printf("%-9s  %-5s  %5d %5d %5d  %s  %s",
-			call, pr->entry.portname, pr->entry.iframes, pr->entry.sframes, pr->entry.uframes, fh, lh);
-		printf("%5d    %5s ", pr->entry.count, types[pr->entry.type]);
+		printf("%-9s  %-5s  %8u %8u %8u  %s  %s  %8u %5s ",
+			call, pr->entry.portname, pr->entry.iframes, pr->entry.sframes, pr->entry.uframes, fh, lh, pr->entry.count, types[pr->entry.type]);
 		if (pr->entry.mode & MHEARD_MODE_ARP)
 			printf(" ARP      ");
 		if (pr->entry.mode & MHEARD_MODE_FLEXNET)
@@ -179,7 +213,7 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			printf("          ");
 		
 		buffer[0] = '\0';
-		for (i = 0; i < pr->entry.ndigis; i++) {
+		for (i = 0; i < pr->entry.ndigis && i < 8; i++) {
 			if (i)
 				strcat(buffer, ",");
 			call = ax25_ntoa(&pr->entry.digis[i]);
@@ -188,6 +222,8 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			strcat(buffer, call);
 		}
 		printf("%s\n", buffer);
+		free(lh);
+		free(fh);
 		break;
 	}
 }
@@ -223,6 +259,8 @@ static void LoadPortData(void)
 	while (fread(&mheard, sizeof(struct mheard_struct), 1, fp) == 1) {
 		pr = malloc(sizeof(struct PortRecord));
 		pr->entry = mheard;
+		/* assure 0-terminated portname in case the record is garbled */
+		pr->entry.portname[19] = '\0';
 		pr->Next  = PortList;
 		PortList  = pr;
 	}
