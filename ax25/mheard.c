@@ -47,26 +47,27 @@ static void PrintHeader(int data)
 		printf("Callsign                                                               Port\n");
 		break;
 	case 2:
-		printf("Callsign   Port         #I       #S       #U  First Heard               Last Heard\n");
+		printf("Callsign   Port         #I       #S       #U  First Heard          Last Heard\n");
 		break;
 	case 3:
 		printf("Callsign   Port    Packets  Type  PIDs\n");
 		break;
 	case 4:
-		printf("Callsign   Port         #I       #S       #U  First Heard               Last Heard                 Packets  Type  PIDs     Targets\n");
+		printf("Callsign   Port         #I       #S       #U  First Heard          Last Heard            Packets  Type  PIDs     Targets\n");
 		break;
 	}
 }
 
 static void PrintPortEntry(struct PortRecord *pr, int data)
 {
-	char *lh, *fh, *call, *s;
+	char lh[20], fh[20], *call, *s;
 	char buffer[80];
 	int i;
+	struct tm *loc;
+
 
 	/* port record data can be garbled. We cannot trust the data.
-	   i.e., ctime() returns NULL at time_t 2^33 (72057594037927936).
-	   char lh[] was size 30. This is not enough for year > 999999999.
+	   time operations may returns NULL,
 	   also assure that pr->entry.type is < sizeof(types), and in 'case 4:',
            only up to 8 digipeaters are copied.
          */
@@ -77,15 +78,14 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			return;
 		if (pr->entry.last_heard < 0)
 			return;
-		if ((lh = strndup(ctime(&pr->entry.last_heard), 33)) == NULL)
- 			return;
-		if (*lh) lh[strlen(lh)-1] = '\0';
+        	if ((loc = localtime(&pr->entry.last_heard)) == 0 ||
+			strftime(lh, sizeof(lh),"%Y-%m-%d %H:%M:%S", loc) == 0)
+			return;
 		call =  ax25_ntoa(&pr->entry.from_call);
 		if ((s = strstr(call, "-0")) != NULL)
 			*s = '\0';
 		printf("%-9s  %-5s  %8u   %s\n",
 			call, pr->entry.portname, pr->entry.count, lh);
-		free(lh);
 		break;
 	case 1:
 		buffer[0] = '\0';
@@ -113,21 +113,17 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 	case 2:
 		if (pr->entry.last_heard < 0 || pr->entry.first_heard < 0)
 			return;
-		if ((lh = strndup(ctime(&pr->entry.last_heard), 33)) == NULL)
- 			return;
-		if (*lh) lh[strlen(lh)-1] = '\0';
-		if ((fh = strndup(ctime(&pr->entry.first_heard), 33)) == NULL) {
-			free(lh);
- 			return;
-		}
-		if (*fh) fh[strlen(fh)-1] = '\0';
+        	if ((loc = localtime(&pr->entry.last_heard)) == 0 ||
+			strftime(lh, sizeof(lh),"%Y-%m-%d %H:%M:%S", loc) == 0)
+			return;
+        	if ((loc = localtime(&pr->entry.first_heard)) == 0 ||
+			strftime(fh, sizeof(fh),"%Y-%m-%d %H:%M:%S", loc) == 0)
+			return;
 		call = ax25_ntoa(&pr->entry.from_call);
 		if ((s = strstr(call, "-0")) != NULL)
 			*s = '\0';
 		printf("%-9s  %-5s  %8u %8u %8u  %s  %s\n",
 			call, pr->entry.portname, pr->entry.iframes, pr->entry.sframes, pr->entry.uframes, fh, lh);
-		free(lh);
-		free(fh);
 		break;
 	case 3:
 		if (!pr->entry.count)
@@ -172,14 +168,12 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			return;
 		if (pr->entry.last_heard < 0 || pr->entry.first_heard < 0)
 			return;
-		if ((lh = strndup(ctime(&pr->entry.last_heard), 33)) == NULL)
- 			return;
-		if (*lh) lh[strlen(lh)-1] = '\0';
-		if ((fh = strndup(ctime(&pr->entry.first_heard), 33)) == NULL) {
-			free(lh);
- 			return;
-		}
-		if (*fh) fh[strlen(fh)-1] = '\0';
+        	if ((loc = localtime(&pr->entry.last_heard)) == 0 ||
+			strftime(lh, sizeof(lh),"%Y-%m-%d %H:%M:%S", loc) == 0)
+			return;
+        	if ((loc = localtime(&pr->entry.first_heard)) == 0 ||
+			strftime(fh, sizeof(fh),"%Y-%m-%d %H:%M:%S", loc) == 0)
+			return;
 		call = ax25_ntoa(&pr->entry.from_call);
 		if ((s = strstr(call, "-0")) != NULL)
 			*s = '\0';
@@ -222,8 +216,6 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			strcat(buffer, call);
 		}
 		printf("%s\n", buffer);
-		free(lh);
-		free(fh);
 		break;
 	}
 }
