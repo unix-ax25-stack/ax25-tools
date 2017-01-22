@@ -45,6 +45,8 @@
 #include <net/if.h>
 #include "hdrvcomm.h"
 
+#include <config.h>
+
 /* ---------------------------------------------------------------------- */
 
 static unsigned char trace_stat;
@@ -484,7 +486,7 @@ int main(int argc, char *argv[])
 	char pktbuf[2048];
 
 	progname = *argv;
-	printf("%s: Version 0.5; (C) 1996-1997 by Thomas Sailer HB9JNX/AE4WA\n", *argv);
+	printf("%s: Version " VERSION "; (C) 1996-1997 by Thomas Sailer HB9JNX/AE4WA\n", *argv);
 	hdrvc_args(&argc, argv, "bc0");
 	while ((ret = getopt(argc, argv, "bsdhpc:a")) != -1) {
 		switch (ret) {
