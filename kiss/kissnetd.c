@@ -24,7 +24,8 @@
 #include <time.h>
 #include <limits.h>
 
-static char *Version = "1.5";
+#include <config.h>
+
 static int VerboseMode;
 static int MaxFrameSize = 512;
 
@@ -57,14 +58,17 @@ static void Usage(void)
 static void Banner(int Small)
 {
 	if (Small) {
-		printf("kissnetd V %s by Frederic RIBLE F1OAT - ATEPRA FPAC/Linux Project\n", Version);
+		printf("kissnetd V %s by Frederic RIBLE F1OAT - ATEPRA FPAC/Linux Project\n", VERSION);
 	}
 	else {
 		printf("****************************************\n");
 		printf("* Network broadcast between kiss ports *\n");
 		printf("*      ATEPRA FPAC/Linux Project       *\n");
 		printf("****************************************\n");
-		printf("*         kissnetd Version %-4s        *\n", Version);
+		printf("* %*skissnetd Version %s%*s*\n",
+		       (int) (10 - strlen(VERSION) / 2), "",
+		       VERSION,
+		       (int) (10 - (strlen(VERSION) + 1)) / 2, "");
 		printf("*        by Frederic RIBLE F1OAT       *\n");
 		printf("****************************************\n");
 	}
