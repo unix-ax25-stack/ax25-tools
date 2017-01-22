@@ -41,6 +41,8 @@
 #include "hdrvcomm.h"
 #include "xfsmmixer.h"
 
+#include <config.h>
+
 /* ---------------------------------------------------------------------- */
 
 static char *progname;
@@ -314,7 +316,7 @@ int main(int argc, char *argv[])
 	unsigned char mdata;
 
 	progname = *argv;
-	printf("%s: Version 0.3; (C) 1996,1997,2000 by Thomas Sailer HB9JNX/AE4WA\n", progname);
+	printf("%s: Version " VERSION "; (C) 1996,1997,2000 by Thomas Sailer HB9JNX/AE4WA\n", progname);
 	hdrvc_args(&argc, argv, "sm0");
 	for (i = 1; i < argc; ) {
 		c = i;
