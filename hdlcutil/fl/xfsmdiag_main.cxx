@@ -50,6 +50,8 @@
 #include <FL/x.H>
 #include <FL/fl_draw.H>
 
+#include <config.h>
+
 /* ---------------------------------------------------------------------- */
 
 static char *progname;
@@ -355,7 +357,7 @@ int main(int argc, char *argv[])
 	char name[64];
 
 	progname = *argv;
-	printf("%s: Version 0.3; (C) 1996,1997,2000 by Thomas Sailer HB9JNX/AE4WA\n", *argv);
+	printf("%s: Version " VERSION "; (C) 1996,1997,2000 by Thomas Sailer HB9JNX/AE4WA\n", *argv);
 
 	hdrvc_args(&argc, argv, "sm0");
 	for (i = 1; i < argc; ) {
