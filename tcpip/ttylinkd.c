@@ -53,7 +53,7 @@
 #include "../pathnames.h"
 
 
-static char version[] = "ttylink daemon (Version 0.05, 9 March 1997) ready.\n";
+static char version[] = "ttylink daemon (Version " VERSION ") ready.\n";
 
 #define SYSOP_USER "root"
 
