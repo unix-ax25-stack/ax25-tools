@@ -333,7 +333,7 @@ int main(int argc, char *argv[])
 	unsigned int samplesperbit;
 
 	progname = *argv;
-	printf("%s: Version " VERSION "0.2; (C) 1996-1997 by Thomas Sailer HB9JNX/AE4WA\n", *argv);
+	printf("%s: Version " VERSION "; (C) 1996-1997 by Thomas Sailer HB9JNX/AE4WA\n", *argv);
 	hdrvc_args(&argc, argv, "sm0");
 	while ((ret = getopt(argc, argv, "d:ecp")) != -1) {
 		switch (ret) {
