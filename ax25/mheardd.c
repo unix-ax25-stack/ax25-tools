@@ -23,7 +23,6 @@
 
 #include <netinet/in.h>
 
-#include <config.h>
 #include <netax25/ax25.h>
 #include <netrose/rose.h>
 
