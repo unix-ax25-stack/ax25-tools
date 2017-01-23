@@ -6,6 +6,7 @@
 #include <pwd.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include <sys/types.h>
 #include <sys/ioctl.h>
@@ -25,7 +26,7 @@ int main(int argc, char **argv)
 	int s;
 
 	if (argc == 2 && strncmp(argv[1], "-v", 2) == 0) {
-		printf("axctl: %s\n", VERSION);
+		printf("axctl: %s\n", FULL_VER);
 		return 0;
 	}
 

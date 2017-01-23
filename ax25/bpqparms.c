@@ -36,6 +36,7 @@
 #include <linux/bpqether.h> /* xlz - dammit, we need this again */
 
 #include <config.h>
+#include <scm-version.h>
 
 void usage(void)
 {
@@ -96,7 +97,7 @@ int main(int argc, char **argv)
 			break;
 
 		case 'V':
-			printf("bpqparms version " VERSION "\n");
+			printf("bpqparms version " FULL_VER "\n");
 			printf("Copyright 1996, Jörg Reuter (jreuter@poboxes.com)\n");
 			printf("This program is free software; you can redistribute it and/or modify\n");
 			printf("it under the terms of the GNU General Public License as published by\n");
@@ -108,7 +109,7 @@ int main(int argc, char **argv)
 			return 0;
 
 		case 'v':
-			printf("bpqparms: %s\n", VERSION);
+			printf("bpqparms: %s\n", FULL_VER);
 			return 0;
 
 		case 'h':

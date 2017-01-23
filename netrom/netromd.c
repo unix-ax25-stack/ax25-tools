@@ -8,6 +8,7 @@
 #include <sys/time.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include <sys/types.h>
 #include <sys/ioctl.h>
@@ -172,7 +173,7 @@ int main(int argc, char **argv)
 			}
 			break;
 		case 'v':
-			printf("netromd: %s\n", VERSION);
+			printf("netromd: %s\n", FULL_VER);
 			return 0;
 		case '?':
 		case ':':

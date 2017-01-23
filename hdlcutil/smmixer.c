@@ -43,6 +43,7 @@
 #include "hdrvcomm.h"
 
 #include <config.h>
+#include <scm-version.h>
 
 /* ---------------------------------------------------------------------- */
 
@@ -726,7 +727,7 @@ int main(int argc, char *argv[])
 	struct sm_mixer_data mixdat;
 
 	progname = *argv;
-	printf("%s: Version " VERSION "; (C) 1996-1997 by Thomas Sailer HB9JNX/AE4WA\n", *argv);
+	printf("%s: Version " FULL_VER "; (C) 1996-1997 by Thomas Sailer HB9JNX/AE4WA\n", *argv);
 	hdrvc_args(&argc, argv, "sm0");
 	while ((c = getopt(argc, argv, "")) != -1) {
 		switch (c) {

@@ -33,6 +33,7 @@
 #include <netax25/mheard.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include "../pathnames.h"
 
@@ -149,7 +150,7 @@ int main(int argc, char **argv)
 			}
 			break;
 		case 'v':
-			printf("mheardd: %s\n", VERSION);
+			printf("mheardd: %s\n", FULL_VER);
 			return 0;
 		case ':':
 			fprintf(stderr, "mheardd: option -n needs an argument\n");

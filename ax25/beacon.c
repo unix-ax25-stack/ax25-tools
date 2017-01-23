@@ -17,6 +17,8 @@
 #include <netax25/axconfig.h>
 #include <netax25/daemon.h>
 
+#include <scm-version.h>
+
 static int logging = FALSE;
 static int mail = FALSE;
 static int single = FALSE;
@@ -75,7 +77,7 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case 'v':
-			printf("beacon: %s\n", VERSION);
+			printf("beacon: %s\n", FULL_VER);
 			return 0;
 		case '?':
 		case ':':

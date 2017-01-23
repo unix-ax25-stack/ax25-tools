@@ -25,6 +25,7 @@
 #include <limits.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 static int VerboseMode;
 static int MaxFrameSize = 512;
@@ -58,7 +59,7 @@ static void Usage(void)
 static void Banner(int Small)
 {
 	if (Small) {
-		printf("kissnetd V %s by Frederic RIBLE F1OAT - ATEPRA FPAC/Linux Project\n", VERSION);
+		printf("kissnetd V %s by Frederic RIBLE F1OAT - ATEPRA FPAC/Linux Project\n", FULL_VER);
 	}
 	else {
 		printf("****************************************\n");
@@ -66,9 +67,9 @@ static void Banner(int Small)
 		printf("*      ATEPRA FPAC/Linux Project       *\n");
 		printf("****************************************\n");
 		printf("* %*skissnetd Version %s%*s*\n",
-		       (int) (10 - strlen(VERSION) / 2), "",
-		       VERSION,
-		       (int) (10 - (strlen(VERSION) + 1)) / 2, "");
+		       (int) (10 - strlen(FULL_VER) / 2), "",
+		       FULL_VER,
+		       (int) (10 - (strlen(FULL_VER) + 1)) / 2, "");
 		printf("*        by Frederic RIBLE F1OAT       *\n");
 		printf("****************************************\n");
 	}

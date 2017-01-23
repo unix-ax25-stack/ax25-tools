@@ -58,6 +58,7 @@
 #include <netax25/daemon.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #define FLEX_CRC	2
 #define G8BPQ_CRC	1
@@ -385,7 +386,7 @@ static void report(void)
 	long t;
 
 	time(&t);
-	syslog(LOG_INFO, "version %s.", VERSION);
+	syslog(LOG_INFO, "version %s.", FULL_VER);
 	syslog(LOG_INFO, "Status report at %s", ctime(&t));
 	syslog(LOG_INFO, "Hardware handshaking %sabled.",
 	       hwflag  ? "en" : "dis");
@@ -462,7 +463,7 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case 'v':
-			printf("mkiss: %s\n", VERSION);
+			printf("mkiss: %s\n", FULL_VER);
 			return 1;
 		case ':':
 		case '?':

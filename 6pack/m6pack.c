@@ -53,6 +53,7 @@
 #include <netax25/daemon.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 typedef unsigned char __u8;
 typedef enum {data, command} frame_t;
@@ -387,7 +388,7 @@ static void report(struct iface *tty, struct iface **pty, int numptys)
 	long t;
 
 	time(&t);
-	syslog(LOG_INFO, "version %s.", VERSION);
+	syslog(LOG_INFO, "version %s.", FULL_VER);
 	syslog(LOG_INFO, "Status report at %s", ctime(&t));
 	syslog(LOG_INFO, "ttyinterface is %s (fd=%d)", tty->name, tty->fd);
 	for (i = 0; i < numptys; i++)
@@ -439,7 +440,7 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case 'v':
-			printf("m6pack: %s\n", VERSION);
+			printf("m6pack: %s\n", FULL_VER);
 			return 1;
 		case ':':
 		case '?':

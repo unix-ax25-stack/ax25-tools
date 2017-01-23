@@ -37,6 +37,7 @@
 #include <arpa/inet.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include <protocols/talkd.h>
 
@@ -53,7 +54,7 @@
 #include "../pathnames.h"
 
 
-static char version[] = "ttylink daemon (Version " VERSION ") ready.\n";
+static char version[] = "ttylink daemon (Version " FULL_VER ") ready.\n";
 
 #define SYSOP_USER "root"
 

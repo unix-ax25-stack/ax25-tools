@@ -138,6 +138,7 @@
 #include <netax25/rsconfig.h>
 #include <netax25/daemon.h>
 
+#include <scm-version.h>
 
 #include "../pathnames.h"
 
@@ -277,7 +278,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'v':
-			printf("ax25d: %s\n", VERSION);
+			printf("ax25d: %s\n", FULL_VER);
 			return 1;
 
 		default:

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -45,7 +46,7 @@ int main(int argc, char **argv)
 			Nrparms = strdup(buf);
 			break;
 		case 'v':
-			printf("nodesave: %s\n", VERSION);
+			printf("nodesave: %s\n", FULL_VER);
 			return 0;
 		case ':':
 		case '?':

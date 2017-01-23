@@ -17,6 +17,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <scm-version.h>
 
 #include "includes.h"
 
@@ -144,7 +145,7 @@ static void signal_handler(int sig)
 
 void do_version(void)
 {
-        fprintf(stderr, MYNAME " " VERSION "\n");
+        fprintf(stderr, MYNAME " " FULL_VER "\n");
 	fprintf(stderr, "  (c) 2002 Thomas Osterried <thomas@x-berg.in-berlin.de>\n");
 	fprintf(stderr, "  License: GPL. See http://www.fsf.org/\n");
 	fprintf(stderr, "  Sources: http://x-berg.in-berlin.de/cgi-bin/viewcvs.cgi/ampr/axgetput/\n");

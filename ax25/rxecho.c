@@ -64,6 +64,7 @@
 #include <sys/types.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include <sys/socket.h>
 
@@ -386,7 +387,7 @@ int main(int argc, char **argv)
 			logging = TRUE;
 			break;
 		case 'v':
-			printf("rxecho: %s\n", VERSION);
+			printf("rxecho: %s\n", FULL_VER);
 			return 0;
 		default:
 			fprintf(stderr, "usage: rxecho [-l] [-v]\n");

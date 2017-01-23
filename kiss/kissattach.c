@@ -12,6 +12,7 @@
 #include <errno.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -254,7 +255,7 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case 'v':
-			printf("%s: %s\n", progname, VERSION);
+			printf("%s: %s\n", progname, FULL_VER);
 			return 0;
 		case ':':
 		case '?':

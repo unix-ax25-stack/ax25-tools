@@ -5,6 +5,7 @@
 #include <ctype.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -127,7 +128,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'v':
-			printf("kissparms: %s\n", VERSION);
+			printf("kissparms: %s\n", FULL_VER);
 			return 0;
 
 		case 'x':

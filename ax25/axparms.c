@@ -7,6 +7,7 @@
 #include <pwd.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -352,7 +353,7 @@ int main(int argc, char **argv)
 	}
 
 	if (strncmp(argv[1], "--v", 3) == 0 || strncmp(argv[1], "-v", 2) == 0) {
-		printf("axparms: %s\n", VERSION);
+		printf("axparms: %s\n", FULL_VER);
 		return 0;
 	}
 

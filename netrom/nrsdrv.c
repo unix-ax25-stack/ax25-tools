@@ -19,6 +19,7 @@
 #include <netax25/ttyutils.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include "../pathnames.h"
 
@@ -326,7 +327,7 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case 'v':
-			printf("kissattach: %s\n", VERSION);
+			printf("kissattach: %s\n", FULL_VER);
 			return 0;
 		case ':':
 		case '?':
