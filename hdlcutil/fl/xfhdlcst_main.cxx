@@ -42,6 +42,7 @@
 #include "xfhdlcst.h"
 
 #include <config.h>
+#include <scm-version.h>
 
 /* ---------------------------------------------------------------------- */
 
@@ -82,7 +83,7 @@ int main(int argc, char *argv[])
 	char name[64];
 
 	progname = *argv;
-	printf("%s: Version " VERSION "; (C) 1996,1997,2000 by Thomas Sailer HB9JNX/AE4WA\n", *argv);
+	printf("%s: Version " FULL_VER "; (C) 1996,1997,2000 by Thomas Sailer HB9JNX/AE4WA\n", *argv);
 	hdrvc_args(&argc, argv, "bc0");
 	for (i = 1; i < argc; ) {
 		c = i;

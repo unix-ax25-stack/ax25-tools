@@ -2,6 +2,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <scm-version.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -296,7 +297,7 @@ int main(int argc, char **argv)
 			}
 			break;
 		case 'v':
-			printf("rip98d: %s\n", VERSION);
+			printf("rip98d: %s\n", FULL_VER);
 			return 0;
 		case ':':
 			fprintf(stderr, "rip98d: invalid time interval\n");

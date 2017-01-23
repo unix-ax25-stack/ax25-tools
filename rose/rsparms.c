@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include <sys/types.h>
 #include <sys/ioctl.h>
@@ -204,7 +205,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (strncmp(argv[1], "-v", 2) == 0) {
-		printf("rsparms: %s\n", VERSION);
+		printf("rsparms: %s\n", FULL_VER);
 		return 0;
 	}
 

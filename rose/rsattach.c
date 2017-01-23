@@ -10,6 +10,7 @@
 #include <limits.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include <sys/ioctl.h>
 
@@ -192,7 +193,7 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case 'v':
-			printf("rsattach: %s\n", VERSION);
+			printf("rsattach: %s\n", FULL_VER);
 			return 0;
 		case ':':
 		case '?':

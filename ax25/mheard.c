@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 
 #include <config.h>
+#include <scm-version.h>
 
 #include <netax25/ax25.h>
 #include <netrose/rose.h>
@@ -423,7 +424,7 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case 'v':
-			printf("mheard: %s\n", VERSION);
+			printf("mheard: %s\n", FULL_VER);
 			return 0;
 		case '?':
 		case ':':
