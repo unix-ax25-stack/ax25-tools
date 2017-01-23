@@ -1,0 +1,8 @@
+#ifndef __SCM_VERSION_H
+#define __SCM_VERSION_H
+
+#define RELEASE_VER "@RELEASE_VER@"
+#define SCM_VER "@SCM_VER@"
+#define FULL_VER RELEASE_VER SCM_VER
+
+#endif /* __SCM_VERSION_H  */
