@@ -125,7 +125,10 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "beacon: unable to convert callsign '%s'\n", addr);
 		return 1;
 	}
-	if (addr != NULL) free(addr); addr = NULL;
+	if (addr != NULL) {
+		free(addr);
+		addr = NULL;
+	}
 
 	if (srccall != NULL && strcmp(srccall, portcall) != 0) {
 		if ((addr = (char *) malloc(strlen(srccall) + 1 + strlen(portcall) + 1)) == NULL)
