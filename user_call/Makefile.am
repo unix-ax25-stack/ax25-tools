@@ -25,3 +25,5 @@ rose_call_SOURCES =	rose_call.c \
 tcp_call_SOURCES =	tcp_call.c \
 			user_io.c \
 			user_io.h
+
+AM_CPPFLAGS = -D_GNU_SOURCE

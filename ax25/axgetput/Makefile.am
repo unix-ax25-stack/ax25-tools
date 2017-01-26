@@ -17,3 +17,5 @@ install-exec-hook:
 
 install-data-hook:
 	(cd $(DESTDIR)$(mandir)/man1 && ln -sf axgetput.1 bget.1 && ln -sf axgetput.1 bput.1)
+
+AM_CPPFLAGS = -D_GNU_SOURCE

@@ -10,7 +10,6 @@
  */
 
 #include <stdio.h>
-#define __USE_XOPEN
 #include <stdlib.h>
 #include <sys/time.h>
 #include <sys/types.h>

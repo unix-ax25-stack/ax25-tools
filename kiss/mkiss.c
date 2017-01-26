@@ -38,7 +38,6 @@
  */
 
 #include <stdio.h>
-#define __USE_XOPEN
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>

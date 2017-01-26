@@ -1,5 +1,4 @@
 #include <stdio.h>
-#define __USE_XOPEN
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
