@@ -75,7 +75,7 @@ static unsigned char bitswap (unsigned char c)
 static int in2hex (char *ptr)
 {
 	char str[3];
-	int val;
+	unsigned int val;
 
 	memcpy (str, ptr, 2);
 	str[2] = '\0';
