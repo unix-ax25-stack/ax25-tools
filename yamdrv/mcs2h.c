@@ -5,7 +5,7 @@
 int in2hex(char *ptr)
 {
 	char str[3];
-	int val;
+	unsigned int val;
 
 	memcpy(str, ptr, 2);
 	str[2] = '\0';
@@ -33,7 +33,7 @@ unsigned char swap(unsigned char c)
 int in4hex(char *ptr)
 {
 	char str[5];
-	int val;
+	unsigned int val;
 
 	memcpy(str, ptr, 4);
 	str[4] = '\0';
