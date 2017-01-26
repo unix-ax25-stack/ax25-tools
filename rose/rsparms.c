@@ -123,7 +123,7 @@ void nodes(int s, int argc, char *argv[])
 		*mask = '\0';
 		mask++;
 
-		if (sscanf(mask, "%hd", &rs_node.mask) != 1) {
+		if (sscanf(mask, "%hu", &rs_node.mask) != 1) {
 			fprintf(stderr, "rsparms: nodes: no mask supplied!\n");
 			close(s);
 			exit(1);
