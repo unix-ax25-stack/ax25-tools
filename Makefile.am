@@ -21,4 +21,4 @@ scm-version.h:
 	    scm-version.h.in > scm-version.h.tmp &&			\
 	(cmp -s scm-version.h.tmp scm-version.h 2>/dev/zero ||		\
 	 mv scm-version.h.tmp scm-version.h)
-	rm scm-version.h.tmp
+	rm -f scm-version.h.tmp
