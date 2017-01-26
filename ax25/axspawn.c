@@ -1776,7 +1776,7 @@ again:
 			ret = -1;
 			if (pw->pw_dir && *(pw->pw_dir))
 				p = pw->pw_dir;
-				ret = chdir(p);
+			ret = chdir(p);
 			if (ret != 0) {
 				p = "/tmp";
 				chdir(p);
