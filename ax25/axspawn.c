@@ -460,7 +460,7 @@ struct write_queue *wqueue_tail;
 long wqueue_length = 0L;
 
 
-int encstathuf(char *src, int srclen, char *dest, int *destlen);
+int encstathuf(char *src, int srclen, void *dptr, int *destlen);
 int decstathuf(char *src, char *dest, int srclen, int *destlen);
 
 /*---------------------------------------------------------------------------*/
@@ -515,15 +515,16 @@ pid_t forkpty(int *, char *, void *, struct winsize *);
    is returned
 */
 
-int encstathuf(char *src, int srclen, char *dest, int *destlen)
+int encstathuf(char *src, int srclen, void *dptr, int *destlen)
 {
 	char *srcptr;
-	char *destptr;
+	unsigned char *destptr;
 	int wrklen;
 	int bit16;
 	int bit8;
 	unsigned short huffcode;
 	int hufflen;
+	unsigned char *dest = dptr;
 
 	if ((src == NULL) || (dest == NULL)) {
 		syslog(LOG_NOTICE, "Huffman encode: src or dest NULL!");
