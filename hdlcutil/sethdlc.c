@@ -332,17 +332,16 @@ static void do_set_params(int argc, char **argv)
 
 	if (set & 1)
 		ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_SETMODE, &newm);
+	if (ret < 0) {
+		perror("ioctl (HDLCDRVCTL_SETMODE)");
+		ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_MODELIST, &mlist);
 		if (ret < 0) {
-			perror("ioctl (HDLCDRVCTL_SETMODE)");
-			ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_MODELIST, &mlist);
-			if (ret < 0) {
-				perror("ioctl (HDLCDRVCTL_MODELIST)");
-				exit(1);
-			}
-			printf("driver supported modes: %s\n",
-			       mlist.data.modename);
+			perror("ioctl (HDLCDRVCTL_MODELIST)");
 			exit(1);
 		}
+		printf("driver supported modes: %s\n", mlist.data.modename);
+		exit(1);
+	}
 	if (set & 2) {
 		ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_SETMODEMPAR, &newp);
 		if (ret < 0) {
