@@ -7,4 +7,6 @@ dist_man_MANS = dmascc_cfg.1
 
 dist_doc_DATA = README.dmascc
 
+AM_CPPFLAGS = -D_GNU_SOURCE
+
 installconf:
