@@ -143,7 +143,10 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "beacon: unable to convert callsign '%s'\n", addr);
 		return 1;
 	}
-	if (addr != NULL) free(addr); addr = NULL;
+	if (addr != NULL) {
+		free(addr);
+		addr = NULL;
+	}
 
 	if (!single && dofork) {
 		if (!daemon_start(FALSE)) {
