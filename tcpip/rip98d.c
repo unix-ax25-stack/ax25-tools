@@ -161,7 +161,8 @@ static int read_routes(void)
 {
 	struct route_struct *route, *temp;
 	char buffer[1023], iface[16], net_addr[64], gate_addr[64], mask_addr[64];
-	int n, iflags, refcnt, use, metric, mss, window;
+	int n, refcnt, use, metric, mss, window;
+	unsigned int iflags;
 	struct in_addr address;
 	unsigned long int netmask;
 	unsigned long int network;
