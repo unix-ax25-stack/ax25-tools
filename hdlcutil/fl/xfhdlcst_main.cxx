@@ -76,9 +76,7 @@ int main(int argc, char *argv[])
 	int c, i;
 	int ret;
 	struct hdrvc_channel_state cs;
-#ifdef HDRVC_KERNEL
 	struct sm_ioctl smi;
-#endif /* HDRVC_KERNEL */
 	char buf[32];
 	char name[64];
 
@@ -126,10 +124,8 @@ int main(int argc, char *argv[])
 	/*
 	 * check for soundmodem driver
 	 */
-#ifdef HDRVC_KERNEL
 	ret = hdrvc_sm_ioctl(SMCTL_GETDEBUG, &smi);
 	if (ret < 0) {
-#endif /* HDRVC_KERNEL */
 		tdemodcyc->hide();
 		tmodcyc->hide();
 		tintfreq->hide();
@@ -138,9 +134,7 @@ int main(int argc, char *argv[])
 		modcyc->hide();
 		intfreq->hide();
 		dmares->hide();
-#ifdef HDRVC_KERNEL
 	}
-#endif /* HDRVC_KERNEL */
 	hdlcst->show();
 	for (;;) {
 		Fl::wait();

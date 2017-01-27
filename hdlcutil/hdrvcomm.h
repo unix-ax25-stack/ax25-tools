@@ -36,15 +36,9 @@ extern "C" {
 
 /* ---------------------------------------------------------------------- */
 
-#define HDRVC_KERNEL 1
-
-/* ---------------------------------------------------------------------- */
-
-#ifdef HDRVC_KERNEL
 #include <linux/hdlcdrv.h>
 #include "soundmodem.h"
 #include <linux/baycom.h>
-#endif /* HDRVC_KERNEL */
 
 /* ---------------------------------------------------------------------- */
 
@@ -102,12 +96,10 @@ extern int hdrvc_diag2(unsigned int mode, unsigned int flags, short *data, unsig
 extern int hdrvc_get_driver_name(char *buf, int bufsz);
 extern int hdrvc_get_mode_name(char *buf, int bufsz);
 
-#ifdef HDRVC_KERNEL
 extern int hdrvc_hdlcdrv_ioctl(int cmd, struct hdlcdrv_ioctl *par);
 extern int hdrvc_sm_ioctl(int cmd, struct sm_ioctl *par);
 extern int hdrvc_baycom_ioctl(int cmd, struct baycom_ioctl *par);
 extern int hdrvc_diag(struct sm_diag_data *diag);
-#endif /* HDRVC_KERNEL */
 
 /* ---------------------------------------------------------------------- */
 #ifdef __cplusplus
