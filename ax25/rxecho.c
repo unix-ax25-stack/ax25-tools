@@ -87,7 +87,6 @@
 #endif
 
 #include <features.h>    /* for the glibc version number */
-#if __GLIBC__ >= 2
 #ifdef	USE_SOCKADDR_SPKT
 #include <net/if_packet.h>
 #endif
@@ -97,13 +96,6 @@
 #include <netpacket/packet.h>
 #endif
 #include <net/ethernet.h>
-#else
-#if defined(USE_SOCKADDR_SPKT) || defined(USE_SOCKADDR_SLL)
-#include <asm/types.h>
-#include <linux/if_packet.h>
-#endif
-#include <linux/if_ether.h>
-#endif
 
 #include <netinet/in.h>
 
