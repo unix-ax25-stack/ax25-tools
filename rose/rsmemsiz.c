@@ -10,6 +10,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "../pathnames.h"
+
 enum meminfo_row { meminfo_main = 0,
 		   meminfo_swap };
 
@@ -22,10 +24,6 @@ unsigned read_total_main(void);
 /*
  * This code is slightly modified from the procps package.
  */
-
-#define UPTIME_FILE  "/proc/uptime"
-#define LOADAVG_FILE "/proc/loadavg"
-#define MEMINFO_FILE "/proc/meminfo"
 
 static char buf[300];
 
@@ -55,9 +53,9 @@ static char buf[300];
 int uptime(double *uptime_secs, double *idle_secs) {
     double up=0, idle=0;
 
-    FILE_TO_BUF(UPTIME_FILE)
+    FILE_TO_BUF(PROC_UPTIME_FILE)
     if (sscanf(buf, "%lf %lf", &up, &idle) < 2) {
-	fprintf(stdout, "ERROR: Bad data in %s\r", UPTIME_FILE);
+	fprintf(stdout, "ERROR: Bad data in %s\r", PROC_UPTIME_FILE);
 	return 0;
     }
     SET_IF_DESIRED(uptime_secs, up);
@@ -68,9 +66,9 @@ int uptime(double *uptime_secs, double *idle_secs) {
 int loadavg(double *av1, double *av5, double *av15) {
     double avg_1=0, avg_5=0, avg_15=0;
 
-    FILE_TO_BUF(LOADAVG_FILE)
+    FILE_TO_BUF(PROC_LOADAVG_FILE)
     if (sscanf(buf, "%lf %lf %lf", &avg_1, &avg_5, &avg_15) < 3) {
-	fprintf(stdout, "ERROR: Bad data in %s\r", LOADAVG_FILE);
+	fprintf(stdout, "ERROR: Bad data in %s\r", PROC_LOADAVG_FILE);
 	return 0;
     }
     SET_IF_DESIRED(av1,  avg_1);
@@ -101,7 +99,7 @@ unsigned** meminfo(void) {
 	char *p;
 	int i, j, k, l;
 
-	FILE_TO_BUF(MEMINFO_FILE)
+	FILE_TO_BUF(PROC_MEMINFO_FILE)
 	if (!row[0])				/* init ptrs 1st time through */
 	for (i=0; i < MAX_ROW; i++)		/* std column major order: */
 		row[i] = num + MAX_COL*i;	/* A[i][j] = A + COLS*i + j */
