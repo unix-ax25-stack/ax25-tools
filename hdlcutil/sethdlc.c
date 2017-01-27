@@ -237,7 +237,6 @@ static void print_bits(int (*bitproc)(void))
 
 /* ---------------------------------------------------------------------- */
 
-#ifdef HDRVC_KERNEL
 
 static void do_set_params(int argc, char **argv)
 {
@@ -375,7 +374,6 @@ static void do_set_params(int argc, char **argv)
 	exit(0);
 }
 
-#endif /* HDRVC_KERNEL */
 
 /* ---------------------------------------------------------------------- */
 
@@ -466,9 +464,7 @@ static const char *usage_str =
 "  -d: trace dcd and ptt status on stdout\n"
 "  -i: specify the name of the baycom kernel driver interface\n"
 "  -c: calibrate (i.e. send calibration pattern) for cal seconds\n"
-#ifdef HDRVC_KERNEL
 "  -p: set or display interface parameters\n"
-#endif /* HDRVC_KERNEL */
 "  -h: this help\n\n";
 
 int main(int argc, char *argv[])
@@ -499,11 +495,9 @@ int main(int argc, char *argv[])
 		case 'd':
 			trace_stat = 1;
 			break;
-#ifdef HDRVC_KERNEL
 		case 'p':
 			getsetparams = 1;
 			break;
-#endif /* HDRVC_KERNEL */
 		case 'a':
 			getsetparams = 2;
 			break;
@@ -518,9 +512,7 @@ int main(int argc, char *argv[])
 	}
 	hdrvc_init();
 	if (getsetparams == 1) {
-#ifdef HDRVC_KERNEL
 		do_set_params(argc - optind, argv+optind);
-#endif /* HDRVC_KERNEL */
 		exit(0);
 	}
 	if (getsetparams == 2) {
@@ -549,7 +541,6 @@ int main(int argc, char *argv[])
 			       chst.dcd ? 'D' : '-', chst.ptt ? 'P' : '-',
 			       chst.rx_packets, chst.tx_packets, chst.rx_errors,
 			       chst.tx_errors);
-#ifdef HDRVC_KERNEL
 			if (hdrvc_sm_ioctl(SMCTL_GETDEBUG, &bsi) >= 0) {
 				printf("   intrate: %u  modcyc: %u  "
 				       "demodcyc: %u  dmares: %u",
@@ -563,7 +554,6 @@ int main(int argc, char *argv[])
 				       bbi.data.dbg.debug1, bbi.data.dbg.debug2,
 				       bbi.data.dbg.debug3);
 			}
-#endif /* HDRVC_KERNEL */
 			printf("\n");
 			break;
 		case 2:

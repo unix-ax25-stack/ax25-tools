@@ -62,9 +62,7 @@
 
 /* ---------------------------------------------------------------------- */
 
-#ifdef HDRVC_KERNEL
 static int kernel_mode = 1;
-#endif /* HDRVC_KERNEL */
 static const char *if_name = "bcsf0";
 static char *prg_name;
 static int fd = -1;
@@ -77,14 +75,12 @@ static int msqid = -1;
 
 static void terminate(void)
 {
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		if (ioctl(fd, SIOCSIFFLAGS, &ifr_h) < 0) {
 			perror("ioctl (SIOCSIFFLAGS)");
 			exit(1);
 		}
 	}
-#endif /* HDRVC_KERNEL */
 	exit(0);
 }
 
@@ -104,7 +100,6 @@ int hdrvc_recvpacket(char *pkt, int maxlen)
 	struct sockaddr_ll from;
 	socklen_t from_len = sizeof(from);
 
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		if (!promisc) {
 			if (afpacket) {
@@ -158,7 +153,6 @@ int hdrvc_recvpacket(char *pkt, int maxlen)
 			return 0;
 		return recvfrom(fd, pkt, maxlen, 0, (struct sockaddr *)&from, &from_len);
 	}
-#endif /* HDRVC_KERNEL */
 	return -1;
 }
 
@@ -188,7 +182,6 @@ void hdrvc_args(int *argc, char *argv[], const char *def_if)
 		return;
 	prg_name = argv[0];
 	for (i = 1; i < ac-1; i++) {
-#ifdef HDRVC_KERNEL
 		if (!strcmp(argv[i], "-i")) {
 			kernel_mode = 1;
 			if_name = argv[i+1];
@@ -197,11 +190,8 @@ void hdrvc_args(int *argc, char *argv[], const char *def_if)
 				memmove(argv+i, argv+i+2, (ac-i) * sizeof(void *));
 			i--;
 		} else
-#endif /* HDRVC_KERNEL */
 			if (!strcmp(argv[i], "-u")) {
-#ifdef HDRVC_KERNEL
 				kernel_mode = 0;
-#endif /* HDRVC_KERNEL */
 				if_name = argv[i+1];
 				ac -= 2;
 				if (i < ac)
@@ -219,7 +209,6 @@ void hdrvc_init(void)
 	key_t k;
 	static struct ifreq ifr;
 
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		strcpy(ifr_h.ifr_name, if_name);
 		/* first try to use AF_PACKET */
@@ -252,7 +241,6 @@ void hdrvc_init(void)
 		}
 		return;
 	}
-#endif /* HDRVC_KERNEL */
 	k = ftok(if_name, USERSM_KEY_PROJ);
 	if (k == (key_t)-1) {
 		fprintf(stderr, "%s: Error %s (%i), cannot ftok on %s\n", prg_name,
@@ -300,7 +288,6 @@ int hdrvc_recvmsg(struct usersmmsg *msg, int maxlen, long type)
 
 /* ---------------------------------------------------------------------- */
 
-#ifdef HDRVC_KERNEL
 
 int hdrvc_hdlcdrv_ioctl(int cmd, struct hdlcdrv_ioctl *par)
 {
@@ -402,7 +389,6 @@ int hdrvc_diag(struct sm_diag_data *diag)
 	return 0;
 }
 
-#endif /* HDRVC_KERNEL */
 
 /* ---------------------------------------------------------------------- */
 
@@ -411,14 +397,12 @@ int hdrvc_get_samples(void)
 	int ret;
 	struct hdlcdrv_ioctl bi;
 
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_GETSAMPLES, &bi);
 		if (ret < 0)
 			return ret;
 		return bi.data.bits & 0xff;
 	}
-#endif /* HDRVC_KERNEL */
 	errno = EAGAIN;
 	return -1;
 }
@@ -430,14 +414,12 @@ int hdrvc_get_bits(void)
 	int ret;
 	struct hdlcdrv_ioctl bi;
 
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_GETBITS, &bi);
 		if (ret < 0)
 			return ret;
 		return bi.data.bits & 0xff;
 	}
-#endif /* HDRVC_KERNEL */
 	errno = EAGAIN;
 	return -1;
 }
@@ -450,7 +432,6 @@ int hdrvc_get_channel_access_param(struct hdrvc_channel_params *par)
 	int ret;
 	struct usersmmsg msg;
 
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		if ((ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_GETCHANNELPAR, &hi)) < 0)
 			return ret;
@@ -465,7 +446,6 @@ int hdrvc_get_channel_access_param(struct hdrvc_channel_params *par)
 		par->fulldup = hi.data.cp.fulldup;
 		return 0;
 	}
-#endif /* HDRVC_KERNEL */
 	msg.hdr.type = USERSM_CMD_REQ_CHACCESS_PAR;
 	msg.hdr.channel = 0;
 	hdrvc_sendmsg(&msg, 0);
@@ -491,7 +471,6 @@ int hdrvc_set_channel_access_param(struct hdrvc_channel_params par)
 	int ret;
 	struct usersmmsg msg;
 
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		struct hdlcdrv_ioctl hi;
 
@@ -504,7 +483,6 @@ int hdrvc_set_channel_access_param(struct hdrvc_channel_params par)
 			return ret;
 		return 0;
 	}
-#endif /* HDRVC_KERNEL */
 	msg.hdr.type = USERSM_CMD_SET_CHACCESS_PAR;
 	msg.hdr.channel = 0;
 	msg.data.cp.tx_delay = par.tx_delay;
@@ -523,12 +501,10 @@ int hdrvc_calibrate(int calib)
 	struct hdlcdrv_ioctl bhi;
 	struct usersmmsg msg;
 
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		bhi.data.calibrate = calib;
 		return hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_CALIBRATE, &bhi);
 	}
-#endif /* HDRVC_KERNEL */
 	msg.hdr.type = USERSM_CMD_CALIBRATE;
 	msg.hdr.channel = 0;
 	msg.data.calib = calib;
@@ -548,7 +524,6 @@ int hdrvc_get_channel_state(struct hdrvc_channel_state *st)
 		errno = EINVAL;
 		return -1;
 	}
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_GETSTAT, &bhi);
 		if (ret >= 0) {
@@ -562,7 +537,6 @@ int hdrvc_get_channel_state(struct hdrvc_channel_state *st)
 		}
 		return ret;
 	}
-#endif /* HDRVC_KERNEL */
 	msg.hdr.type = USERSM_CMD_REQ_CHANNELSTATE;
 	msg.hdr.channel = 0;
 	hdrvc_sendmsg(&msg, 0);
@@ -599,7 +573,6 @@ int hdrvc_diag2(unsigned int mode, unsigned int flags, short *data,
 		errno = EINVAL;
 		return -1;
 	}
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		struct sm_ioctl smi;
 		static unsigned int modeconvsm[4] = {
@@ -619,7 +592,6 @@ int hdrvc_diag2(unsigned int mode, unsigned int flags, short *data,
 			return 0;
 		return smi.data.diag.datalen;
 	}
-#endif /* HDRVC_KERNEL */
 	msg.hdr.type = USERSM_CMD_REQ_DIAG;
 	msg.hdr.channel = 0;
 	msg.data.diag.mode = modeconvusersm[mode];
@@ -651,7 +623,6 @@ int hdrvc_get_driver_name(char *buf, int bufsz)
 	int ret;
 	struct usersmmsg msg;
 
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		struct hdlcdrv_ioctl bhi;
 
@@ -661,7 +632,6 @@ int hdrvc_get_driver_name(char *buf, int bufsz)
 		strncpy(buf, bhi.data.modename, bufsz);
 		return 0;
 	}
-#endif /* HDRVC_KERNEL */
 	msg.hdr.type = USERSM_CMD_REQ_DRVNAME;
 	msg.hdr.channel = 0;
 	hdrvc_sendmsg(&msg, 0);
@@ -686,7 +656,6 @@ int hdrvc_get_mode_name(char *buf, int bufsz)
 	int ret;
 	struct usersmmsg msg;
 
-#ifdef HDRVC_KERNEL
 	if (kernel_mode) {
 		struct hdlcdrv_ioctl bhi;
 
@@ -696,7 +665,6 @@ int hdrvc_get_mode_name(char *buf, int bufsz)
 		strncpy(buf, bhi.data.modename, bufsz);
 		return 0;
 	}
-#endif /* HDRVC_KERNEL */
 	msg.hdr.type = USERSM_CMD_REQ_DRVMODE;
 	msg.hdr.channel = 0;
 	hdrvc_sendmsg(&msg, 0);
