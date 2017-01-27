@@ -15,6 +15,10 @@
 #define	LOCK_AXSPAWN_FILE	"/var/lock/axspawn"
 #define	LOCK_SERIAL_DIR		"/var/lock"
 
+#define PROC_LOADAVG_FILE	"/proc/loadavg"
+#define PROC_MEMINFO_FILE	"/proc/meminfo"
+#define PROC_UPTIME_FILE	"/proc/uptime"
+
 #define	PROC_AX25_FILE		"/proc/net/ax25"
 #define	PROC_AX25_ROUTE_FILE	"/proc/net/ax25_route"
 #define	PROC_IP_ROUTE_FILE	"/proc/net/route"
