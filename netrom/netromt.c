@@ -155,7 +155,7 @@ static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, in
 
 			if (ax25_aton_entry(callsign, message + len) == -1) {
 				if (logging)
-					syslog(LOG_ERR, "netromt: invalid callsign '%s' in /proc/net/nr_nodes\n", callsign);
+					syslog(LOG_ERR, "netromt: invalid callsign '%s' in "PROC_NR_NODES_FILE"\n", callsign);
 				continue;
 			}
 			len += CALLSIGN_LEN;
@@ -166,7 +166,7 @@ static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, in
 
 			if (ax25_aton_entry(neighbour, message + len) == -1) {
 				if (logging)
-					syslog(LOG_ERR, "netromt: invalid callsign '%s' in /proc/net/nr_neigh\n", neighbour);
+					syslog(LOG_ERR, "netromt: invalid callsign '%s' in "PROC_NR_NEIGH_FILE"\n", neighbour);
 				len -= (CALLSIGN_LEN + MNEMONIC_LEN);
 				continue;
 			}
