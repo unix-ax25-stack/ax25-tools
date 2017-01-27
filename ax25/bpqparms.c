@@ -29,9 +29,7 @@
 #include <sys/socket.h>
 #include <net/if.h>
 
-#ifdef __GLIBC__
 #include <net/ethernet.h> /* is this really needed ??  */
-#endif
 
 #include <linux/bpqether.h> /* xlz - dammit, we need this again */
 

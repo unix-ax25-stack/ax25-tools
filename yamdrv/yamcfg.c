@@ -47,11 +47,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <net/if.h>
-#ifdef __GLIBC__
 #include <netinet/if_ether.h>
-#else
-#include <linux/if_ether.h>
-#endif
 #include <endian.h>
 #include <netinet/in.h>
 

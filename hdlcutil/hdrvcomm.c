@@ -49,11 +49,7 @@
 #include "usersmdiag.h"
 #include <net/if_arp.h>
 
-#ifdef __GLIBC__
 #include <net/ethernet.h>
-#else
-#include <linux/if_ether.h>
-#endif
 
 #include <linux/if_packet.h>
 #ifndef SOL_PACKET

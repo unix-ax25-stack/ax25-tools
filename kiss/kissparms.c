@@ -11,11 +11,7 @@
 #include <netinet/in.h>
 #include <net/if.h>
 
-#ifdef __GLIBC__
 #include <net/ethernet.h>
-#else
-#include <linux/if_ether.h>
-#endif
 
 #include <netax25/ax25.h>
 #include <netrose/rose.h>
