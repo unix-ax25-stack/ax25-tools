@@ -18,7 +18,7 @@
 #include <netax25/axconfig.h>
 #include <netax25/rsconfig.h>
 
-void alarm_handler(int sig)
+static void alarm_handler(int sig)
 {
 }
 
