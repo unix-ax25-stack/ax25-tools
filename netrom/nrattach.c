@@ -28,10 +28,10 @@
 
 #include "../pathnames.h"
 
-char *callsign;
-int  mtu;
+static char *callsign;
+static int  mtu;
 
-int readconfig(char *port)
+static int readconfig(char *port)
 {
 	FILE *fp;
 	char buffer[90], *s;
@@ -95,7 +95,7 @@ int readconfig(char *port)
 	return FALSE;
 }
 
-int getfreedev(char *dev)
+static int getfreedev(char *dev)
 {
 	struct ifreq ifr;
 	int fd;
@@ -126,7 +126,7 @@ int getfreedev(char *dev)
 	return FALSE;
 }
 
-int startiface(char *dev, struct hostent *hp)
+static int startiface(char *dev, struct hostent *hp)
 {
 	struct ifreq ifr;
 	char call[7];
