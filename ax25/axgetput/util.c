@@ -75,7 +75,7 @@ int my_read(int fd, char *s, int len_max, int *eof, char *p_break)
   timeout.tv_usec = 0;
   FD_ZERO(&errfds);
   FD_SET(fdout, &errfds);
-  if (select(fd+1, 0, 0, &errfds, &timeout) && FD_ISSET(fd, &errfds))
+  if (select(fd+1, NULL, NULL, &errfds, &timeout) && FD_ISSET(fd, &errfds))
     *eof = 1;
 
   return len_got;
@@ -152,7 +152,7 @@ char *get_fixed_filename(char *line, long size, unsigned int msg_crc, int genera
     }
   }
   if (!*filename && generate_filename) {
-    sprintf(filename, "unknown-%ld%d%ld.bin", size, msg_crc, time(0));
+    sprintf(filename, "unknown-%ld%d%ld.bin", size, msg_crc, time(NULL));
   }
   return filename;
 }
