@@ -226,8 +226,8 @@ int main(int argc, char *argv[])
 	sysop_user=strtok(sysop_addr,"@");
 	sysop_host=strtok(NULL,"@");
 
-	if ((ppe = getprotobyname("udp")) == 0)
-	{
+	ppe = getprotobyname("udp");
+	if (!ppe) {
 		syslog(LOG_DAEMON | LOG_CRIT, "Cannot find udp protocol entry.");
 		exit(1);
 	}
@@ -383,7 +383,7 @@ int main(int argc, char *argv[])
 	signal(SIGALRM, alarm_handle);
 	alarm(30);
 
-	if ((new_skt = accept(skt, 0, 0)) < 0)
+	if ((new_skt = accept(skt, NULL, NULL)) < 0)
 	{
 		if (errno == EINTR)
 		{
