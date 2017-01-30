@@ -32,14 +32,14 @@ static int conv_rand(void)
 
 static void conv_randomize(void)
 {
-	seed = (time(0) & CONV_RAND_MAX);
+	seed = (time(NULL) & CONV_RAND_MAX);
 }
 
 /*--------------------------------------------------------------------------*/
 
 static int conv_random(int num, int base)
 {
-	return ((long) (conv_rand() * time(0)) & CONV_RAND_MAX) % num + base;
+	return ((long) (conv_rand() * time(NULL)) & CONV_RAND_MAX) % num + base;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -231,14 +231,14 @@ static void write_example_passwd(char *pwfile, char pwlocation,
 
 char *read_pwd (struct passwd *pw, int *pwtype)
 {
-	FILE * f = 0;
+	FILE * f = NULL;
 	struct stat statbuf;
 	char pwfile[PATH_MAX + 1];
 	int len;
 	char pwlocation;
 	char buf[2048];
 	int only_systempw = 0;
-	char *pass = 0;
+	char *pass = NULL;
 	char *p_buf;
 	char *p;
 
@@ -364,7 +364,7 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 			} else if ( (*pwtype & PW_UNIX) &&  (!Strcasecmp(p_buf, "unix") ) ) {
 				fclose(f);
 				*pwtype = PW_UNIX;
-				return 0;
+				return NULL;
 			}
 		}
 	}
@@ -388,5 +388,5 @@ found:
 end:
 	*pwtype = (((*pwtype) & PW_CLEARTEXT) ? PW_CLEARTEXT : 0);
 		   /*         ^ may allow cleartext? - then cleartext, else deny */
-	return 0;
+	return NULL;
 }
