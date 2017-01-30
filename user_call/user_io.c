@@ -62,12 +62,13 @@ void end_compress(void)
 
 static int flush_output(int fd, const void *buf, size_t count)
 {
+	const unsigned char *byte = buf;
 	int cnt = count;
 
 	while (cnt > 0) {
-		if (write(fd, buf, min(paclen_out, cnt)) < 0)
+		if (write(fd, byte, min(paclen_out, cnt)) < 0)
 			return -1;
-		buf += paclen_out;
+		byte += paclen_out;
 		cnt -= paclen_out;
 	}
 
