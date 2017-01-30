@@ -243,7 +243,7 @@ static void reload_timer(int sec)
 	itv.it_value.tv_usec = 0;
 	itv.it_interval.tv_sec = 0;
 	itv.it_interval.tv_usec = 0;
-	setitimer(ITIMER_REAL, &itv, 0);
+	setitimer(ITIMER_REAL, &itv, NULL);
 	signal(SIGALRM, _ReadConfig);
 }
 
@@ -1272,7 +1272,7 @@ int main(int argc, char *argv[])
 						}
 
 						*buf = 0;
-						mesg = 0;
+						mesg = NULL;
 						while ((i = read(new, buf, (sizeof(buf)-1))) > 0) {
 							buf[i] = 0;
 							if (Logging && raxl->LoggingVC > 1) {
