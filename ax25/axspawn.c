@@ -467,15 +467,6 @@ static int Xtolower(int c)
 
 /*---------------------------------------------------------------------------*/
 
-/* Use private function because some platforms are broken, eg 386BSD */
-
-int Xtoupper(int c)
-{
-  return (c >= 'a' && c <= 'z') ? (c - 'a' + 'A') : c;
-}
-
-/*---------------------------------------------------------------------------*/
-
 int Strcasecmp(const char *s1, const char *s2)
 {
   while (Xtolower(*s1) == Xtolower(*s2)) {
