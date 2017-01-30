@@ -19,10 +19,13 @@
 #include <netax25/axconfig.h>
 #include <netax25/nrconfig.h>
 
-char nodes_usage[]  = "usage: nrparms -nodes nodecall +|- ident quality count port neighbour [digicall...]\n";
-char routes_usage[] = "usage: nrparms -routes port nodecall [digicall...] +|- pathquality\n";
+static char nodes_usage[]  = "usage: nrparms -nodes nodecall +|- "
+	"ident quality count port neighbour [digicall...]\n";
+static char routes_usage[] = "usage: nrparms -routes port nodecall "
+	"[digicall...] +|- pathquality\n";
 
-void nodes(int s, char *nodecall, char *op, char *ident, int quality, int count, char *port, char *neighbour, char *digis[])
+static void nodes(int s, char *nodecall, char *op, char *ident, int quality,
+	int count, char *port, char *neighbour, char *digis[])
 {
 	struct nr_route_struct nr_node;
 	char *p, *q, *dev;
@@ -121,7 +124,7 @@ void nodes(int s, char *nodecall, char *op, char *ident, int quality, int count,
 	}
 }
 
-void routes(int s, char *port, char *nodecall, char *rest[])
+static void routes(int s, char *port, char *nodecall, char *rest[])
 {
 	struct nr_route_struct nr_neigh;
 	char *dev, *op;
