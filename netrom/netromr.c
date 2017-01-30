@@ -25,8 +25,6 @@
 
 #include "netromd.h"
 
-extern int compliant;
-
 static int validcallsign(ax25_address *a)
 {
 	char c;
