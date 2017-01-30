@@ -22,33 +22,6 @@ enum meminfo_col { meminfo_total = 0, meminfo_used, meminfo_free,
 
 unsigned read_total_main(void);
 
-/*
- * This code is slightly modified from the procps package.
- */
-
-static char buf[300];
-
-/* This macro opens FILE only if necessary and seeks to 0 so that successive
-   calls to the functions are more efficient.  It also reads the current
-   contents of the file into the global buf.
-*/
-#define FILE_TO_BUF(FILE) {					\
-    static int n, fd = -1;					\
-    if (fd == -1 && (fd = open(FILE, O_RDONLY)) == -1) {	\
-	fprintf(stdout, "ERROR: file %s, %s\r", FILE, strerror(errno));	\
-	close(fd);						\
-	return 0;						\
-    }								\
-    lseek(fd, 0L, SEEK_SET);					\
-    if ((n = read(fd, buf, sizeof buf - 1)) < 0) {		\
-	fprintf(stdout, "ERROR: file %s, %s\r", FILE, strerror(errno));	\
-	close(fd);						\
-	fd = -1;						\
-	return 0;						\
-    }								\
-    buf[n] = '\0';						\
-}
-
 static int getuptime(double *uptime_secs)
 {
 	struct sysinfo si;
@@ -81,10 +54,34 @@ static unsigned **meminfo(void)
 {
 	static unsigned *row[MAX_ROW + 1];	/* row pointers */
 	static unsigned num[MAX_ROW * MAX_COL];	/* number storage */
+	static int n, fd = -1;
+	char buf[300];
 	char *p;
 	int i, j, k, l;
 
-	FILE_TO_BUF(PROC_MEMINFO_FILE)
+	/*
+	 * Open FILE only if necessary and seek to 0 so that successive calls
+	 * to the functions are more efficient.  It also reads the current
+	 * contents of the file into the global buf.
+	 */
+	if (fd == -1 && (fd = open(PROC_MEMINFO_FILE, O_RDONLY)) == -1) {
+		fprintf(stdout, "ERROR: file %s, %s\r",
+		        PROC_MEMINFO_FILE, strerror(errno));
+
+		return NULL;
+	}
+	lseek(fd, 0L, SEEK_SET);
+	n = read(fd, buf, sizeof buf - 1);
+	if (n < 0) {
+		fprintf(stdout, "ERROR: file %s, %s\r",
+		        PROC_MEMINFO_FILE, strerror(errno));
+		close(fd);
+		fd = -1;
+
+		return NULL;
+	}
+	buf[n] = '\0';
+
 	if (!row[0])				/* init ptrs 1st time through */
 	for (i=0; i < MAX_ROW; i++)		/* std column major order: */
 		row[i] = num + MAX_COL*i;	/* A[i][j] = A + COLS*i + j */
