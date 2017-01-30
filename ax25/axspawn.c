@@ -821,7 +821,7 @@ static void kick_wqueue(int dummy)
 	itv.it_interval.tv_sec = 0;
 	itv.it_interval.tv_usec = 0;
 
-	setitimer(ITIMER_REAL, &itv, 0);
+	setitimer(ITIMER_REAL, &itv, NULL);
 	signal(SIGALRM, kick_wqueue);
 }
 
@@ -1403,7 +1403,7 @@ int main(int argc, char **argv)
 	int pwtype = 0;
 	int pwtype_orig = 0;
 	char prompt[20];
-	char *pwd = 0;
+	char *pwd = NULL;
 
 	*prompt = 0;
 
@@ -1646,7 +1646,7 @@ again:
 			pwtype = (pwtype_orig & ~PW_MD5);
 			if (pwd)
 				free(pwd);
-			pwd = 0;
+			pwd = NULL;
 			goto again;
 		}
 		if (!strstr(buf, pass_want)) {
@@ -1657,7 +1657,7 @@ again:
 		}
 		if (pwd)
 			free(pwd);
-		pwd = 0;
+		pwd = NULL;
 	} else {
 		if (pw->pw_uid == 0 || pw->pw_gid == 0) {
 			sprintf(buf, "Sorry, root logins are only allowed with md5- or baycom-password!\r");
@@ -1669,7 +1669,7 @@ again:
 	}
 	if (pwd)
 		free(pwd);
-	pwd = 0;
+	pwd = NULL;
 
 	/*
 	 * associate UID with callsign (or vice versa?)
@@ -1748,7 +1748,7 @@ again:
 
 		if (dumb_embedded_system) {
 			int ret = -1;
-			char *p = 0;
+			char *p = NULL;
 
 			chown(ptyslave, pw->pw_uid, 0);
 			chmod(ptyslave, 0622);
@@ -1779,7 +1779,7 @@ again:
 					if ((p = strdup(p)))
 						*p = '-';
 
-				} else p = 0;
+				} else p = NULL;
 			}
 			if (!p)
 				p = shell;
