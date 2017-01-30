@@ -205,7 +205,8 @@ static int maxfd = -1;
 
 /*--------------------------------------------------------------------------*/
 
-void update_maxfd(void) {
+static void update_maxfd(void)
+{
 	struct axlist *paxl;
 
 	FD_ZERO(&fdread);
@@ -220,7 +221,8 @@ void update_maxfd(void) {
 
 /*--------------------------------------------------------------------------*/
 
-void err_config(void) {
+static void err_config(void)
+{
 	if (AXL == NULL) {
 		if (Logging)
 			syslog(LOG_ERR, "config file reload error, exiting");
@@ -233,14 +235,15 @@ void err_config(void) {
 
 /*--------------------------------------------------------------------------*/
 
-void _ReadConfig(int dummy)
+static void _ReadConfig(int dummy)
 {
 	ReadConfig();
 }
 
 /*--------------------------------------------------------------------------*/
 
-void reload_timer(int sec) {
+static void reload_timer(int sec)
+{
 	struct itimerval itv;
 
 	itv.it_value.tv_sec = sec;
