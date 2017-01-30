@@ -142,7 +142,7 @@ static void init_crc(void)
 
 static int poll(int fd, int ports)
 {
-	char buffer[3];
+	unsigned char buffer[3];
 	static int port;
 
 	buffer[0] = FEND;
