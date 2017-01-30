@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <time.h>
+#include <sys/sysinfo.h>
 #include <sys/utsname.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -50,17 +51,16 @@ static char buf[300];
 
 #define SET_IF_DESIRED(x,y)  if (x) *(x) = (y)	/* evals 'x' twice */
 
-static int uptime(double *uptime_secs)
+static int getuptime(double *uptime_secs)
 {
-    double up=0;
+	struct sysinfo si;
 
-    FILE_TO_BUF(PROC_UPTIME_FILE)
-    if (sscanf(buf, "%lf %*f", &up) < 1) {
-	fprintf(stdout, "ERROR: Bad data in %s\r", PROC_UPTIME_FILE);
+	if (sysinfo(&si) < 0)
+		return -1;
+
+	*uptime_secs = si.uptime;
+
 	return 0;
-    }
-    SET_IF_DESIRED(uptime_secs, up);
-    return up;	/* assume never be zero seconds in practice */
 }
 
 /* The following /proc/meminfo parsing routine assumes the following format:
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
 	}
 
 	/* read and calculate the amount of uptime and format it nicely */
-	uptime(&uptime_secs);
+	getuptime(&uptime_secs);
 	updays = (int) uptime_secs / (60*60*24);
 	upminutes = (int) uptime_secs / 60;
 	uphours = upminutes / 60;
