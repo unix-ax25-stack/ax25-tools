@@ -31,6 +31,10 @@ int fderr = 2;
 int fdout_is_pipe;
 int fdin_is_pipe;
 
+char myname[PATH_MAX+1];
+char filename[PATH_MAX+1];
+char err_msg[2048];
+
 int is_stream;
 int mode;
 int do_crc_only;
