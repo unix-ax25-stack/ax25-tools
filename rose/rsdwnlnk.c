@@ -19,7 +19,7 @@
 
 #define	AX25_HBIT	0x80
 
-void alarm_handler(int sig)
+static void alarm_handler(int sig)
 {
 }
 
