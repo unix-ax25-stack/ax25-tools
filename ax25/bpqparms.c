@@ -36,7 +36,7 @@
 #include <config.h>
 #include <scm-version.h>
 
-void usage(void)
+static void usage(void)
 {
 		fprintf(stderr, "usage   : bpqparms dev -d address [-a address]\n");
 		fprintf(stderr, "examples: bpqparms bpq0 -d 00:80:AD:1B:05:26\n");
@@ -44,7 +44,7 @@ void usage(void)
 		exit(1);
 }
 
-int get_hwaddr(unsigned char *k, char *s)
+static int get_hwaddr(unsigned char *k, char *s)
 {
 	unsigned char broadcast[ETH_ALEN] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 	unsigned int  eth[ETH_ALEN];
