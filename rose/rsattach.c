@@ -29,10 +29,10 @@
 
 #include "../pathnames.h"
 
-char *address;
-int  mtu = 128;
+static char *address;
+static int  mtu = 128;
 
-int readconfig(char *port)
+static int readconfig(char *port)
 {
 	FILE *fp;
 	char buffer[90], *s;
@@ -79,7 +79,7 @@ int readconfig(char *port)
 	return FALSE;
 }
 
-int getfreedev(char *dev)
+static int getfreedev(char *dev)
 {
 	struct ifreq ifr;
 	int fd;
@@ -110,7 +110,7 @@ int getfreedev(char *dev)
 	return FALSE;
 }
 
-int startiface(char *dev, struct hostent *hp)
+static int startiface(char *dev, struct hostent *hp)
 {
 	struct ifreq ifr;
 	char addr[5];
