@@ -147,7 +147,7 @@ static void signal_handler(int sig)
 
 /*---------------------------------------------------------------------------*/
 
-void do_version(void)
+static void do_version(void)
 {
         fprintf(stderr, MYNAME " " FULL_VER "\n");
 	fprintf(stderr, "  (c) 2002 Thomas Osterried <thomas@x-berg.in-berlin.de>\n");
