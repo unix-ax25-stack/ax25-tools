@@ -174,7 +174,7 @@ int main(int argc, char **argv)
 		tv.tv_sec = 0;
 		tv.tv_usec = FLUSHTIMEOUT;
 
-		len = select(256, &fdset, 0, 0, &tv);
+		len = select(256, &fdset, NULL, NULL, &tv);
 		if (len == -1) {
 			perror("axwrapper: select");
 			exit(1);
