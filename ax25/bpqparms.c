@@ -38,10 +38,10 @@
 
 static void usage(void)
 {
-		fprintf(stderr, "usage   : bpqparms dev -d address [-a address]\n");
-		fprintf(stderr, "examples: bpqparms bpq0 -d 00:80:AD:1B:05:26\n");
-		fprintf(stderr, "          bpqparms bpq0 -d broadcast -a 00:80:AD:1B:05:26\n");
-		exit(1);
+	fprintf(stderr, "usage   : bpqparms dev -d address [-a address]\n");
+	fprintf(stderr, "examples: bpqparms bpq0 -d 00:80:AD:1B:05:26\n");
+	fprintf(stderr, "          bpqparms bpq0 -d broadcast -a 00:80:AD:1B:05:26\n");
+	exit(1);
 }
 
 static int get_hwaddr(unsigned char *k, char *s)
