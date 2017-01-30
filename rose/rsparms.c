@@ -20,10 +20,11 @@
 
 #include "../pathnames.h"
 
-char nodes_usage[]  = "usage: rsparms -nodes add|del nodeaddr[/mask] port neighbour [digis...]\n       rsparms -nodes list\n";
+static char nodes_usage[]  = "usage: rsparms -nodes add|del nodeaddr[/mask] "
+	"port neighbour [digis...]\n       rsparms -nodes list\n";
 
 /* print the Rose neighbour whose number is supplied */
-void printnb(char *neigh)
+static void printnb(char *neigh)
 {
 	FILE* fp;
 	char addr[10], callsign[10], port[10], digi[10];
@@ -55,7 +56,7 @@ void printnb(char *neigh)
 	fclose(fp);
 }
 
-void nodes(int s, int argc, char *argv[])
+static void nodes(int s, int argc, char *argv[])
 {
 	struct rose_route_struct rs_node;
 	char *dev;
