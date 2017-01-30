@@ -64,21 +64,6 @@ static int uptime(double *uptime_secs, double *idle_secs)
     return up;	/* assume never be zero seconds in practice */
 }
 
-static int loadavg(double *av1, double *av5, double *av15)
-{
-    double avg_1=0, avg_5=0, avg_15=0;
-
-    FILE_TO_BUF(PROC_LOADAVG_FILE)
-    if (sscanf(buf, "%lf %lf %lf", &avg_1, &avg_5, &avg_15) < 3) {
-	fprintf(stdout, "ERROR: Bad data in %s\r", PROC_LOADAVG_FILE);
-	return 0;
-    }
-    SET_IF_DESIRED(av1,  avg_1);
-    SET_IF_DESIRED(av5,  avg_5);
-    SET_IF_DESIRED(av15, avg_15);
-    return 1;
-}
-
 /* The following /proc/meminfo parsing routine assumes the following format:
    [ <label> ... ]				# header lines
    [ <label> ] <num> [ <num> ... ]		# table rows
@@ -171,7 +156,7 @@ int main(int argc, char **argv)
 		fprintf(stdout, "%d hour%s ", uphours, (uphours != 1) ? "s" : "");
 	fprintf(stdout, "%d minute%s\r", upminutes, (upminutes != 1) ? "s" : "");
 
-	loadavg(&av[0], &av[1], &av[2]);
+	getloadavg(av, 3);
 	fprintf(stdout, "Load average:      %.2f, %.2f, %.2f\r", av[0], av[1], av[2]);
 
 	if (!(mem = meminfo()) || mem[meminfo_main][meminfo_total] == 0) {
