@@ -59,22 +59,22 @@ static char version[] = "ttylink daemon (Version " FULL_VER ") ready.\n";
 #define SYSOP_USER "root"
 
 /* TTY control characters from the sysop's talk screen */
-char erasec;
-char killc;
-char werasec;
+static char erasec;
+static char killc;
+static char werasec;
 
 /* Users address family */
-int userfamily;
+static int userfamily;
 
 #define ADDR_SIZE 256
-char sysop_addr[ADDR_SIZE];
-char *sysop_user=NULL, *sysop_host=NULL;
-char config_file[128];
+static char sysop_addr[ADDR_SIZE];
+static char *sysop_user=NULL, *sysop_host=NULL;
+static char config_file[128];
 
-int send_control(int skt, struct in_addr addr, CTL_MSG msg, CTL_RESPONSE *resp);
-void alarm_handle(int i);
-void do_talk(int skt);
-void read_config_file(int dummy);
+static int send_control(int skt, struct in_addr addr, CTL_MSG msg, CTL_RESPONSE *resp);
+static void alarm_handle(int i);
+static void do_talk(int skt);
+static void read_config_file(int dummy);
 
 /*static char *Commands[] = {
 	"leaving invitation",
@@ -468,7 +468,8 @@ int main(int argc, char *argv[])
 /*
  * Used to send control messages to our friendly local talk daemon
  */
-int send_control(int skt, struct in_addr addr, CTL_MSG msg, CTL_RESPONSE *resp)
+static int send_control(int skt, struct in_addr addr, CTL_MSG msg,
+	CTL_RESPONSE *resp)
 {
 	fd_set fdvar;
 	struct timeval timeout;
@@ -526,7 +527,7 @@ int send_control(int skt, struct in_addr addr, CTL_MSG msg, CTL_RESPONSE *resp)
 }
 
 /* Used to process the data from the sysop */
-int send_sysop_data(char *buf, int len)
+static int send_sysop_data(char *buf, int len)
 {
 	static char outbuf[82];
 	static char *bptr = outbuf;
@@ -590,7 +591,7 @@ int send_sysop_data(char *buf, int len)
 }
 
 /* Used to process the data from the user - len must not exceed 256 */
-int send_user_data(int skt, char *buf, int len)
+static int send_user_data(int skt, char *buf, int len)
 {
 	char outbuf[256];
 	char *bptr = outbuf;
@@ -632,7 +633,7 @@ int send_user_data(int skt, char *buf, int len)
 
 
 /* The main talking loop */
-void do_talk(int skt)
+static void do_talk(int skt)
 {
 	fd_set fdvar;
 	char inbuf[256], outbuf[256];
@@ -689,7 +690,7 @@ void do_talk(int skt)
 	}
 }
 
-void alarm_handle(int i)
+static void alarm_handle(int i)
 {
 	char buf[256];
 
@@ -697,7 +698,7 @@ void alarm_handle(int i)
 	write(STDOUT_FILENO, buf, strlen(buf));
 }
 
-void read_config_file(int dummy)
+static void read_config_file(int dummy)
 {
 	char buf[128];
 	char param[20], value[108];
