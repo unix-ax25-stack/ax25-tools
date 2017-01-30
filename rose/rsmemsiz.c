@@ -50,7 +50,8 @@ static char buf[300];
 
 #define SET_IF_DESIRED(x,y)  if (x) *(x) = (y)	/* evals 'x' twice */
 
-int uptime(double *uptime_secs, double *idle_secs) {
+static int uptime(double *uptime_secs, double *idle_secs)
+{
     double up=0, idle=0;
 
     FILE_TO_BUF(PROC_UPTIME_FILE)
@@ -63,7 +64,8 @@ int uptime(double *uptime_secs, double *idle_secs) {
     return up;	/* assume never be zero seconds in practice */
 }
 
-int loadavg(double *av1, double *av5, double *av15) {
+static int loadavg(double *av1, double *av5, double *av15)
+{
     double avg_1=0, avg_5=0, avg_15=0;
 
     FILE_TO_BUF(PROC_LOADAVG_FILE)
@@ -93,7 +95,8 @@ int loadavg(double *av1, double *av5, double *av15) {
 #define MAX_ROW 3	/* these are a little liberal for flexibility */
 #define MAX_COL 7
 
-unsigned** meminfo(void) {
+static unsigned **meminfo(void)
+{
 	static unsigned *row[MAX_ROW + 1];	/* row pointers */
 	static unsigned num[MAX_ROW * MAX_COL];	/* number storage */
 	char *p;
