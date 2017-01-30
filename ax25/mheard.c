@@ -79,7 +79,7 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			return;
 		if (pr->entry.last_heard < 0)
 			return;
-        	if ((loc = localtime(&pr->entry.last_heard)) == 0 ||
+        	if ((loc = localtime(&pr->entry.last_heard)) == NULL ||
 			strftime(lh, sizeof(lh),"%Y-%m-%d %H:%M:%S", loc) == 0)
 			return;
 		call =  ax25_ntoa(&pr->entry.from_call);
@@ -114,10 +114,10 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 	case 2:
 		if (pr->entry.last_heard < 0 || pr->entry.first_heard < 0)
 			return;
-        	if ((loc = localtime(&pr->entry.last_heard)) == 0 ||
+        	if ((loc = localtime(&pr->entry.last_heard)) == NULL ||
 			strftime(lh, sizeof(lh),"%Y-%m-%d %H:%M:%S", loc) == 0)
 			return;
-        	if ((loc = localtime(&pr->entry.first_heard)) == 0 ||
+        	if ((loc = localtime(&pr->entry.first_heard)) == NULL ||
 			strftime(fh, sizeof(fh),"%Y-%m-%d %H:%M:%S", loc) == 0)
 			return;
 		call = ax25_ntoa(&pr->entry.from_call);
@@ -169,10 +169,10 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			return;
 		if (pr->entry.last_heard < 0 || pr->entry.first_heard < 0)
 			return;
-        	if ((loc = localtime(&pr->entry.last_heard)) == 0 ||
+        	if ((loc = localtime(&pr->entry.last_heard)) == NULL ||
 			strftime(lh, sizeof(lh),"%Y-%m-%d %H:%M:%S", loc) == 0)
 			return;
-        	if ((loc = localtime(&pr->entry.first_heard)) == 0 ||
+        	if ((loc = localtime(&pr->entry.first_heard)) == NULL ||
 			strftime(fh, sizeof(fh),"%Y-%m-%d %H:%M:%S", loc) == 0)
 			return;
 		call = ax25_ntoa(&pr->entry.from_call);
