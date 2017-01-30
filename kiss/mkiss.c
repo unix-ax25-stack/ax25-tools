@@ -553,7 +553,7 @@ int main(int argc, char *argv[])
 			if ((pty[i]->fd = open(pty_name, O_RDWR)) == -1) {
 				perror("mkiss: open");
 				free(pty[i]);
-				pty[i] = 0;
+				pty[i] = NULL;
 				return 1;
 			}
 			tty_raw(pty[i]->fd, FALSE);
@@ -567,7 +567,7 @@ int main(int argc, char *argv[])
 			if ((npts = ptsname(pty[i]->fd)) == NULL) {
 				fprintf(stderr, "mkiss: Cannot get name of pts-device.\n");
 				free(pty[i]);
-				pty[i] = 0;
+				pty[i] = NULL;
 				return 1;
 			}
 			strncpy(pty[i]->namepts, npts, PATH_MAX-1);
@@ -577,7 +577,7 @@ int main(int argc, char *argv[])
 			if (unlockpt(pty[i]->fd) == -1) {
 				fprintf(stderr, "mkiss: Cannot unlock pts-device %s\n", pty[i]->namepts);
 				free(pty[i]);
-				pty[i] = 0;
+				pty[i] = NULL;
 				return 1;
 			}
 			if (wrote_info == 0)
