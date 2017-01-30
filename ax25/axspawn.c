@@ -428,26 +428,26 @@ static unsigned short mask16tab[16] = {
 };
 
 
-char   policy_add_user = 1;
-char   policy_add_empty_password;
-char   policy_add_prog_useradd;
-char   policy_guest = 1;
-char   policy_associate;
-char   pwcheck = 1;
-char   secure_home;
+static char   policy_add_user = 1;
+static char   policy_add_empty_password;
+static char   policy_add_prog_useradd;
+static char   policy_guest = 1;
+static char   policy_associate;
+static char   pwcheck = 1;
+static char   secure_home;
 
-gid_t  user_gid =  400;
-char   *user_shell = "/bin/bash";
-int    user_shell_configured = 0;
-char   *start_home = "/home/hams";
-char   *guest = "guest";
-int    start_uid = 400;
-int    end_uid   = 65535;
-int    paclen    = ROSE_PACLEN;		/* Its the shortest ie safest */
+static gid_t  user_gid =  400;
+static char   *user_shell = "/bin/bash";
+static int    user_shell_configured = 0;
+static char   *start_home = "/home/hams";
+static char   *guest = "guest";
+static int    start_uid = 400;
+static int    end_uid   = 65535;
+static int    paclen    = ROSE_PACLEN;		/* Its the shortest ie safest */
 
-int    huffman;
-int    bin;
-int    fdmaster;
+static int    huffman;
+static int    bin;
+static int    fdmaster;
 
 struct write_queue {
 	struct write_queue *next;
@@ -455,19 +455,15 @@ struct write_queue {
 	unsigned int  len;
 };
 
-struct write_queue *wqueue_head;
-struct write_queue *wqueue_tail;
-long wqueue_length = 0L;
-
-
-int encstathuf(char *src, int srclen, void *dptr, int *destlen);
-int decstathuf(char *src, char *dest, int srclen, int *destlen);
+static struct write_queue *wqueue_head;
+static struct write_queue *wqueue_tail;
+static long wqueue_length = 0L;
 
 /*---------------------------------------------------------------------------*/
 
 /* Use private function because some platforms are broken, eg 386BSD */
 
-int Xtolower(int c)
+static int Xtolower(int c)
 {
   return (c >= 'A' && c <= 'Z') ? (c - 'A' + 'a') : c;
 }
@@ -495,7 +491,7 @@ int Strcasecmp(const char *s1, const char *s2)
 
 /*---------------------------------------------------------------------------*/
 
-int Strncasecmp(const char *s1, const char *s2, int n)
+static int Strncasecmp(const char *s1, const char *s2, int n)
 {
   while (--n >= 0 && Xtolower(*s1) == Xtolower(*s2)) {
     if (!*s1) return 0;
@@ -515,7 +511,7 @@ pid_t forkpty(int *, char *, void *, struct winsize *);
    is returned
 */
 
-int encstathuf(char *src, int srclen, void *dptr, int *destlen)
+static int encstathuf(char *src, int srclen, void *dptr, int *destlen)
 {
 	char *srcptr;
 	unsigned char *destptr;
@@ -582,7 +578,7 @@ int encstathuf(char *src, int srclen, void *dptr, int *destlen)
 */
 
 
-int decstathuf(char *src, char *dest, int srclen, int *destlen)
+static int decstathuf(char *src, char *dest, int srclen, int *destlen)
 {
 	char *srcptr;
 	char *destptr;
@@ -649,7 +645,7 @@ int decstathuf(char *src, char *dest, int srclen, int *destlen)
 }
 
 
-int _write_ax25(const char *s, int len)
+static int _write_ax25(const char *s, int len)
 {
 	int i;
 	if (!len)
@@ -660,7 +656,7 @@ int _write_ax25(const char *s, int len)
 	return i > 0 ? i : 0;	/* on error, -1 is returned  */
 }
 
-int read_ax25(char *s, int size)
+static int read_ax25(char *s, int size)
 {
 	int len;
 	int k;
@@ -738,7 +734,7 @@ int read_ax25(char *s, int size)
  *  PACKET radio, isn't it?
  */
 
-void kick_wqueue(int dummy)
+static void kick_wqueue(int dummy)
 {
 	char *s, *p;
 	struct write_queue *w_buf, *new_head;
@@ -965,7 +961,7 @@ int write_ax25(char *s, int len, int kick)
 	return len;
 }
 
-int get_assoc(struct sockaddr_ax25 *sax25)
+static int get_assoc(struct sockaddr_ax25 *sax25)
 {
 	FILE *fp;
 	int  uid;
@@ -992,7 +988,7 @@ int get_assoc(struct sockaddr_ax25 *sax25)
 }
 
 
-void cleanup(char *tty)
+static void cleanup(char *tty)
 {
 	struct utmp ut, *ut_line;
 	struct timeval tv;
@@ -1034,7 +1030,7 @@ void cleanup(char *tty)
  * If we mask SIGCHLD before execve(), useradd works as it should.
  */
 
-void signal_handler_sigchild(int dummy)
+static void signal_handler_sigchild(int dummy)
 {
 	exit(0);
 }
@@ -1043,7 +1039,7 @@ void signal_handler_sigchild(int dummy)
  * add a new user to /etc/passwd and do some init
  */
 
-void new_user(char *newuser)
+static void new_user(char *newuser)
 {
 	struct passwd pw, *pwp;
 	uid_t uid;
@@ -1278,7 +1274,7 @@ out:
 	flock(fd_l, LOCK_UN);
 }
 
-void read_config(void)
+static void read_config(void)
 {
 	FILE *fp = fopen(CONF_AXSPAWN_FILE, "r");
 	char buf[512];
@@ -1382,10 +1378,10 @@ void read_config(void)
 	fclose(fp);
 }
 
-char ptyslave[20];
-int child_pid;
+static char ptyslave[20];
+static int child_pid;
 
-void signal_handler(int dummy)
+static void signal_handler(int dummy)
 {
 	kill(child_pid, SIGHUP);
 	cleanup(ptyslave+5);
