@@ -18,18 +18,13 @@
 #define	SYSTEMPW 0
 #define	USERPW	 1
 
-long seed = 1L;
+static long seed = 1L;
 
-int conv_rand(void);
-void conv_randomize(void);
-int conv_random(int num, int base);
-char *generate_rand_pw(int len);
 void calc_md5_pw (const char *MD5prompt, const char *MD5pw, char *MD5result);
-static void char_to_hex(char *c, char *h, int n);
 
 /*--------------------------------------------------------------------------*/
 
-int conv_rand(void)
+static int conv_rand(void)
 {
 	seed = (1103515245L * seed + 12345) & CONV_RAND_MAX;
 	return (int) (seed & 077777);
@@ -37,14 +32,14 @@ int conv_rand(void)
 
 /*--------------------------------------------------------------------------*/
 
-void conv_randomize(void)
+static void conv_randomize(void)
 {
 	seed = (time(0) & CONV_RAND_MAX);
 }
 
 /*--------------------------------------------------------------------------*/
 
-int conv_random(int num, int base)
+static int conv_random(int num, int base)
 {
 	return ((long) (conv_rand() * time(0)) & CONV_RAND_MAX) % num + base;
 }
@@ -66,7 +61,7 @@ static void char_to_hex(char *c, char *h, int n)
 
 /*--------------------------------------------------------------------------*/
 
-char *generate_rand_pw(int len)
+static char *generate_rand_pw(int len)
 {
 	static char pass[PASSSIZE+1];
 	int i, j;
@@ -204,7 +199,9 @@ void calc_md5_pw (const char *MD5prompt, const char *MD5pw, char *MD5result)
 
 /*--------------------------------------------------------------------------*/
 
-void write_example_passwd(char *pwfile, char pwlocation, struct passwd *pw) {
+static void write_example_passwd(char *pwfile, char pwlocation,
+	struct passwd *pw)
+{
 	FILE * f;
 	int i;
 
