@@ -7,6 +7,7 @@
 #include "includes.h"
 
 #include "axgetput.h"
+#include "util.h"
 
 /* Use private function because some platforms are broken, eg 386BSD */
 
