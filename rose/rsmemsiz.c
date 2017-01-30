@@ -50,17 +50,16 @@ static char buf[300];
 
 #define SET_IF_DESIRED(x,y)  if (x) *(x) = (y)	/* evals 'x' twice */
 
-static int uptime(double *uptime_secs, double *idle_secs)
+static int uptime(double *uptime_secs)
 {
-    double up=0, idle=0;
+    double up=0;
 
     FILE_TO_BUF(PROC_UPTIME_FILE)
-    if (sscanf(buf, "%lf %lf", &up, &idle) < 2) {
+    if (sscanf(buf, "%lf %*f", &up) < 1) {
 	fprintf(stdout, "ERROR: Bad data in %s\r", PROC_UPTIME_FILE);
 	return 0;
     }
     SET_IF_DESIRED(uptime_secs, up);
-    SET_IF_DESIRED(idle_secs, idle);
     return up;	/* assume never be zero seconds in practice */
 }
 
@@ -118,7 +117,7 @@ static unsigned **meminfo(void)
 int main(int argc, char **argv)
 {
 	int upminutes, uphours, updays;
-	double uptime_secs, idle_secs;
+	double uptime_secs;
 	double av[3];
 	unsigned **mem;
 	char *p;
@@ -141,7 +140,7 @@ int main(int argc, char **argv)
 	}
 
 	/* read and calculate the amount of uptime and format it nicely */
-	uptime(&uptime_secs, &idle_secs);
+	uptime(&uptime_secs);
 	updays = (int) uptime_secs / (60*60*24);
 	upminutes = (int) uptime_secs / 60;
 	uphours = upminutes / 60;
