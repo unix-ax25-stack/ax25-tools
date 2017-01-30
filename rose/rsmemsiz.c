@@ -49,8 +49,6 @@ static char buf[300];
     buf[n] = '\0';						\
 }
 
-#define SET_IF_DESIRED(x,y)  if (x) *(x) = (y)	/* evals 'x' twice */
-
 static int getuptime(double *uptime_secs)
 {
 	struct sysinfo si;
