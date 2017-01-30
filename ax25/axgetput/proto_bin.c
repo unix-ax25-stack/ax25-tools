@@ -66,7 +66,7 @@ static char * unix_to_sfbin_date_string(long gmt)
 	static char buf[9];
 	unsigned short s_time, s_date;
 
-	date_unix2dos(((gmt == -1) ? time(0) : gmt), &s_time, &s_date);
+	date_unix2dos(((gmt == -1) ? time(NULL) : gmt), &s_time, &s_date);
 	sprintf(buf, "%X", ((s_date << 16) + s_time));
 	return buf;
 }
@@ -83,7 +83,7 @@ int bput(void)
 	time_t file_time = 0L;
 	unsigned int msg_crc = 0;
 	unsigned int crc = 0;
-	char *term_line = 0;
+	char *term_line = NULL;
 	int last_line_had_CR = 0;
 	int len_termline = 0;
 	int len = 0;
@@ -259,12 +259,12 @@ int bput(void)
 		if (file_time != 0L) {
 			struct utimbuf utb;
 			utb.modtime = file_time;
-			utb.actime = time(0);
+			utb.actime = time(NULL);
 			utime(filename, &utb);
 		}
 	}
 
-	send_on_signal = 0;
+	send_on_signal = NULL;
 	return 0;
 
 abort:
@@ -283,8 +283,8 @@ int bget(void) {
 		char data[1]; /* actually a the address of char * pointer */
 	};
 
-	struct strlist *stored_file = 0;
-	struct strlist  *sl_tail = 0;
+	struct strlist *stored_file = NULL;
+	struct strlist  *sl_tail = NULL;
 	struct strlist *sl;
 	struct timeval timeout;
 	struct stat statbuf;
@@ -308,7 +308,7 @@ int bget(void) {
 #define	store_line(s, len) { \
 	if (!(sl = (struct strlist *) malloc(sizeof(struct strlist *) + sizeof(size_t) + len))) \
 		return 1; \
-	sl->next = 0; \
+	sl->next = NULL; \
 	sl->len = len; \
 	memcpy(sl->data, s, len); \
 	if (!stored_file) { \
@@ -332,7 +332,7 @@ int bget(void) {
 		if (!fstat(fddata, &statbuf))
 			file_time =  statbuf.st_mtime;
 		else
-			file_time = time(0);
+			file_time = time(NULL);
 
 		/* compute crc  */
 		while ((len = read(fddata, buf, BLOCKSIZ)) > 0) {
@@ -352,7 +352,7 @@ int bget(void) {
 		}
 		sprintf(buf, "\r#BIN#%ld#|%d#$%s#%s\r", file_size, crc, unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, file_size, crc, 1));
 	} else {
-		file_time = time(0);
+		file_time = time(NULL);
 		if (!is_stream || do_crc_only) {
 			sprintf(err_msg, "error: not enough memory\n");
 			while ((len = read(fddata, buf, sizeof(buf))) > 0) {
@@ -438,7 +438,8 @@ int bget(void) {
 		/* check for user \r#ABORT#\r on tty stream  */
 		FD_ZERO(&readfds);
 		FD_SET(fdin, &readfds);
-		if (select(fdin+1, &readfds, 0, 0, &timeout) && FD_ISSET(fdin, &readfds)) {
+		if (select(fdin+1, &readfds, NULL, NULL, &timeout) &&
+		    FD_ISSET(fdin, &readfds)) {
 			if ((len = read(fdin, buf, sizeof(buf))) < 0) {
 				sprintf(err_msg, "read from tty failed (%s)\n", strerror(errno));
 				save_close(fddata);
@@ -453,7 +454,7 @@ int bget(void) {
 		/* read data  */
 		if (!fdin_is_pipe || is_stream) {
 			p_buf = buf;
-			if ((len = my_read(fddata, buf, ((len_remains > BLOCKSIZ || is_stream) ? BLOCKSIZ : len_remains), &is_eof, 0)) < 1) {
+			if ((len = my_read(fddata, buf, ((len_remains > BLOCKSIZ || is_stream) ? BLOCKSIZ : len_remains), &is_eof, NULL)) < 1) {
 				save_close(fddata);
 				if (len < 0) {
 					sprintf(err_msg, "error: read failed (%s)\n", strerror(errno));
