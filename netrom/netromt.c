@@ -25,7 +25,7 @@
 
 static int build_header(char *message)
 {
-	message[0] = NODES_SIG;
+	message[0] = (char) NODES_SIG;
 
 	strcpy(message + 1, nr_config_get_alias(NULL));
 	strncat(message + 1, "       ", MNEMONIC_LEN - strlen(message + 1));
