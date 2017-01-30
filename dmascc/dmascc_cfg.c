@@ -60,7 +60,7 @@ struct scc_param {
   int reserved[35];
 };
 
-void usage(void)
+static void usage(void)
 {
 	fprintf(stderr,
 		"usage:   dmascc_cfg <interface> [ options ... ]\n\n"
