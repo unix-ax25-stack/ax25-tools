@@ -15,7 +15,7 @@
 
 #include "user_io.h"
 
-void alarm_handler(int sig)
+static void alarm_handler(int sig)
 {
 }
 
