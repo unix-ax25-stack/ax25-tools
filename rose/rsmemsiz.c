@@ -135,7 +135,11 @@ int main(int argc, char **argv)
 	}
 
 	/* read and calculate the amount of uptime and format it nicely */
-	getuptime(&uptime_secs);
+	if (getuptime(&uptime_secs) < 0) {
+		fprintf(stdout, "Cannot get system uptime\r");
+		uptime_secs = 0;
+	}
+
 	updays = (int) uptime_secs / (60*60*24);
 	upminutes = (int) uptime_secs / 60;
 	uphours = upminutes / 60;
