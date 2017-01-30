@@ -128,10 +128,6 @@
  * be within the range of 0 and 15. Please drop me a note if you
  * know a valid Amateur Radio (sic!) callsign that does not fit this
  * pattern _and_ can be represented correctly in AX.25.
- *
- * It uses the forkpty from libbsd.a (found after analyzing logind)
- * which has no prototype in any of my .h files.
- *
  */
 
 /* removed -h <protocol> from login command as it was causing hostname lookups
@@ -154,6 +150,7 @@
 #include <time.h>
 #include <pwd.h>
 #include <grp.h>
+#include <pty.h>
 #include <utmp.h>
 #include <paths.h>
 #include <errno.h>
@@ -500,11 +497,6 @@ static int Strncasecmp(const char *s1, const char *s2, int n)
   }
   return n < 0 ? 0 : Xtolower(*s1) - Xtolower(*s2);
 }
-
-/* This one is in /usr/lib/libbsd.a, but not in bsd.h and fellows... weird. */
-/* (found in logind.c)							    */
-
-pid_t forkpty(int *, char *, void *, struct winsize *);
 
 /* The buffer in src (first byte length-1) is decoded into dest
    (first byte length-1). If decoding is not successful, non-0
