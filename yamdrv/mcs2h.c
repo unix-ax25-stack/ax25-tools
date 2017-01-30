@@ -2,7 +2,7 @@
 #include <time.h>
 #include <string.h>
 
-int in2hex(char *ptr)
+static int in2hex(char *ptr)
 {
 	char str[3];
 	unsigned int val;
@@ -15,7 +15,7 @@ int in2hex(char *ptr)
 	return val;
 }
 
-unsigned char swap(unsigned char c)
+static unsigned char swap(unsigned char c)
 {
 	unsigned char r = 0;
 	int i;
@@ -28,19 +28,6 @@ unsigned char swap(unsigned char c)
 		c >>= 1;
 	}
 	return r;
-}
-
-int in4hex(char *ptr)
-{
-	char str[5];
-	unsigned int val;
-
-	memcpy(str, ptr, 4);
-	str[4] = '\0';
-
-	sscanf(str, "%x", &val);
-
-	return val;
 }
 
 int main(int ac, char *av[])
