@@ -23,12 +23,12 @@
 
 #include "../pathnames.h"
 
-void usage(void)
+static void usage(void)
 {
 	fprintf(stderr, "usage: axparms --assoc|--forward|--route|--setcall|--version ...\n");
 }
 
-void usageassoc(void)
+static void usageassoc(void)
 {
 	fprintf(stderr, "usage: axparms --assoc show\n");
 	fprintf(stderr, "usage: axparms --assoc policy default|deny\n");
@@ -36,25 +36,25 @@ void usageassoc(void)
 	fprintf(stderr, "usage: axparms --assoc [callsign] delete\n");
 }
 
-void usageforward(void)
+static void usageforward(void)
 {
 	fprintf(stderr, "usage: axparms --forward <portfrom> <portto>\n");
 	fprintf(stderr, "usage: axparms --forward <portfrom> delete\n");
 }
 
-void usageroute(void)
+static void usageroute(void)
 {
 	fprintf(stderr, "usage: axparms --route add port callsign [digi ...] [--ipmode mode]\n");
 	fprintf(stderr, "usage: axparms --route del port callsign\n");
 	fprintf(stderr, "usage: axparms --route list\n");
 }
 
-void usagesetcall(void)
+static void usagesetcall(void)
 {
 	fprintf(stderr, "usage: axparms --setcall interface callsign\n");
 }
 
-int routes(int s, int argc, char *argv[], ax25_address *callsign)
+static int routes(int s, int argc, char *argv[], ax25_address *callsign)
 {
 	struct ax25_routes_struct ax25_route;
 	struct ax25_route_opt_struct ax25_opt;
@@ -148,7 +148,7 @@ PROC_AX25_ROUTE_FILE);
 	return 0;
 }
 
-int setifcall(int s, char *ifn, char *name)
+static int setifcall(int s, char *ifn, char *name)
 {
 	char call[7];
 	struct ifreq ifr;
@@ -168,7 +168,7 @@ int setifcall(int s, char *ifn, char *name)
 	return 0;
 }
 
-int associate(int s, int argc, char *argv[])
+static int associate(int s, int argc, char *argv[])
 {
 	char buffer[80], *u, *c, *endp;
 	struct sockaddr_ax25 sax25;
@@ -285,7 +285,7 @@ int associate(int s, int argc, char *argv[])
 	return 0;
 }
 
-int forward(int s, int argc, char *argv[])
+static int forward(int s, int argc, char *argv[])
 {
 #ifdef HAVE_AX25_FWD_STRUCT
 	struct ax25_fwd_struct ax25_fwd;
