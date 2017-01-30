@@ -258,7 +258,7 @@ int main(int argc, char **argv)
 				break;
 			}
 			if (buffer[0] == 0) {		/* Q Bit not set */
-				buffer[0] = 0xF0;
+				buffer[0] = (char) 0xF0;
 				write(s, buffer, n);
 			} else {
 				/* Lose the leading 0x7F */
