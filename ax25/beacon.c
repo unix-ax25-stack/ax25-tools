@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (srccall != NULL && strcmp(srccall, portcall) != 0) {
-		if ((addr = (char *) malloc(strlen(srccall) + 1 + strlen(portcall) + 1)) == NULL)
+		if ((addr = malloc(strlen(srccall) + 1 + strlen(portcall) + 1)) == NULL)
 			return 1;
 		sprintf(addr, "%s %s", srccall, portcall);
 	} else {
