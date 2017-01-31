@@ -905,11 +905,11 @@ int write_ax25(char *s, int len, int kick)
 		*(p+len) = 0;
 	}
 
-	buf = (struct write_queue *) malloc(sizeof(struct write_queue));
+	buf = malloc(sizeof(struct write_queue));
 	if (buf == NULL)
 		return 0;
 
-	buf->data = (char *) malloc(len);
+	buf->data = malloc(len);
 	if (buf->data == NULL) {
 		free(buf);
 		return 0;
@@ -1302,7 +1302,7 @@ static void read_config(void)
 					policy_guest = 0;
 				} else {
 					policy_guest = 1;
-					guest = (char *) malloc(strlen(param)+1);
+					guest = malloc(strlen(param)+1);
 					strcpy(guest, param);
 				}
 			} else
@@ -1333,7 +1333,7 @@ static void read_config(void)
 			} else
 			if (!strncmp(cmd, "home", 4))
 			{
-				start_home = (char *) malloc(strlen(param)+1);
+				start_home = malloc(strlen(param)+1);
 				strcpy(start_home, param);
 			} else
 			if (!strncmp(cmd, "secure_home", 11)) {
@@ -1348,7 +1348,7 @@ static void read_config(void)
 			} else
 			if (!strncmp(cmd, "shell", 5))
 			{
-				user_shell = (char *) malloc(strlen(param)+1);
+				user_shell = malloc(strlen(param)+1);
 				strcpy(user_shell, param);
 				user_shell_configured = 1;
 			} else
@@ -1762,11 +1762,11 @@ again:
 				chdir(p);
 			}
 
-			if ((envp[envc] = (char *) malloc(strlen(p)+6)))
+			if ((envp[envc] = malloc(strlen(p)+6)))
 				sprintf(envp[envc++], "HOME=%s", p);
-			if ((envp[envc] = (char *) malloc(strlen(pw->pw_name)+6)))
+			if ((envp[envc] = malloc(strlen(pw->pw_name)+6)))
 				sprintf(envp[envc++], "USER=%s", pw->pw_name);
-			if ((envp[envc] = (char *) malloc(strlen(pw->pw_name)+9)))
+			if ((envp[envc] = malloc(strlen(pw->pw_name)+9)))
 				sprintf(envp[envc++], "LOGNAME=%s", pw->pw_name);
 
 			if (pw->pw_shell && *(pw->pw_shell)) {
@@ -1784,14 +1784,14 @@ again:
 			if (!p)
 				p = shell;
 			chargv[chargc++] = p;
-			if ((envp[envc] = (char *) malloc(strlen(shell)+7)))
+			if ((envp[envc] = malloc(strlen(shell)+7)))
 				sprintf(envp[envc++], "SHELL=%s", shell);
 
 			if (pw->pw_uid == 0)
 				p = "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin";
 			else
 				p = "/bin:/usr/bin:/usr/local/bin";
-			if ((envp[envc] = (char *) malloc(strlen(p)+6)))
+			if ((envp[envc] = malloc(strlen(p)+6)))
 				sprintf(envp[envc++], "PATH=%s", p);
 
 		} else {
@@ -1827,18 +1827,18 @@ again:
 		}
 		chargv[chargc]   = NULL;
 
-		if ((envp[envc] = (char *) malloc(30)))
+		if ((envp[envc] = malloc(30)))
 			sprintf(envp[envc++], "AXCALL=%s", call);
-		if ((envp[envc] = (char *) malloc(30)))
+		if ((envp[envc] = malloc(30)))
 			sprintf(envp[envc++], "CALL=%s", user);
-		if ((envp[envc] = (char *) malloc(30)))
+		if ((envp[envc] = malloc(30)))
 			sprintf(envp[envc++], "PROTOCOL=%s", protocol);
-		if ((envp[envc] = (char *) malloc(30)))
+		if ((envp[envc] = malloc(30)))
 			sprintf(envp[envc++], "TERM=dumb"); /* SuSE bug (dump - tsts) */
 		/* other useful defaults */
-		if ((envp[envc] = (char *) malloc(30)))
+		if ((envp[envc] = malloc(30)))
 			sprintf(envp[envc++], "EDITOR=/usr/bin/ex");
-		if ((envp[envc] = (char *) malloc(30)))
+		if ((envp[envc] = malloc(30)))
 			sprintf(envp[envc++], "LESS=-d -E -F");
 		envp[envc] = NULL;
 
