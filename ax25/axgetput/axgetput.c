@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
 	else
 		p = argv[0];
 	len = strlen(p);
-	if (len < 0 || len > sizeof(myname)-1)
+	if (len > sizeof(myname)-1)
 		len = sizeof(myname)-1;
 	strncpy(myname, p, len);
 	myname[len] = 0;
