@@ -132,7 +132,7 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 		call = ax25_ntoa(&pr->entry.from_call);
 		if ((s = strstr(call, "-0")) != NULL)
 			*s = '\0';
-		if (pr->entry.type < 0 || pr->entry.type > sizeof(types))
+		if (pr->entry.type > sizeof(types))
 			return;
 		printf("%-9s  %-5s  %8u %5s ",
 			call, pr->entry.portname, pr->entry.count, types[pr->entry.type]);
@@ -165,7 +165,7 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 	case 4:
 		if (!pr->entry.count)
 			return;
-		if (pr->entry.type < 0 || pr->entry.type > sizeof(types))
+		if (pr->entry.type > sizeof(types))
 			return;
 		if (pr->entry.last_heard < 0 || pr->entry.first_heard < 0)
 			return;
