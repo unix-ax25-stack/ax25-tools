@@ -161,13 +161,22 @@ int main(int argc, char **argv)
 
 	while (1) {
 		FD_ZERO(&fdset);
+		int maxfd = -1;
+
 		FD_SET(STDIN_FILENO, &fdset);
+		if (STDIN_FILENO > maxfd)
+			maxfd = STDIN_FILENO + 1;
 		FD_SET(pipe_out[0], &fdset);
+		if (pipe_out[0] > maxfd)
+			maxfd = pipe_out[0] + 1;
 		FD_SET(pipe_err[0], &fdset);
+		if (pipe_err[0] > maxfd)
+			maxfd = pipe_err[0] + 1;
+
 		tv.tv_sec = 0;
 		tv.tv_usec = FLUSHTIMEOUT;
 
-		len = select(256, &fdset, NULL, NULL, &tv);
+		len = select(maxfd, &fdset, NULL, NULL, &tv);
 		if (len == -1) {
 			if (errno == EINTR)
 				continue;
