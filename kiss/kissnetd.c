@@ -106,7 +106,8 @@ static void NewPort(char *Name)
 
 static void ReopenPort(int PortNumber)
 {
-	char MyString[80];
+	char MyString[28 + PATH_MAX];
+
 	PortList[PortNumber]->TimeLastOpen = time(NULL);
 
 	if (VerboseMode) {
