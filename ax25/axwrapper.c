@@ -46,12 +46,6 @@
 #define	PERROR(s)	fprintf(stderr, "*** %s: %s\r", (s), strerror(errno))
 #define	USAGE()		fputs("Usage: axwrapper [-p <paclen>] <filename> <argv[0]> ...\r", stderr)
 
-static void sigchld_handler(int sig)
-{
-	/* fprintf(stderr, "Caught SIGCHLD, exiting...\r"); */
-	exit(0);
-}
-
 static void convert_cr_lf(unsigned char *buf, int len)
 {
 	while (len-- > 0) {
@@ -118,7 +112,6 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	/* signal(SIGCHLD, sigchld_handler); */
 	signal(SIGCHLD, SIG_IGN);
 
 	pid = fork();
