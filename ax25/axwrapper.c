@@ -176,6 +176,9 @@ int main(int argc, char **argv)
 
 		len = select(256, &fdset, NULL, NULL, &tv);
 		if (len == -1) {
+			if (errno == EINTR)
+				continue;
+
 			perror("axwrapper: select");
 			exit(1);
 		}
