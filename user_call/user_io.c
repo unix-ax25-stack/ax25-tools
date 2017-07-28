@@ -163,7 +163,8 @@ int user_read(int fd, void *buf, size_t count)
 		incoming_stream.next_in = input_buffer;
 		incoming_stream.avail_in = 0;
 
-		if ((len = read(fd, input_buffer, BUFLEN)) <= 0)
+		len = read(fd, input_buffer, BUFLEN);
+		if (len <= 0)
 			return len;
 
 		incoming_stream.avail_in = len;

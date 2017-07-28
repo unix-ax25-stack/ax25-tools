@@ -42,14 +42,16 @@ static void build_mine(int s, struct full_sockaddr_ax25 *dest, int dlen, int loc
 
 	len = build_header(message);
 
-	if ((fp = fopen(CONF_NRPORTS_FILE, "r")) == NULL) {
+	fp = fopen(CONF_NRPORTS_FILE, "r");
+	if (fp == NULL) {
 		if (logging)
 			syslog(LOG_ERR, "netromt: cannot open nrports file\n");
 		return;
 	}
 
 	while (fgets(buffer, 255, fp) != NULL) {
-		if ((p = strchr(buffer, '\n')) != NULL)
+		p = strchr(buffer, '\n');
+		if (p != NULL)
 			*p = '\0';
 
 		if (strlen(buffer) == 0 || buffer[0] == '#')
@@ -102,13 +104,15 @@ static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, in
 	int  quality, neigh_no, obs_count;
 	int  olen, len;
 
-	if ((fpnodes = fopen(PROC_NR_NODES_FILE, "r")) == NULL) {
+	fpnodes = fopen(PROC_NR_NODES_FILE, "r");
+	if (fpnodes == NULL) {
 		if (logging)
 			syslog(LOG_ERR, "netromt: cannot open %s\n", PROC_NR_NODES_FILE);
 		return;
 	}
 
-	if ((fpneigh = fopen(PROC_NR_NEIGH_FILE, "r")) == NULL) {
+	fpneigh = fopen(PROC_NR_NEIGH_FILE, "r");
+	if (fpneigh == NULL) {
 		if (logging)
 			syslog(LOG_ERR, "netromt: cannot open %s\n", PROC_NR_NEIGH_FILE);
 		fclose(fpnodes);
@@ -232,7 +236,8 @@ void transmit_nodes(int localval, int pause)
 		ax25_aton(path, &src);
 		slen = sizeof(struct full_sockaddr_ax25);
 
-		if ((s = socket(AF_AX25, SOCK_DGRAM, NETROM_PID)) < 0) {
+		s = socket(AF_AX25, SOCK_DGRAM, NETROM_PID);
+		if (s < 0) {
 			if (logging)
 				syslog(LOG_ERR, "netromt: socket: %m");
 			continue;
@@ -253,7 +258,8 @@ void transmit_nodes(int localval, int pause)
 		close(s);
 	}
 
-	if ((s = socket(AF_NETROM, SOCK_SEQPACKET, 0)) < 0) {
+	s = socket(AF_NETROM, SOCK_SEQPACKET, 0);
+	if (s < 0) {
 		if (logging)
 			syslog(LOG_ERR, "netromt: socket: %m");
 		exit(1);

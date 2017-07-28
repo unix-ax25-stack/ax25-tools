@@ -78,7 +78,8 @@ int main(int argc, char **argv)
 	nrbind.fsa_ax25.sax25_ndigis    = 1;
 	nrconnect.fsa_ax25.sax25_ndigis = 0;
 
-	if ((addr = nr_config_get_addr(argv[optind])) == NULL) {
+	addr = nr_config_get_addr(argv[optind]);
+	if (addr == NULL) {
 		sprintf(buffer, "ERROR: invalid NET/ROM port name - %s\r", argv[optind]);
 		err(buffer);
 	}
@@ -106,7 +107,8 @@ int main(int argc, char **argv)
 	/*
 	 * Open the socket into the kernel.
 	 */
-	if ((s = socket(AF_NETROM, SOCK_SEQPACKET, 0)) < 0) {
+	s = socket(AF_NETROM, SOCK_SEQPACKET, 0);
+	if (s < 0) {
 		sprintf(buffer, "ERROR: cannot open NET/ROM socket, %s\r", strerror(errno));
 		err(buffer);
 	}

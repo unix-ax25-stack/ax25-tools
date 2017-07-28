@@ -180,7 +180,8 @@ static int read_routes(void)
 		first_route = NULL;
 	}
 
-	if ((fp = fopen(PROC_IP_ROUTE_FILE, "r")) == NULL) {
+	fp = fopen(PROC_IP_ROUTE_FILE, "r");
+	if (fp == NULL) {
 		if (logging)
 			syslog(LOG_ERR, "error cannot open %s\n", PROC_IP_ROUTE_FILE);
 		return FALSE;
@@ -213,7 +214,8 @@ static int read_routes(void)
 			}
 		}
 
-		if ((route = malloc(sizeof(struct route_struct))) == NULL) {
+		route = malloc(sizeof(struct route_struct));
+		if (route == NULL) {
 			if (logging)
 				syslog(LOG_ERR, "out of memory !\n");
 			return FALSE;
@@ -239,15 +241,18 @@ static int load_dests(void)
 	char buffer[255], *s;
 	FILE *fp;
 
-	if ((fp = fopen(CONF_RIP98D_FILE, "r")) == NULL) {
+	fp = fopen(CONF_RIP98D_FILE, "r");
+	if (fp == NULL) {
 		fprintf(stderr, "rip98d: cannot open config file\n");
 		return FALSE;
 	}
 
 	while (fgets(buffer, 255, fp) != NULL) {
-		if ((s = strchr(buffer, '\n')) != NULL) *s = '\0';
+		s = strchr(buffer, '\n');
+		if (s != NULL) *s = '\0';
 
-		if ((host = gethostbyname(buffer)) == NULL) {
+		host = gethostbyname(buffer);
+		if (host == NULL) {
 			fprintf(stderr, "rip98d: cannot resolve name %s\n", buffer);
 			fclose(fp);
 			return FALSE;
@@ -311,7 +316,8 @@ int main(int argc, char **argv)
 
 	signal(SIGTERM, terminate);
 
-	if ((s = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+	s = socket(AF_INET, SOCK_DGRAM, 0);
+	if (s < 0) {
 		perror("rip98d: socket");
 		return 1;
 	}

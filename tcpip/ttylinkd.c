@@ -238,7 +238,8 @@ int main(int argc, char *argv[])
 	/* Get the remote address, or use ours if remote isn't specified */
 	if (sysop_host)
 	{
-		if ((rhe = gethostbyname(sysop_host)) == NULL)
+		rhe = gethostbyname(sysop_host);
+		if (rhe == NULL)
 		{
 			syslog(LOG_DAEMON | LOG_CRIT, "main(): gethostbyname failed.");
 			exit(1);
@@ -246,7 +247,8 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		if ((rhe = gethostbyname(hostname)) == NULL)
+		rhe = gethostbyname(hostname);
+		if (rhe == NULL)
 		{
 			syslog(LOG_DAEMON | LOG_CRIT, "main(): gethostbyname failed.");
 			exit(1);
@@ -255,7 +257,8 @@ int main(int argc, char *argv[])
 	memcpy((char*)&rem_addr, rhe->h_addr, rhe->h_length);
 
 	/* Get our local address */
-	if ((phe = gethostbyname(hostname)) == NULL)
+	phe = gethostbyname(hostname);
+	if (phe == NULL)
 	{
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): gethostbyname failed.");
 		exit(1);
@@ -270,7 +273,8 @@ int main(int argc, char *argv[])
 	msg_sin->sin_port = htons(0);
 	memcpy((char*)&(msg_sin->sin_addr), phe->h_addr, phe->h_length);
 
-	if ((skt = socket(PF_INET, SOCK_STREAM, 0)) < 0)
+	skt = socket(PF_INET, SOCK_STREAM, 0);
+	if (skt < 0)
 	{
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): socket() failed.");
 		exit(1);
@@ -296,7 +300,8 @@ int main(int argc, char *argv[])
 	memcpy((char*)&ctl_sin.sin_addr, phe->h_addr, phe->h_length);
 	ctl_sin.sin_port = htons(0);
 
-	if ((ctl_skt = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
+	ctl_skt = socket(PF_INET, SOCK_DGRAM, 0);
+	if (ctl_skt < 0)
 	{
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): socket() while attempting to create control socket.");
 		close(skt);
@@ -383,7 +388,8 @@ int main(int argc, char *argv[])
 	signal(SIGALRM, alarm_handle);
 	alarm(30);
 
-	if ((new_skt = accept(skt, NULL, NULL)) < 0)
+	new_skt = accept(skt, NULL, NULL);
+	if (new_skt < 0)
 	{
 		if (errno == EINTR)
 		{
@@ -659,7 +665,8 @@ static void do_talk(int skt)
 
 		if (FD_ISSET(skt, &fdvar))
 		{
-			if ((i = read(skt, inbuf, 256)) <= 0)
+			i = read(skt, inbuf, 256);
+			if (i <= 0)
 			{
 				strcpy(inbuf,"Sysop closed connection.\n");
 				write(STDOUT_FILENO, inbuf, strlen(inbuf));
@@ -674,7 +681,8 @@ static void do_talk(int skt)
 		}
 		if (FD_ISSET(STDIN_FILENO, &fdvar))
 		{
-			if ((i = read(STDIN_FILENO, outbuf, 256)) <= 0)
+			i = read(STDIN_FILENO, outbuf, 256);
+			if (i <= 0)
 			{
 				strcpy(outbuf, "User closed connection.\n");
 				(void) write(skt, outbuf, strlen(outbuf));
@@ -704,7 +712,8 @@ static void read_config_file(int dummy)
 	char param[20], value[108];
 	FILE *fp;
 
-	if ( (fp = fopen(config_file, "r")) == NULL) {
+	fp = fopen(config_file, "r");
+	if (fp == NULL) {
 		syslog(LOG_DAEMON | LOG_ERR, "Cannot find configuration file: %s (%m)\n",config_file);
 		return;
 	}

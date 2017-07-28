@@ -40,7 +40,8 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if ((addr = ax25_config_get_addr(argv[1])) == NULL) {
+	addr = ax25_config_get_addr(argv[1]);
+	if (addr == NULL) {
 		fprintf(stderr, "axctl: invalid port name - %s\n", argv[1]);
 		return 1;
 	}
@@ -52,7 +53,8 @@ int main(int argc, char **argv)
 	if (ax25_aton_entry(argv[3], (char *)&ax25_ctl.source_addr) == -1)
 		return 1;
 
-	if ((s = socket(AF_AX25, SOCK_SEQPACKET, 0)) < 0) {
+	s = socket(AF_AX25, SOCK_SEQPACKET, 0);
+	if (s < 0) {
 		perror("axctl: socket");
 		return 1;
 	}

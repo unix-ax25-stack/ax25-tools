@@ -510,12 +510,14 @@ int main(int argc, char *argv[])
 	 * non-blocking so it won't block regardless of the modem
 	 * status lines.
 	 */
-	if ((tty = calloc(1, sizeof(struct iface))) == NULL) {
+	tty = calloc(1, sizeof(struct iface));
+	if (tty == NULL) {
 		perror("mkiss: malloc");
 		return 1;
 	}
 
-	if ((tty->fd = open(argv[optind], O_RDWR | O_NDELAY)) == -1) {
+	tty->fd = open(argv[optind], O_RDWR | O_NDELAY);
+	if (tty->fd == -1) {
 		perror("mkiss: open");
 		return 1;
 	}
@@ -542,7 +544,8 @@ int main(int argc, char *argv[])
 		static char name_ptmx[] = "/dev/ptmx";
 		char *pty_name = (i < numptys ? argv[optind+i+1] : name_ptmx);
 
-		if ((pty[i] = calloc(1, sizeof(struct iface))) == NULL) {
+		pty[i] = calloc(1, sizeof(struct iface));
+		if (pty[i] == NULL) {
 			perror("mkiss: malloc");
 			return 1;
 		}
@@ -550,7 +553,8 @@ int main(int argc, char *argv[])
 			pty[i]->fd = -1;
 			strcpy(pty[i]->namepts, "none");
 		} else {
-			if ((pty[i]->fd = open(pty_name, O_RDWR)) == -1) {
+			pty[i]->fd = open(pty_name, O_RDWR);
+			if (pty[i]->fd == -1) {
 				perror("mkiss: open");
 				free(pty[i]);
 				pty[i] = NULL;
@@ -564,7 +568,8 @@ int main(int argc, char *argv[])
 		pty[i]->optr = pty[i]->obuf;
 		if (!strcmp(pty[i]->name, "/dev/ptmx")) {
 			/* get name of pts-device */
-			if ((npts = ptsname(pty[i]->fd)) == NULL) {
+			npts = ptsname(pty[i]->fd);
+			if (npts == NULL) {
 				fprintf(stderr, "mkiss: Cannot get name of pts-device.\n");
 				free(pty[i]);
 				pty[i] = NULL;
@@ -672,7 +677,8 @@ int main(int argc, char *argv[])
 				break;
 			}
 			for (icp = ibuf; size > 0; size--, icp++) {
-				if ((len = kiss_rx(tty, *icp, crcflag)) != 0) {
+				len = kiss_rx(tty, *icp, crcflag);
+				if (len != 0) {
 					if ((i = (*tty->obuf & 0xF0) >> 4) < numptys) {
 						if (pty[i]->fd != -1) {
 							kiss_tx(pty[i]->fd, 0, tty->obuf, len, FALSE);
@@ -698,7 +704,8 @@ int main(int argc, char *argv[])
 					goto end;
 				}
 				for (icp = ibuf; size > 0; size--, icp++) {
-					if ((len = kiss_rx(pty[i], *icp, FALSE)) != 0) {
+					len = kiss_rx(pty[i], *icp, FALSE);
+					if (len != 0) {
 						kiss_tx(tty->fd, i, pty[i]->obuf, len, crcflag);
 						tty->txpackets++;
 						tty->txbytes += len;

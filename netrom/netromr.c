@@ -73,7 +73,8 @@ static int add_node(int s, unsigned char *buffer, struct nr_route_struct *nr_nod
 	best_quality = buffer[20];
 
 	nr_node->mnemonic[MNEMONIC_LEN] = '\0';
-	if ((p = strchr(nr_node->mnemonic, ' ')) != NULL)
+	p = strchr(nr_node->mnemonic, ' ');
+	if (p != NULL)
 		*p = '\0';
 
 	if (!validcallsign(&nr_node->callsign)) {
@@ -147,7 +148,8 @@ void receive_nodes(unsigned char *buffer, int length, ax25_address *neighbour, i
 
 	sprintf(neigh_buffer, "%s/obsolescence_count_initialiser", PROC_NR_SYSCTL_DIR);
 
-	if ((fp = fopen(neigh_buffer, "r")) == NULL) {
+	fp = fopen(neigh_buffer, "r");
+	if (fp == NULL) {
 		if (logging)
 			syslog(LOG_ERR, "netromr: cannot open %s\n", neigh_buffer);
 		return;
@@ -159,13 +161,15 @@ void receive_nodes(unsigned char *buffer, int length, ax25_address *neighbour, i
 
 	fclose(fp);
 
-	if ((s = socket(AF_NETROM, SOCK_SEQPACKET, 0)) < 0) {
+	s = socket(AF_NETROM, SOCK_SEQPACKET, 0);
+	if (s < 0) {
 		if (logging)
 			syslog(LOG_ERR, "netromr: socket: %m");
 		return;
 	}
 
-	if ((fp = fopen(PROC_NR_NEIGH_FILE, "r")) == NULL) {
+	fp = fopen(PROC_NR_NEIGH_FILE, "r");
+	if (fp == NULL) {
 		if (logging)
 			syslog(LOG_ERR, "netromr: cannot open %s\n", PROC_NR_NEIGH_FILE);
 		close(s);
@@ -199,7 +203,8 @@ void receive_nodes(unsigned char *buffer, int length, ax25_address *neighbour, i
 	memcpy(nr_node.mnemonic, buffer, MNEMONIC_LEN);
 	nr_node.mnemonic[MNEMONIC_LEN] = '\0';
 
-	if ((p = strchr(nr_node.mnemonic, ' ')) != NULL)
+	p = strchr(nr_node.mnemonic, ' ');
+	if (p != NULL)
 		*p = '\0';
 
 	if (!validmnemonic(nr_node.mnemonic)) {

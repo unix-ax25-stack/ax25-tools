@@ -176,7 +176,8 @@ static struct config *readconfig(void)
 	char line[80], *cp, *dev;
 	struct config *p, *list = NULL;
 
-	if ((fp = fopen(CONF_RXECHO_FILE, "r")) == NULL) {
+	fp = fopen(CONF_RXECHO_FILE, "r");
+	if (fp == NULL) {
 		fprintf(stderr, "rxecho: cannot open config file\n");
 		return NULL;
 	}
@@ -187,12 +188,14 @@ static struct config *readconfig(void)
 		if (cp == NULL || cp[0] == '#')
 			continue;
 
-		if ((p = calloc(1, sizeof(struct config))) == NULL) {
+		p = calloc(1, sizeof(struct config));
+		if (p == NULL) {
 			perror("rxecho: malloc");
 			return NULL;
 		}
 
-		if ((dev = ax25_config_get_dev(cp)) == NULL) {
+		dev = ax25_config_get_dev(cp);
+		if (dev == NULL) {
 			fprintf(stderr, "rxecho: invalid port name - %s\n", cp);
 			return NULL;
 		}
@@ -200,12 +203,14 @@ static struct config *readconfig(void)
 		strcpy(p->from, dev);
 		p->from_idx = -1;
 
-		if ((cp = strtok(NULL, " \t\r\n")) == NULL) {
+		cp = strtok(NULL, " \t\r\n");
+		if (cp == NULL) {
 			fprintf(stderr, "rxecho: config file error.\n");
 			return NULL;
 		}
 
-		if ((dev = ax25_config_get_dev(cp)) == NULL) {
+		dev = ax25_config_get_dev(cp);
+		if (dev == NULL) {
 			fprintf(stderr, "rxecho: invalid port name - %s\n", cp);
 			return NULL;
 		}
@@ -394,11 +399,13 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if ((list = readconfig()) == NULL)
+	list = readconfig();
+	if (list == NULL)
 		return 1;
 
 #ifdef	USE_SOCKADDR_SLL
-	if ((s = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_AX25))) == -1) {
+	s = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_AX25));
+	if (s == -1) {
 #else
 	if ((s = socket(AF_INET, SOCK_PACKET, htons(ETH_P_AX25))) == -1) {
 #endif
@@ -450,7 +457,8 @@ int main(int argc, char **argv)
 	for (;;) {
 		alen = sa_len;
 
-		if ((size = recvfrom(s, buf, 1500, 0, psa, &alen)) == -1) {
+		size = recvfrom(s, buf, 1500, 0, psa, &alen);
+		if (size == -1) {
 			if (logging) {
 				syslog(LOG_ERR, "recvfrom: %m");
 				closelog();

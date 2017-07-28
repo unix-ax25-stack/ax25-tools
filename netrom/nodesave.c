@@ -61,7 +61,8 @@ int main(int argc, char **argv)
 	}
 
 	if ((argc - optind) == 1) {
-		if ((fp = fopen(argv[optind], "w")) == NULL) {
+		fp = fopen(argv[optind], "w");
+		if (fp == NULL) {
 			fprintf(stderr, "nodesave: cannot open file %s\n", argv[optind]);
 			return 1;
 		}

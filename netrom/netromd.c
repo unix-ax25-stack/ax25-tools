@@ -57,13 +57,15 @@ static int bcast_config_load_ports(void)
 	char buffer[255], port[32], *s;
 	FILE *fp;
 
-	if ((fp = fopen(CONF_NETROMD_FILE, "r")) == NULL) {
+	fp = fopen(CONF_NETROMD_FILE, "r");
+	if (fp == NULL) {
 		fprintf(stderr, "netromd: cannot open config file\n");
 		return -1;
 	}
 
 	while (fgets(buffer, 255, fp) != NULL) {
-		if ((s = strchr(buffer, '\n')) != NULL)
+		s = strchr(buffer, '\n');
+		if (s != NULL)
 			*s = '\0';
 
 		if (strlen(buffer) == 0 || buffer[0] == '#')
@@ -198,7 +200,8 @@ int main(int argc, char **argv)
 	ax25_aton_entry(nr_config_get_addr(NULL), (char *)&my_call);
 	ax25_aton_entry("NODES", (char *)&node_call);
 
-	if ((s = socket(PF_PACKET, SOCK_PACKET, htons(ETH_P_AX25))) == -1) {
+	s = socket(PF_PACKET, SOCK_PACKET, htons(ETH_P_AX25));
+	if (s == -1) {
 		perror("netromd: socket");
 		return 1;
 	}
@@ -226,7 +229,9 @@ int main(int argc, char **argv)
 		if (FD_ISSET(s, &fdset)) {
 			asize = sizeof(sa);
 
-			if ((size = recvfrom(s, buffer, sizeof(buffer), 0, &sa, &asize)) == -1) {
+			size = recvfrom(s, buffer, sizeof(buffer), 0, &sa,
+					&asize);
+			if (size == -1) {
 				if (logging) {
 					syslog(LOG_ERR, "recvfrom: %m");
 					closelog();

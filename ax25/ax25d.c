@@ -518,15 +518,18 @@ static int ReadConfig(void)
 	signal(SIGALRM, SIG_IGN);
 	memset(&axl_defaults, 0, sizeof(axl_defaults));
 
-	if ((fp = fopen(ConfigFile, "r")) == NULL)
+	fp = fopen(ConfigFile, "r");
+	if (fp == NULL)
 		return -1;
 
 	while (fgets(buffer, sizeof(buffer), fp) != NULL) {
 		line++;
 
-		if ((s = strchr(buffer, '\n')) != NULL)
+		s = strchr(buffer, '\n');
+		if (s != NULL)
 			*s = '\0';
-		if ((s = strchr(buffer, '\r')) != NULL)
+		s = strchr(buffer, '\r');
+		if (s != NULL)
 			*s = '\0';
 
 		if (buffer[0] == '#')
@@ -563,23 +566,28 @@ static int ReadConfig(void)
 
 			switch (af_type) {
 			case AF_AX25:
-				if ((s = strchr(buffer, ']')) == NULL)
+				s = strchr(buffer, ']');
+				if (s == NULL)
 					goto BadLine;
 				*s = '\0';
-				if ((s = strtok(buffer + 1, " \t")) == NULL)
+				s = strtok(buffer + 1, " \t");
+				if (s == NULL)
 					goto BadLine;
 				port = s;
 				call = NULL;
-				if ((s = strtok(NULL, " \t")) != NULL) {
+				s = strtok(NULL, " \t");
+				if (s != NULL) {
 					if (strcasecmp(s, "VIA") == 0 || strcasecmp(s, "V") == 0) {
-						if ((s = strtok(NULL, " \t")) == NULL)
+						s = strtok(NULL, " \t");
+						if (s == NULL)
 							goto BadLine;
 					}
 
 					call = port;
 					port = s;
 
-					if ((s = strchr(call, '*')) != NULL) {
+					s = strchr(call, '*');
+					if (s != NULL) {
 						*s = '\0';
 					}
 				}
@@ -588,7 +596,8 @@ static int ReadConfig(void)
 					continue;
 				}
 				if (strcmp(port, "*") != 0) {
-					if ((addr = ax25_config_get_addr(port)) == NULL) {
+					addr = ax25_config_get_addr(port);
+					if (addr == NULL) {
 						fprintf(stderr, "ax25d: invalid AX.25 port '%s'\n", port);
 						continue;
 					}
@@ -610,11 +619,13 @@ static int ReadConfig(void)
 				break;
 
 			case AF_NETROM:
-				if ((s = strchr(buffer, '>')) == NULL)
+				s = strchr(buffer, '>');
+				if (s == NULL)
 					goto BadLine;
 				*s = '\0';
 				port = buffer + 1;
-				if ((addr = nr_config_get_addr(port)) == NULL) {
+				addr = nr_config_get_addr(port);
+				if (addr == NULL) {
 					fprintf(stderr, "ax25d: invalid NET/ROM port '%s'\n", port);
 					continue;
 				}
@@ -625,20 +636,25 @@ static int ReadConfig(void)
 				break;
 
 			case AF_ROSE:
-				if ((s = strchr(buffer, '}')) == NULL)
+				s = strchr(buffer, '}');
+				if (s == NULL)
 					goto BadLine;
 				*s = '\0';
-				if ((s = strtok(buffer + 1, " \t")) == NULL)
+				s = strtok(buffer + 1, " \t");
+				if (s == NULL)
 					goto BadLine;
 				call = s;
-				if ((s = strtok(NULL, " \t")) == NULL)
+				s = strtok(NULL, " \t");
+				if (s == NULL)
 					goto BadLine;
 				if (strcasecmp(s, "VIA") == 0 || strcasecmp(s, "V") == 0) {
-					if ((s = strtok(NULL, " \t")) == NULL)
+					s = strtok(NULL, " \t");
+					if (s == NULL)
 						goto BadLine;
 				}
 				port = s;
-				if ((addr = rs_config_get_addr(port)) == NULL) {
+				addr = rs_config_get_addr(port);
+				if (addr == NULL) {
 					fprintf(stderr, "ax25d: invalid Rose port '%s'\n", port);
 					continue;
 				}
@@ -661,7 +677,8 @@ static int ReadConfig(void)
 				exit(1);
 			}
 
-			if ((axl_port = calloc(1, sizeof(*axl_port))) == NULL) {
+			axl_port = calloc(1, sizeof(*axl_port));
+			if (axl_port == NULL) {
 				fprintf(stderr, "ax25d: out of memory\n");
 				goto Error;
 			}
@@ -669,7 +686,9 @@ static int ReadConfig(void)
 			axl_port->port    = strdup(port);
 			axl_port->af_type = af_type;
 
-			if ((axl_port->fd = socket(axl_port->af_type, SOCK_SEQPACKET, 0)) < 0) {
+			axl_port->fd = socket(axl_port->af_type,
+					      SOCK_SEQPACKET, 0);
+			if (axl_port->fd < 0) {
 				fprintf(stderr, "ax25d: socket: %s\n", strerror(errno));
 				free(axl_port->port);
 				free(axl_port);
@@ -708,14 +727,16 @@ static int ReadConfig(void)
 
 			hunt = FALSE;	/* Next lines will be entries */
 		} else {		/* This is an entry */
-			if ((axl_ent = calloc(1, sizeof(*axl_ent))) == NULL) {
+			axl_ent = calloc(1, sizeof(*axl_ent));
+			if (axl_ent == NULL) {
 				fprintf(stderr, "ax25d: out of memory\n");
 				goto Error;
 			}
 
 			axl_ent->af_type = axl_port->af_type;	/* Inherit this */
 
-			if ((call = strtok(buffer, " \t")) == NULL) {
+			call = strtok(buffer, " \t");
+			if (call == NULL) {
 				free(axl_ent);
 				continue;
 			}
@@ -723,7 +744,8 @@ static int ReadConfig(void)
 			strupr(call);
 
 			if (axl_ent->af_type == AF_NETROM) {
-				if ((s = strchr(call, '@')) != NULL) {
+				s = strchr(call, '@');
+				if (s != NULL) {
 					node = s + 1;
 					*s = '\0';
 
@@ -792,7 +814,8 @@ ignore:
 				axl_ent->call = strdup(call);
 
 			/* Window */
-			if ((s = strtok(NULL, " \t")) == NULL)
+			s = strtok(NULL, " \t");
+			if (s == NULL)
 				goto BadArgsFree;
 
 			if (!parameters) {
@@ -806,7 +829,8 @@ ignore:
 			}
 
 			/* T1 */
-			if ((s = strtok(NULL, " \t")) == NULL)
+			s = strtok(NULL, " \t");
+			if (s == NULL)
 				goto BadArgsFree;
 
 			if (!parameters) {
@@ -830,7 +854,8 @@ ignore:
 			}
 
 			/* T2 */
-			if ((s = strtok(NULL, " \t")) == NULL)
+			s = strtok(NULL, " \t");
+			if (s == NULL)
 				goto BadArgsFree;
 
 			if (!parameters) {
@@ -854,7 +879,8 @@ ignore:
 			}
 
 			/* T3 */
-			if ((s = strtok(NULL, " \t")) == NULL)
+			s = strtok(NULL, " \t");
+			if (s == NULL)
 				goto BadArgsFree;
 
 			if (!parameters) {
@@ -868,7 +894,8 @@ ignore:
 			}
 
 			/* Idle */
-			if ((s = strtok(NULL, " \t")) == NULL)
+			s = strtok(NULL, " \t");
+			if (s == NULL)
 				goto BadArgsFree;
 
 			if (!parameters) {
@@ -882,7 +909,8 @@ ignore:
 			}
 
 			/* N2 */
-			if ((s = strtok(NULL, " \t")) == NULL)
+			s = strtok(NULL, " \t");
+			if (s == NULL)
 				goto BadArgsFree;
 
 			if (!parameters) {
@@ -897,17 +925,20 @@ ignore:
 
 			if (!parameters) {
 				/* Flags */
-				if ((s = strtok(NULL, " \t")) == NULL)
+				s = strtok(NULL, " \t");
+				if (s == NULL)
 					goto BadArgsFree;
 
 				axl_ent->flags = ParseFlags(s, line);
 
 				if (!(axl_ent->flags & FLAG_LOCKOUT)) {
 					/* Get username */
-					if ((s = strtok(NULL, " \t")) == NULL)
+					s = strtok(NULL, " \t");
+					if (s == NULL)
 						goto BadArgsFree;
 
-					if ((pwd = getpwnam(s)) == NULL) {
+					pwd = getpwnam(s);
+					if (pwd == NULL) {
 						fprintf(stderr, "ax25d: UID for user '%s' is unknown, ignoring entry\n", s);
 						goto BadUID;
 					}
@@ -916,13 +947,15 @@ ignore:
 					axl_ent->gid = pwd->pw_gid;
 
 					/* Get exec file */
-					if ((s = strtok(NULL, " \t")) == NULL)
+					s = strtok(NULL, " \t");
+					if (s == NULL)
 						goto BadArgsFree;
 
 					axl_ent->exec = strdup(s);
 
 					/* Get command line */
-					if ((s = strtok(NULL, "")) == NULL)
+					s = strtok(NULL, "");
+					if (s == NULL)
 						goto BadArgsFree2;
 
 					axl_ent->shell = strdup(s);
@@ -990,7 +1023,8 @@ static char *stripssid(const char *call)
 
 	strcpy(newcall, call);
 
-	if ((s = strchr(newcall, '-')) != NULL)
+	s = strchr(newcall, '-');
+	if (s != NULL)
 		*s = '\0';
 
 	return newcall;

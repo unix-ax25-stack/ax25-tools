@@ -106,7 +106,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if ((portcall = ax25_config_get_addr(port)) == NULL) {
+	portcall = ax25_config_get_addr(port);
+	if (portcall == NULL) {
 		fprintf(stderr, "beacon: invalid AX.25 port setting - %s\n", port);
 		return 1;
 	}
@@ -121,7 +122,8 @@ int main(int argc, char *argv[])
 	if (addr == NULL)
 		return 1;
 
-	if ((dlen = ax25_aton(addr, &dest)) == -1) {
+	dlen = ax25_aton(addr, &dest);
+	if (dlen == -1) {
 		fprintf(stderr, "beacon: unable to convert callsign '%s'\n", addr);
 		return 1;
 	}
@@ -131,15 +133,18 @@ int main(int argc, char *argv[])
 	}
 
 	if (srccall != NULL && strcmp(srccall, portcall) != 0) {
-		if ((addr = malloc(strlen(srccall) + 1 + strlen(portcall) + 1)) == NULL)
+		addr = malloc(strlen(srccall) + 1 + strlen(portcall) + 1);
+		if (addr == NULL)
 			return 1;
 		sprintf(addr, "%s %s", srccall, portcall);
 	} else {
-		if ((addr = strdup(portcall)) == NULL)
+		addr = strdup(portcall);
+		if (addr == NULL)
 			return 1;
 	}
 
-	if ((len = ax25_aton(addr, &src)) == -1) {
+	len = ax25_aton(addr, &src);
+	if (len == -1) {
 		fprintf(stderr, "beacon: unable to convert callsign '%s'\n", addr);
 		return 1;
 	}
@@ -171,7 +176,8 @@ int main(int argc, char *argv[])
 				sleep(t_sleep);
 		}
 
-		if ((s = socket(AF_AX25, SOCK_DGRAM, 0)) == -1) {
+		s = socket(AF_AX25, SOCK_DGRAM, 0);
+		if (s == -1) {
 			if (logging) {
 				syslog(LOG_ERR, "socket: %m");
 				closelog();

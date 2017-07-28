@@ -258,7 +258,8 @@ static int openpty(int *amaster, int *aslave, char *name,
 #if 0
 				(void) revoke(line);
 #endif
-				if ((slave = open(line, O_RDWR, 0)) != -1) {
+				slave = open(line, O_RDWR, 0);
+				if (slave != -1) {
 					*amaster = master;
 					*aslave = slave;
 					if (name)
@@ -596,8 +597,8 @@ int main(int argc, char *argv[])
 		slavename[5] = 'p';
 		master_name = slavename;
 	} else {
-		if ((fdpty = open(name_pname,
-				  O_RDWR | O_NOCTTY | O_NONBLOCK)) < 0) {
+		fdpty = open(name_pname, O_RDWR | O_NOCTTY | O_NONBLOCK);
+		if (fdpty < 0) {
 			fprintf(stderr, "%s: cannot open \"%s\"\n", progname,
 				name_pname);
 			exit(1);
@@ -606,7 +607,8 @@ int main(int argc, char *argv[])
 			i_am_unix98_pty_master = 1;
 		master_name = name_pname;
 	}
-	if ((fdif = socket(PF_INET, SOCK_PACKET, proto)) < 0)
+	fdif = socket(PF_INET, SOCK_PACKET, proto);
+	if (fdif < 0)
 		die("socket");
 	memset(&sa, 0, sizeof(struct sockaddr));
 	memcpy(sa.sa_data, name_iface, sizeof(sa.sa_data));
@@ -622,7 +624,8 @@ int main(int argc, char *argv[])
 		die("ioctl SIOCSIFFLAGS");
 	if (i_am_unix98_pty_master) {
 		/* get name of pts-device */
-		if ((namepts = ptsname(fdpty)) == NULL) {
+		namepts = ptsname(fdpty);
+		if (namepts == NULL) {
 			fprintf(stderr, "%s: Cannot get name of pts-device.\n", progname);
 			exit (1);
 		}
@@ -673,7 +676,9 @@ int main(int argc, char *argv[])
 				printf("reopening master tty: %s\n", master_name);
 			close(fdpty);
 
-			if ((fdpty = open(master_name, O_RDWR | O_NOCTTY | O_NONBLOCK)) < 0) {
+			fdpty = open(master_name,
+				     O_RDWR | O_NOCTTY | O_NONBLOCK);
+			if (fdpty < 0) {
 				fprintf(stderr, "%s: cannot reopen \"%s\"\n", progname,
 					master_name);
 				exit(1);

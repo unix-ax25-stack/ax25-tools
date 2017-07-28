@@ -82,7 +82,8 @@ int main(int argc, char **argv)
 	roseconnect.srose_ndigis = rosebind.srose_ndigis = 0;
 	addrlen = sizeof(struct sockaddr_rose);
 
-	if ((addr = rs_config_get_addr(argv[1])) == NULL) {
+	addr = rs_config_get_addr(argv[1]);
+	if (addr == NULL) {
 		syslog(LOG_ERR, "invalid Rose port name - %s\n", argv[1]);
 		closelog();
 		return 1;
@@ -104,7 +105,8 @@ int main(int argc, char **argv)
 		addr = ax25_ntoa(&ax25peer.fsa_digipeater[n]);
 
 		if (strspn(addr, "0123456789-") == strlen(addr)) {
-			if ((p = strchr(addr, '-')) != NULL)
+			p = strchr(addr, '-');
+			if (p != NULL)
 				*p = '\0';
 			switch (strlen(addr)) {
 			case 4:
@@ -168,7 +170,8 @@ int main(int argc, char **argv)
 	/*
 	 * Open the socket into the kernel.
 	 */
-	if ((s = socket(AF_ROSE, SOCK_SEQPACKET, 0)) < 0) {
+	s = socket(AF_ROSE, SOCK_SEQPACKET, 0);
+	if (s < 0) {
 		syslog(LOG_ERR, "cannot open ROSE socket, %s\n", strerror(errno));
 		closelog();
 		return 1;
@@ -253,7 +256,8 @@ int main(int argc, char **argv)
 		select(s + 1, &read_fd, NULL, NULL, NULL);
 
 		if (FD_ISSET(s, &read_fd)) {
-			if ((n = read(s, buffer, 512)) == -1) {
+			n = read(s, buffer, 512);
+			if (n == -1) {
 				strcpy(buffer, "\r*** Disconnected - 0000 - DTE Originated\r");
 				write(STDOUT_FILENO, buffer, strlen(buffer));
 				break;
@@ -268,7 +272,8 @@ int main(int argc, char **argv)
 		}
 
 		if (FD_ISSET(STDIN_FILENO, &read_fd)) {
-			if ((n = read(STDIN_FILENO, buffer + 2, sizeof(buffer)-2)) == -1) {
+			n = read(STDIN_FILENO, buffer + 2, sizeof(buffer) - 2);
+			if (n == -1) {
 				close(s);
 				break;
 			}

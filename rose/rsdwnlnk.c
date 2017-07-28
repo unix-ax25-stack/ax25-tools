@@ -78,7 +78,8 @@ int main(int argc, char **argv)
 	axbind.fsa_ax25.sax25_ndigis = 1;
 	axbind.fsa_ax25.sax25_call   = rosepeer.srose_call;
 
-	if ((addr = ax25_config_get_addr(argv[1])) == NULL) {
+	addr = ax25_config_get_addr(argv[1]);
+	if (addr == NULL) {
 		syslog(LOG_ERR, "invalid AX.25 port name - %s\n", argv[1]);
 		closelog();
 		return 1;
@@ -155,7 +156,8 @@ int main(int argc, char **argv)
 	/*
 	 * Open the socket into the kernel.
 	 */
-	if ((s = socket(AF_AX25, SOCK_SEQPACKET, 0)) < 0) {
+	s = socket(AF_AX25, SOCK_SEQPACKET, 0);
+	if (s < 0) {
 		syslog(LOG_ERR, "cannot open AX.25 socket, %s\n", strerror(errno));
 		closelog();
 		return 1;
@@ -240,7 +242,8 @@ int main(int argc, char **argv)
 		select(s + 1, &read_fd, NULL, NULL, NULL);
 
 		if (FD_ISSET(s, &read_fd)) {
-			if ((n = read(s, buffer + 2, sizeof(buffer)-2)) == -1)
+			n = read(s, buffer + 2, sizeof(buffer) - 2);
+			if (n == -1)
 				break;
 			if (buffer[2] == 0xF0) {
 				buffer[2] = 0;
@@ -253,7 +256,8 @@ int main(int argc, char **argv)
 		}
 
 		if (FD_ISSET(STDIN_FILENO, &read_fd)) {
-			if ((n = read(STDIN_FILENO, buffer, 512)) == -1) {
+			n = read(STDIN_FILENO, buffer, 512);
+			if (n == -1) {
 				close(s);
 				break;
 			}

@@ -53,7 +53,8 @@ int my_read(int fd, char *s, int len_max, int *eof, char *p_break)
     int len;
     char *s_curr = s + len_got;
 
-    if ((len = read(fd, s_curr, (p_break ? 1 : len_max))) < 1) {
+    len = read(fd, s_curr, (p_break ? 1 : len_max));
+    if (len < 1) {
       if (len == -1 && errno == EAGAIN) {
 	sleep(10);
 	continue;
@@ -88,7 +89,8 @@ int secure_write(int fd, char *s, int len_write) {
 
   while (len_write_left_curr) {
     int len;
-    if ((len = write(fd, s, len_write_left_curr)) < 0) {
+    len = write(fd, s, len_write_left_curr);
+    if (len < 0) {
       if (len == -1 && errno == EAGAIN) {
 	sleep(10);
 	continue;

@@ -131,7 +131,8 @@ static void ReopenPort(int PortNumber)
 		if (!strcmp(PortList[PortNumber]->Name, "/dev/ptmx")) {
 			char *npts;
 			/* get name of pts-device */
-			if ((npts = ptsname(PortList[PortNumber]->Fd)) == NULL) {
+			npts = ptsname(PortList[PortNumber]->Fd);
+			if (npts == NULL) {
 				sprintf(MyString, "Cannot get name of pts-device.\n");
 				syslog(LOG_WARNING, "kissnetd : Cannot get name of pts-device\n");
 				exit(1);

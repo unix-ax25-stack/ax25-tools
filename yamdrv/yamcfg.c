@@ -320,7 +320,8 @@ int main (int argc, char *argv[])
 
 	strcpy (name, argv[1]);
 
-	if ((sock = socket (PF_INET, SOCK_PACKET, htons (ETH_P_AX25))) < 0)
+	sock = socket(PF_INET, SOCK_PACKET, htons(ETH_P_AX25));
+	if (sock < 0)
 	{
 		fprintf (stderr, "%s: Error %s (%i), cannot open %s\n",
 				 argv[0], strerror (errno), errno, name);

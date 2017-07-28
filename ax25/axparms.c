@@ -135,7 +135,8 @@ static int routes(int s, int argc, char *argv[], ax25_address *callsign)
 	}
 
 	if (strcmp(argv[2], "list") == 0) {
-		if ((fp=fopen(PROC_AX25_ROUTE_FILE,"r")) == NULL) {
+		fp = fopen(PROC_AX25_ROUTE_FILE, "r");
+		if (fp == NULL) {
 			fprintf(stderr, "axparms: route: cannot open %s\n",
 PROC_AX25_ROUTE_FILE);
 			return 1;
@@ -184,7 +185,8 @@ static int associate(int s, int argc, char *argv[])
 			exit(1);
 		}
 
-		if ((fp = fopen(PROC_AX25_CALLS_FILE, "r")) == NULL) {
+		fp = fopen(PROC_AX25_CALLS_FILE, "r");
+		if (fp == NULL) {
 			fprintf(stderr, "axparms: associate: cannot open %s\n", PROC_AX25_CALLS_FILE);
 			return 1;
 		}
@@ -196,7 +198,8 @@ static int associate(int s, int argc, char *argv[])
 		while (fgets(buffer, 80, fp) != NULL) {
 			u = strtok(buffer, " \t\n");
 			c = strtok(NULL, " \t\n");
-			if ((pw = getpwuid(atoi(u))) != NULL)
+			pw = getpwuid(atoi(u));
+			if (pw != NULL)
 				printf("%-10s %s\n", pw->pw_name, c);
 		}
 
@@ -301,7 +304,8 @@ static int forward(int s, int argc, char *argv[])
 		return 1;
 	}
 
-	if ((addr = ax25_config_get_addr(argv[2])) == NULL) {
+	addr = ax25_config_get_addr(argv[2]);
+	if (addr == NULL) {
 		fprintf(stderr, "axparms: invalid port name - %s\n", argv[2]);
 		return 1;
 	}
@@ -320,7 +324,8 @@ static int forward(int s, int argc, char *argv[])
 		return 0;
 	}
 
-	if ((addr = ax25_config_get_addr(argv[3])) == NULL) {
+	addr = ax25_config_get_addr(argv[3]);
+	if (addr == NULL) {
 		fprintf(stderr, "axparms: invalid port name - %s\n", argv[3]);
 		return 1;
 	}
@@ -364,7 +369,8 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		if ((s = socket(AF_AX25, SOCK_SEQPACKET, 0)) < 0) {
+		s = socket(AF_AX25, SOCK_SEQPACKET, 0);
+		if (s < 0) {
 			perror("axparms: socket");
 			return 1;
 		}
@@ -382,7 +388,8 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		if ((s = socket(AF_AX25, SOCK_SEQPACKET, 0)) < 0) {
+		s = socket(AF_AX25, SOCK_SEQPACKET, 0);
+		if (s < 0) {
 			perror("axparms: socket");
 			return 1;
 		}
@@ -415,7 +422,8 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		if ((addr = ax25_config_get_addr(argv[3])) == NULL) {
+		addr = ax25_config_get_addr(argv[3]);
+		if (addr == NULL) {
 			fprintf(stderr, "axparms: invalid port name - %s\n", argv[3]);
 			return 1;
 		}
@@ -423,7 +431,8 @@ int main(int argc, char **argv)
 		if (ax25_aton_entry(addr, callsign.ax25_call) == -1)
 			return 1;
 
-		if ((s = socket(AF_AX25, SOCK_SEQPACKET, 0)) < 0) {
+		s = socket(AF_AX25, SOCK_SEQPACKET, 0);
+		if (s < 0) {
 			perror("axparms: socket");
 			return 1;
 		}
@@ -441,7 +450,8 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		if ((s = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+		s = socket(AF_INET, SOCK_DGRAM, 0);
+		if (s < 0) {
 			perror("axparms: socket");
 			return 1;
 		}

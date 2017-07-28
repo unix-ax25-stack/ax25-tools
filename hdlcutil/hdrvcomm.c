@@ -201,7 +201,8 @@ void hdrvc_init(void)
 		if (fd >= 0)
 			close(fd);
 		afpacket = 0;
-		if ((fd = socket(PF_INET, SOCK_PACKET, htons(ETH_P_AX25))) < 0) {
+		fd = socket(PF_INET, SOCK_PACKET, htons(ETH_P_AX25));
+		if (fd < 0) {
 			fprintf(stderr, "%s: Error %s (%i), cannot open %s\n",
 				prg_name,
 				strerror(errno), errno, if_name);
@@ -234,7 +235,8 @@ void hdrvc_init(void)
 			strerror(errno), errno, if_name);
 		exit(-1);
 	}
-	if ((msqid = msgget(k, 0700)) < 0) {
+	msqid = msgget(k, 0700);
+	if (msqid < 0) {
 		fprintf(stderr, "%s: Error %s (%i), cannot msgget %d\n", prg_name,
 			strerror(errno), errno, k);
 		exit(-1);
@@ -255,7 +257,9 @@ static int hdrvc_recvmsg(struct usersmmsg *msg, int maxlen, long type)
 {
 	int len;
 
-	if ((len = msgrcv(msqid, (struct msgbuf *)msg, maxlen-sizeof(long), type, MSG_NOERROR)) < 0) {
+	len = msgrcv(msqid, (struct msgbuf *)msg, maxlen - sizeof(long), type,
+		     MSG_NOERROR);
+	if (len < 0) {
 		perror("msgrcv");
 		exit(1);
 	}
@@ -405,7 +409,8 @@ int hdrvc_get_channel_access_param(struct hdrvc_channel_params *par)
 	int ret;
 	struct usersmmsg msg;
 
-	if ((ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_GETCHANNELPAR, &hi)) < 0)
+	ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_GETCHANNELPAR, &hi);
+	if (ret < 0)
 		return ret;
 	if (!par) {
 		errno = EINVAL;
@@ -449,7 +454,8 @@ int hdrvc_set_channel_access_param(struct hdrvc_channel_params par)
 	hi.data.cp.slottime = par.slottime;
 	hi.data.cp.ppersist = par.ppersist;
 	hi.data.cp.fulldup = par.fulldup;
-	if ((ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_SETCHANNELPAR, &hi)) < 0)
+	ret = hdrvc_hdlcdrv_ioctl(HDLCDRVCTL_SETCHANNELPAR, &hi);
+	if (ret < 0)
 		return ret;
 	return 0;
 	msg.hdr.type = USERSM_CMD_SET_CHACCESS_PAR;
@@ -549,7 +555,8 @@ int hdrvc_diag2(unsigned int mode, unsigned int flags, short *data,
 	smi.data.diag.samplesperbit = 0;
 	smi.data.diag.datalen = maxdatalen;
 	smi.data.diag.data = data;
-	if ((ret = hdrvc_sm_ioctl(SMCTL_DIAGNOSE, &smi)) < 0)
+	ret = hdrvc_sm_ioctl(SMCTL_DIAGNOSE, &smi);
+	if (ret < 0)
 		return ret;
 	if (samplesperbit)
 		*samplesperbit = smi.data.diag.samplesperbit;

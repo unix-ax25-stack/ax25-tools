@@ -92,7 +92,8 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if ((stdoutbuf = malloc(paclen)) == NULL) {
+	stdoutbuf = malloc(paclen);
+	if (stdoutbuf == NULL) {
 		PERROR("axwrapper: malloc");
 		exit(1);
 	}

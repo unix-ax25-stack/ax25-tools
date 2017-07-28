@@ -321,7 +321,8 @@ int main(int argc, char *argv[])
 			logging = TRUE;
 			break;
 		case 's':
-			if ((speed = atoi(optarg)) <= 0) {
+			speed = atoi(optarg);
+			if (speed <= 0) {
 				fprintf(stderr, "nrsdrv: invalid speed %s\n", optarg);
 				return 1;
 			}
@@ -359,12 +360,14 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if ((kissfd = open(kissdev, O_RDWR)) == -1) {
+	kissfd = open(kissdev, O_RDWR);
+	if (kissfd == -1) {
 		perror("nrsdrv: open kiss device");
 		return 1;
 	}
 
-	if ((nrsfd = open(nrsdev, O_RDWR)) == -1) {
+	nrsfd = open(nrsdev, O_RDWR);
+	if (nrsfd == -1) {
 		perror("nrsdrv: open nrs device");
 		return 1;
 	}
@@ -429,7 +432,8 @@ int main(int argc, char *argv[])
 		n = select(c, &read_fd, NULL, NULL, NULL);
 
 		if (FD_ISSET(kissfd, &read_fd)) {
-			if ((n = read(kissfd, buffer, 512)) <= 0) {
+			n = read(kissfd, buffer, 512);
+			if (n <= 0) {
 				if (logging) {
 					syslog(LOG_INFO, "terminating on KISS device closure\n");
 					closelog();
@@ -440,7 +444,8 @@ int main(int argc, char *argv[])
 		}
 
 		if (FD_ISSET(nrsfd, &read_fd)) {
-			if ((n = read(nrsfd, buffer, 512)) <= 0) {
+			n = read(nrsfd, buffer, 512);
+			if (n <= 0) {
 				if (logging) {
 					syslog(LOG_INFO, "terminating on NRS device closure\n");
 					closelog();

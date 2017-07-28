@@ -96,7 +96,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if ((sk = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+	sk = socket(AF_INET, SOCK_DGRAM, 0);
+	if (sk < 0) {
 		perror("socket");
 		return 2;
 	}
