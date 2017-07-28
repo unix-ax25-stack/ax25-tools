@@ -37,7 +37,8 @@ static int readconfig(char *port)
 	char buffer[90], *s;
 	int n = 0;
 
-	if ((fp = fopen(CONF_NRPORTS_FILE, "r")) == NULL) {
+	fp = fopen(CONF_NRPORTS_FILE, "r");
+	if (fp == NULL) {
 		fprintf(stderr, "nrattach: cannot open nrports file\n");
 		return FALSE;
 	}
@@ -45,13 +46,15 @@ static int readconfig(char *port)
 	while (fgets(buffer, 90, fp) != NULL) {
 		n++;
 
-		if ((s = strchr(buffer, '\n')) != NULL)
+		s = strchr(buffer, '\n');
+		if (s != NULL)
 			*s = '\0';
 
 		if (strlen(buffer) > 0 && *buffer == '#')
 			continue;
 
-		if ((s = strtok(buffer, " \t\r\n")) == NULL) {
+		s = strtok(buffer, " \t\r\n");
+		if (s == NULL) {
 			fprintf(stderr, "nrattach: unable to parse line %d of the nrports file\n", n);
 			return FALSE;
 		}
@@ -59,25 +62,29 @@ static int readconfig(char *port)
 		if (strcmp(s, port) != 0)
 			continue;
 
-		if ((s = strtok(NULL, " \t\r\n")) == NULL) {
+		s = strtok(NULL, " \t\r\n");
+		if (s == NULL) {
 			fprintf(stderr, "nrattach: unable to parse line %d of the nrports file\n", n);
 			return FALSE;
 		}
 
 		callsign = strdup(s);
 
-		if ((s = strtok(NULL, " \t\r\n")) == NULL) {
+		s = strtok(NULL, " \t\r\n");
+		if (s == NULL) {
 			fprintf(stderr, "nrattach: unable to parse line %d of the nrports file\n", n);
 			return FALSE;
 		}
 
-		if ((s = strtok(NULL, " \t\r\n")) == NULL) {
+		s = strtok(NULL, " \t\r\n");
+		if (s == NULL) {
 			fprintf(stderr, "nrattach: unable to parse line %d of the nrports file\n", n);
 			return FALSE;
 		}
 
 		if (mtu == 0) {
-			if ((mtu = atoi(s)) <= 0) {
+			mtu = atoi(s);
+			if (mtu <= 0) {
 				fprintf(stderr, "nrattach: invalid paclen setting\n");
 				return FALSE;
 			}
@@ -101,7 +108,8 @@ static int getfreedev(char *dev)
 	int fd;
 	int i;
 
-	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (fd < 0) {
 		perror("nrattach: socket");
 		return FALSE;
 	}
@@ -132,7 +140,8 @@ static int startiface(char *dev, struct hostent *hp)
 	char call[7];
 	int fd;
 
-	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (fd < 0) {
 		perror("nrattach: socket");
 		return FALSE;
 	}
@@ -203,13 +212,15 @@ int main(int argc, char *argv[])
 	while ((fd = getopt(argc, argv, "i:m:v")) != -1) {
 		switch (fd) {
 		case 'i':
-			if ((hp = gethostbyname(optarg)) == NULL) {
+			hp = gethostbyname(optarg);
+			if (hp == NULL) {
 				fprintf(stderr, "nrattach: invalid internet name/address - %s\n", optarg);
 				return 1;
 			}
 			break;
 		case 'm':
-			if ((mtu = atoi(optarg)) <= 0) {
+			mtu = atoi(optarg);
+			if (mtu <= 0) {
 				fprintf(stderr, "nrattach: invalid mtu size - %s\n", optarg);
 				return 1;
 			}

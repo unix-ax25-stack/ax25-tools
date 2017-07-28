@@ -164,7 +164,9 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if ((mheard_list = calloc(mheard_list_size, sizeof(struct mheard_list_struct))) == NULL) {
+	mheard_list = calloc(mheard_list_size,
+			     sizeof(struct mheard_list_struct));
+	if (mheard_list == NULL) {
 		fprintf(stderr, "mheardd: cannot allocate memory\n");
 		return 1;
 	}
@@ -187,11 +189,13 @@ int main(int argc, char **argv)
 
 		fclose(fp);
 	} else {
-		if ((fp = fopen(DATA_MHEARD_FILE, "w")) != NULL)
+		fp = fopen(DATA_MHEARD_FILE, "w");
+		if (fp != NULL)
 			fclose(fp);
 	}
 
-	if ((s = socket(PF_PACKET, SOCK_PACKET, htons(ETH_P_AX25))) == -1) {
+	s = socket(PF_PACKET, SOCK_PACKET, htons(ETH_P_AX25));
+	if (s == -1) {
 		perror("mheardd: socket");
 		return 1;
 	}
@@ -210,7 +214,8 @@ int main(int argc, char **argv)
 	for (;;) {
 		asize = sizeof(sa);
 
-		if ((size = recvfrom(s, buffer, sizeof(buffer), 0, &sa, &asize)) == -1) {
+		size = recvfrom(s, buffer, sizeof(buffer), 0, &sa, &asize);
+		if (size == -1) {
 			if (logging) {
 				syslog(LOG_ERR, "recv: %m");
 				closelog();
@@ -218,7 +223,8 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		if ((port = ax25_config_get_name(sa.sa_data)) == NULL) {
+		port = ax25_config_get_name(sa.sa_data);
+		if (port == NULL) {
 			if (logging)
 				syslog(LOG_WARNING, "unknown port '%s'\n", sa.sa_data);
 			continue;
@@ -392,7 +398,8 @@ int main(int argc, char **argv)
 
 		time(&mheard->entry.last_heard);
 
-		if ((fp = fopen(DATA_MHEARD_FILE, "r+")) == NULL) {
+		fp = fopen(DATA_MHEARD_FILE, "r+");
+		if (fp == NULL) {
 			if (logging)
 				syslog(LOG_ERR, "cannot open mheard data file\n");
 			continue;

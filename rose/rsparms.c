@@ -31,7 +31,8 @@ static void printnb(char *neigh)
 	char buff[80];
 	int args;
 
-	if ((fp=fopen(PROC_RS_NEIGH_FILE,"r"))==NULL) {
+	fp = fopen(PROC_RS_NEIGH_FILE, "r");
+	if (fp == NULL) {
 		fprintf(stderr,"rsparms: Couldn't open %s file\n",PROC_RS_NEIGH_FILE);
 		exit(1);
 	}
@@ -86,7 +87,8 @@ static void nodes(int s, int argc, char *argv[])
 	}
 
 	if (argv[2][0] == 'l') {
-		if ((fn=fopen(PROC_RS_NODES_FILE,"r"))==NULL) {
+		fn = fopen(PROC_RS_NODES_FILE, "r");
+		if (fn == NULL) {
 			fprintf(stderr,"rsparms: Couldn't open %s file\n",PROC_RS_NODES_FILE);
 			exit(1);
 		}
@@ -153,7 +155,8 @@ static void nodes(int s, int argc, char *argv[])
 		exit(1);
 	}
 
-	if ((dev = ax25_config_get_dev(argv[4])) == NULL) {
+	dev = ax25_config_get_dev(argv[4]);
+	if (dev == NULL) {
 		fprintf(stderr, "rsparms: nodes: invalid port name - %s\n", argv[4]);
 		close(s);
 		exit(1);
@@ -225,7 +228,8 @@ int main(int argc, char *argv[])
 			rose_call = null_ax25_address;
 		}
 
-		if ((s = socket(AF_ROSE, SOCK_SEQPACKET, 0)) < 0) {
+		s = socket(AF_ROSE, SOCK_SEQPACKET, 0);
+		if (s < 0) {
 			perror("rsparms: socket");
 			return 1;
 		}
@@ -243,7 +247,8 @@ int main(int argc, char *argv[])
 
 	if (strncmp(argv[1], "-n", 2) == 0) {
 
-		if ((s = socket(AF_ROSE, SOCK_SEQPACKET, 0)) < 0) {
+		s = socket(AF_ROSE, SOCK_SEQPACKET, 0);
+		if (s < 0) {
 			perror("rsparms: socket");
 			return 1;
 		}

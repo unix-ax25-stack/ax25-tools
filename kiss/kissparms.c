@@ -153,7 +153,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if ((s = socket(PF_PACKET, SOCK_PACKET, htons(proto))) < 0) {
+	s = socket(PF_PACKET, SOCK_PACKET, htons(proto));
+	if (s < 0) {
 		perror("kissparms: socket");
 		return 1;
 	}

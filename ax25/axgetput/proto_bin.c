@@ -168,7 +168,8 @@ int bput(void)
 				goto abort;
 			}
 		}
-		if ((fddata = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0640)) < 0) {
+		fddata = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0640);
+		if (fddata < 0) {
 			sprintf(err_msg, "error: cannot open %s (%s)\n", filename, strerror(errno));
 			write(fderr, "\r#NO#\r", 6);
 			return 1;
@@ -191,7 +192,10 @@ int bput(void)
 
 	for (;;) {
 
-		if ((len = my_read(fdin, buf, ((term_line || len_read_left > sizeof(buf)) ? sizeof(buf) : len_read_left), &is_eof, "\r")) < 1) {
+		len = my_read(fdin, buf,
+			      ((term_line || len_read_left > sizeof(buf)) ? sizeof(buf) : len_read_left),
+			      &is_eof, "\r");
+		if (len < 1) {
 			save_close(fddata);
 			sprintf(err_msg, "error: read failed (%s)\n", strerror(errno));
 			goto abort;
@@ -325,7 +329,8 @@ int bget(void) {
 	init_crc();
 
 	if (!fdin_is_pipe && *filename) {
-		if ((fddata = open(filename, O_RDONLY)) == -1) {
+		fddata = open(filename, O_RDONLY);
+		if (fddata == -1) {
 			sprintf(err_msg, "error: cannot open %s (%s)\n", filename, strerror(errno));
 			return 1;
 		}
@@ -440,7 +445,8 @@ int bget(void) {
 		FD_SET(fdin, &readfds);
 		if (select(fdin+1, &readfds, NULL, NULL, &timeout) &&
 		    FD_ISSET(fdin, &readfds)) {
-			if ((len = read(fdin, buf, sizeof(buf))) < 0) {
+			len = read(fdin, buf, sizeof(buf));
+			if (len < 0) {
 				sprintf(err_msg, "read from tty failed (%s)\n", strerror(errno));
 				save_close(fddata);
 				goto abort;
@@ -454,7 +460,10 @@ int bget(void) {
 		/* read data  */
 		if (!fdin_is_pipe || is_stream) {
 			p_buf = buf;
-			if ((len = my_read(fddata, buf, ((len_remains > BLOCKSIZ || is_stream) ? BLOCKSIZ : len_remains), &is_eof, NULL)) < 1) {
+			len = my_read(fddata, buf,
+				      ((len_remains > BLOCKSIZ || is_stream) ? BLOCKSIZ : len_remains),
+				      &is_eof, NULL);
+			if (len < 1) {
 				save_close(fddata);
 				if (len < 0) {
 					sprintf(err_msg, "error: read failed (%s)\n", strerror(errno));

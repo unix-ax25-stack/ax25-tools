@@ -83,7 +83,8 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			strftime(lh, sizeof(lh),"%Y-%m-%d %H:%M:%S", loc) == 0)
 			return;
 		call =  ax25_ntoa(&pr->entry.from_call);
-		if ((s = strstr(call, "-0")) != NULL)
+		s = strstr(call, "-0");
+		if (s != NULL)
 			*s = '\0';
 		printf("%-9s  %-5s  %8u   %s\n",
 			call, pr->entry.portname, pr->entry.count, lh);
@@ -91,18 +92,21 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 	case 1:
 		buffer[0] = '\0';
 		call = ax25_ntoa(&pr->entry.from_call);
-		if ((s = strstr(call, "-0")) != NULL)
+		s = strstr(call, "-0");
+		if (s != NULL)
 			*s = '\0';
 		strcat(buffer, call);
 		call = ax25_ntoa(&pr->entry.to_call);
-		if ((s = strstr(call, "-0")) != NULL)
+		s = strstr(call, "-0");
+		if (s != NULL)
 			*s = '\0';
 		strcat(buffer, ">");
 		strcat(buffer, call);
 		for (i = 0; i < pr->entry.ndigis && i < 4; i++) {
 			strcat(buffer, ",");
 			call = ax25_ntoa(&pr->entry.digis[i]);
-			if ((s = strstr(call, "-0")) != NULL)
+			s = strstr(call, "-0");
+			if (s != NULL)
 				*s = '\0';
 			strcat(buffer, call);
 		}
@@ -121,7 +125,8 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			strftime(fh, sizeof(fh),"%Y-%m-%d %H:%M:%S", loc) == 0)
 			return;
 		call = ax25_ntoa(&pr->entry.from_call);
-		if ((s = strstr(call, "-0")) != NULL)
+		s = strstr(call, "-0");
+		if (s != NULL)
 			*s = '\0';
 		printf("%-9s  %-5s  %8u %8u %8u  %s  %s\n",
 			call, pr->entry.portname, pr->entry.iframes, pr->entry.sframes, pr->entry.uframes, fh, lh);
@@ -130,7 +135,8 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 		if (!pr->entry.count)
 			return;
 		call = ax25_ntoa(&pr->entry.from_call);
-		if ((s = strstr(call, "-0")) != NULL)
+		s = strstr(call, "-0");
+		if (s != NULL)
 			*s = '\0';
 		if (pr->entry.type > sizeof(types))
 			return;
@@ -176,7 +182,8 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			strftime(fh, sizeof(fh),"%Y-%m-%d %H:%M:%S", loc) == 0)
 			return;
 		call = ax25_ntoa(&pr->entry.from_call);
-		if ((s = strstr(call, "-0")) != NULL)
+		s = strstr(call, "-0");
+		if (s != NULL)
 			*s = '\0';
 		printf("%-9s  %-5s  %8u %8u %8u  %s  %s  %8u %5s ",
 			call, pr->entry.portname, pr->entry.iframes, pr->entry.sframes, pr->entry.uframes, fh, lh, pr->entry.count, types[pr->entry.type]);
@@ -212,7 +219,8 @@ static void PrintPortEntry(struct PortRecord *pr, int data)
 			if (i)
 				strcat(buffer, ",");
 			call = ax25_ntoa(&pr->entry.digis[i]);
-			if ((s = strstr(call, "-0")) != NULL)
+			s = strstr(call, "-0");
+			if (s != NULL)
 				*s = '\0';
 			strcat(buffer, call);
 		}
@@ -244,7 +252,8 @@ static void LoadPortData(void)
 	struct PortRecord *pr;
 	struct mheard_struct mheard;
 
-	if ((fp = fopen(DATA_MHEARD_FILE, "r")) == NULL) {
+	fp = fopen(DATA_MHEARD_FILE, "r");
+	if (fp == NULL) {
 		fprintf(stderr, "mheard: cannot open mheard data file\n");
 		exit(1);
 	}

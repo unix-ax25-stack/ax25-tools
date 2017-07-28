@@ -72,7 +72,8 @@ static unsigned char get_mixer_reg(unsigned char addr)
 	struct sm_mixer_data mixdat;
 
 	mixdat.reg = addr;
-	if ((i = do_mix_ioctl(SMCTL_GETMIXER, &mixdat)) < 0) {
+	i = do_mix_ioctl(SMCTL_GETMIXER, &mixdat);
+	if (i < 0) {
 		perror("do_mix_ioctl: SMCTL_GETMIXER");
 		exit(1);
 	}
@@ -389,21 +390,24 @@ static int set_mixer_ad1848(int argc, char *argv[])
 			}
 		} else if (!strncasecmp(argv[0], "sl=", 3)) {
 			mask |= 16;
-			if ((isrcl = parse_ad_src(argv[0]+3)) < 0) {
+			isrcl = parse_ad_src(argv[0] + 3);
+			if (isrcl < 0) {
 				fprintf(stderr, "invalid input source, must "
 					"be either line, aux1, mic or dac\n");
 				return -1;
 			}
 		} else if (!strncasecmp(argv[0], "sr=", 3)) {
 			mask |= 32;
-			if ((isrcr = parse_ad_src(argv[0]+3)) < 0) {
+			isrcr = parse_ad_src(argv[0] + 3);
+			if (isrcr < 0) {
 				fprintf(stderr, "invalid input source, must "
 					"be either line, aux1, mic or dac\n");
 				return -1;
 			}
 		} else if (!strncasecmp(argv[0], "s=", 2)) {
 			mask |= 48;
-			if ((isrcl = isrcr = parse_ad_src(argv[0]+2)) < 0) {
+			isrcl = isrcr = parse_ad_src(argv[0] + 2);
+			if (isrcl < 0) {
 				fprintf(stderr, "invalid input source, must "
 					"be either line, aux1, mic or dac\n");
 				return -1;

@@ -68,7 +68,8 @@ static int readconfig(char *port)
 	char buffer[90], *s;
 	int n = 0;
 
-	if ((fp = fopen(CONF_AXPORTS_FILE, "r")) == NULL) {
+	fp = fopen(CONF_AXPORTS_FILE, "r");
+	if (fp == NULL) {
 		fprintf(stderr, "%s: cannot open axports file %s\n",
 			progname, CONF_AXPORTS_FILE);
 		return FALSE;
@@ -77,13 +78,15 @@ static int readconfig(char *port)
 	while (fgets(buffer, 90, fp) != NULL) {
 		n++;
 
-		if ((s = strchr(buffer, '\n')) != NULL)
+		s = strchr(buffer, '\n');
+		if (s != NULL)
 			*s = '\0';
 
 		if (*buffer == 0 || *buffer == '#')
 			continue;
 
-		if ((s = strtok(buffer, " \t\r\n")) == NULL) {
+		s = strtok(buffer, " \t\r\n");
+		if (s == NULL) {
 			fprintf(stderr, "%s: unable to parse line %d of the axports file\n", progname, n);
 			return FALSE;
 		}
@@ -91,27 +94,31 @@ static int readconfig(char *port)
 		if (strcmp(s, port) != 0)
 			continue;
 
-		if ((s = strtok(NULL, " \t\r\n")) == NULL) {
+		s = strtok(NULL, " \t\r\n");
+		if (s == NULL) {
 			fprintf(stderr, "%s: unable to parse line %d of the axports file\n", progname, n);
 			return FALSE;
 		}
 
 		callsign = strdup(s);
 
-		if ((s = strtok(NULL, " \t\r\n")) == NULL) {
+		s = strtok(NULL, " \t\r\n");
+		if (s == NULL) {
 			fprintf(stderr, "%s: unable to parse line %d of the axports file\n", progname, n);
 			return FALSE;
 		}
 
 		speed = atoi(s);
 
-		if ((s = strtok(NULL, " \t\r\n")) == NULL) {
+		s = strtok(NULL, " \t\r\n");
+		if (s == NULL) {
 			fprintf(stderr, "%s: unable to parse line %d of the axports file\n", progname, n);
 			return FALSE;
 		}
 
 		if (mtu == 0) {
-			if ((mtu = atoi(s)) <= 0) {
+			mtu = atoi(s);
+			if (mtu <= 0) {
 				fprintf(stderr, "%s: invalid paclen setting\n", progname);
 				return FALSE;
 			}
@@ -153,7 +160,8 @@ static int startiface(char *dev, struct hostent *hp)
 	struct ifreq ifr;
 	int fd;
 
-	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (fd < 0) {
 		fprintf(stderr, "%s: ", progname);
 		perror("socket");
 		return FALSE;
@@ -248,7 +256,8 @@ int main(int argc, char *argv[])
 			logging = TRUE;
 			break;
 		case 'm':
-			if ((mtu = atoi(optarg)) <= 0) {
+			mtu = atoi(optarg);
+			if (mtu <= 0) {
 				fprintf(stderr, "%s: invalid mtu size - %s\n", progname, optarg);
 				return 1;
 			}
@@ -296,7 +305,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if ((fd = open(kttyname, O_RDONLY | O_NONBLOCK)) == -1) {
+	fd = open(kttyname, O_RDONLY | O_NONBLOCK);
+	if (fd == -1) {
 		if (errno == ENOENT) {
 			fprintf(stderr, "%s: Cannot find serial device %s, no such file or directory.\n", progname, kttyname);
 		} else {
@@ -308,7 +318,8 @@ int main(int argc, char *argv[])
 
 	if (i_am_unix98_pty_master) {
 		/* get name of pts-device */
-		if ((namepts = ptsname(fd)) == NULL) {
+		namepts = ptsname(fd);
+		if (namepts == NULL) {
 			fprintf(stderr, "%s: Cannot get name of pts-device.\n", progname);
 			return 1;
 		}

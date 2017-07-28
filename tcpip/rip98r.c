@@ -160,7 +160,8 @@ void receive_routes(int s)
 
 			case ADDITIONAL_ROUTE:
 				if (!found) {
-					if ((new = malloc(sizeof(struct route_struct))) == NULL) {
+					new = malloc(sizeof(struct route_struct));
+					if (new == NULL) {
 						if (logging)
 							syslog(LOG_ERR, "out of memory\n");
 						return;
@@ -186,7 +187,8 @@ void receive_routes(int s)
 		}
 
 		if (!matched) {
-			if ((new = malloc(sizeof(struct route_struct))) == NULL) {
+			new = malloc(sizeof(struct route_struct));
+			if (new == NULL) {
 				if (logging)
 					syslog(LOG_ERR, "out of memory\n");
 				return;

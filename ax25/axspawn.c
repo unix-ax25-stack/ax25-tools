@@ -648,7 +648,8 @@ static int read_ax25(char *s, int size)
 	int declen;
 	struct termios termios;
 
-	if ((len = read(0, s, size)) < 0)
+	len = read(0, s, size);
+	if (len < 0)
 		return len;
 
 	if (huffman) {
@@ -990,7 +991,8 @@ static void cleanup(char *tty)
 		gettimeofday(&tv, NULL);
 		ut_line->ut_tv.tv_sec = tv.tv_sec;
 		ut_line->ut_tv.tv_usec = tv.tv_usec;
-		if ((fp = fopen(_PATH_WTMP, "r+")) != NULL) {
+		fp = fopen(_PATH_WTMP, "r+");
+		if (fp != NULL) {
 			fseek(fp, 0L, SEEK_END);
 			if (fwrite(ut_line, sizeof(ut), 1, fp) != 1)
 				syslog(LOG_ERR, "Ooops, I think I've just barbecued your wtmp file\n");
@@ -1270,7 +1272,8 @@ static void read_config(void)
 	while (!feof(fp))
 	{
 		fgets(buf, sizeof(buf), fp);
-		if ((p = strchr(buf, '#')) || (p = strchr(buf, '\n')))
+		p = strchr(buf, '#');
+		if (p || (p = strchr(buf, '\n')))
 			*p='\0';
 
 		if (buf[0] != '\0')
@@ -1548,7 +1551,8 @@ int main(int argc, char **argv)
 		char *p_buf;
 		sprintf(buf, "Login (%s): ", user);
 		write_ax25(buf, strlen(buf), 1);
-		if ((cnt = read_ax25(buf, sizeof(buf)-1)) < 0)
+		cnt = read_ax25(buf, sizeof(buf) - 1);
+		if (cnt < 0)
 				exit(1);
 		buf[cnt] = 0;
 

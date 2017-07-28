@@ -204,7 +204,9 @@ static void write_example_passwd(char *pwfile, char pwlocation,
 	FILE * f;
 	int i;
 
-	if ((i = open(pwfile, O_CREAT|O_WRONLY|O_TRUNC, (S_IRUSR | S_IWUSR | (pwlocation == SYSTEMPW ? (S_IRGRP /* | S_IWGRP */ ) : 0)))) == -1)
+	i = open(pwfile, O_CREAT | O_WRONLY | O_TRUNC,
+		 (S_IRUSR | S_IWUSR | (pwlocation == SYSTEMPW ? (S_IRGRP /* | S_IWGRP */) : 0)));
+	if (i == -1)
 		return;
 	fchown(i, (pwlocation == SYSTEMPW ? 0 : pw->pw_uid), (pwlocation == SYSTEMPW ? 0 : pw->pw_gid));
 	close(i);

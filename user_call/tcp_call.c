@@ -69,7 +69,8 @@ int main(int argc, char **argv)
 	/*
 	 * Open the socket into the kernel.
 	 */
-	if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+	s = socket(AF_INET, SOCK_STREAM, 0);
+	if (s < 0) {
 		sprintf(buffer, "ERROR: can't open socket: %s\n", strerror(errno));
 		err(buffer);
 	}

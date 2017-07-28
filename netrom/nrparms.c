@@ -98,7 +98,8 @@ static void nodes(int s, char *nodecall, char *op, char *ident, int quality,
 		nr_node.ndigis++;
 	}
 
-	if ((dev = ax25_config_get_dev(port)) == NULL) {
+	dev = ax25_config_get_dev(port);
+	if (dev == NULL) {
 		fprintf(stderr, "nrparms: nodes: invalid port name - %s\n", port);
 		close(s);
 		exit(1);
@@ -162,7 +163,8 @@ static void routes(int s, char *port, char *nodecall, char *rest[])
 		exit(1);
 	}
 
-	if ((dev = ax25_config_get_dev(port)) == NULL) {
+	dev = ax25_config_get_dev(port);
+	if (dev == NULL) {
 		fprintf(stderr, "nrparms: routes: invalid port name - %s\n", port);
 		close(s);
 		exit(1);
@@ -207,7 +209,8 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	if ((s = socket(AF_NETROM, SOCK_SEQPACKET, 0)) < 0) {
+	s = socket(AF_NETROM, SOCK_SEQPACKET, 0);
+	if (s < 0) {
 		perror("nrparms: socket");
 		return 1;
 	}

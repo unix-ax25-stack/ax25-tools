@@ -487,12 +487,14 @@ int main(int argc, char *argv[])
 	 * non-blocking so it won't block regardless of the modem
 	 * status lines.
 	 */
-	if ((tty = calloc(1, sizeof(struct iface))) == NULL) {
+	tty = calloc(1, sizeof(struct iface));
+	if (tty == NULL) {
 		perror("m6pack: malloc");
 		return 1;
 	}
 
-	if ((tty->fd = open(argv[optind], O_RDWR | O_NDELAY)) == -1) {
+	tty->fd = open(argv[optind], O_RDWR | O_NDELAY);
+	if (tty->fd == -1) {
 		perror("m6pack: open");
 		return 1;
 	}
@@ -517,11 +519,13 @@ int main(int argc, char *argv[])
 		static char name_ptmx[] = "/dev/ptmx";
 		char *pty_name = (i < numptys ? argv[optind+i+1] : name_ptmx);
 
-		if ((pty[i] = calloc(1, sizeof(struct iface))) == NULL) {
+		pty[i] = calloc(1, sizeof(struct iface));
+		if (pty[i] == NULL) {
 			perror("m6pack: malloc");
 			return 1;
 		}
-		if ((pty[i]->fd = open(pty_name, O_RDWR)) == -1) {
+		pty[i]->fd = open(pty_name, O_RDWR);
+		if (pty[i]->fd == -1) {
 			perror("m6pack: open");
 			return 1;
 		}
@@ -533,7 +537,8 @@ int main(int argc, char *argv[])
 		pty[i]->namepts[0] = '\0';
 		if (!strcmp(pty[i]->name, "/dev/ptmx")) {
 			/* get name of pts-device */
-			if ((npts = ptsname(pty[i]->fd)) == NULL) {
+			npts = ptsname(pty[i]->fd);
+			if (npts == NULL) {
 				fprintf(stderr, "m6pack: Cannot get name of pts-device.\n");
 				return 1;
 			}
@@ -627,8 +632,8 @@ int main(int argc, char *argv[])
 			}
 
 			for (icp = ibuf; size > 0; size--, icp++) {
-				if ((len = sixpack_rx(tty,*icp,&tnc_addr,
-						      &type)) != 0) {
+				len = sixpack_rx(tty, *icp, &tnc_addr, &type);
+				if (len != 0) {
 					if (tnc_addr <= numptys) {
 						sixpack_tx(pty[tnc_addr]->fd,
 							   0,
@@ -659,10 +664,9 @@ int main(int argc, char *argv[])
 				}
 
 				for (icp = ibuf; size > 0; size--, icp++) {
-					if ((len = sixpack_rx(pty[i],
-							      *icp,
-							      &tnc_addr,
-							      &type)) != 0) {
+					len = sixpack_rx(pty[i], *icp,
+							 &tnc_addr, &type);
+					if (len != 0) {
 						sixpack_tx(tty->fd, i,
 							   (type == data) ?
 							   pty[i]->databuf :

@@ -368,8 +368,10 @@ int main(int argc, char *argv[])
 	}
 	printmode(mode, trigger);
 	for (;;) {
-		if ((ret = hdrvc_diag2(mode, trigger, data, sizeof(data) / sizeof(short),
-				       &samplesperbit)) < 0) {
+		ret = hdrvc_diag2(mode, trigger, data,
+				  sizeof(data) / sizeof(short),
+				  &samplesperbit);
+		if (ret < 0) {
 			perror("hdrvc_diag2");
 			exit(1);
 		}
