@@ -243,7 +243,7 @@ int main(int argc, char **argv)
 	loc_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	loc_addr.sin_port        = htons(RIP_PORT);
 
-	if (bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr)) < 0) {
+	if (bind(s, &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("rip98d: bind");
 		close(s);
 		return 1;

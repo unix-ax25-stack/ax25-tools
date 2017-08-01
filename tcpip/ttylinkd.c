@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	if (bind(ctl_skt, (struct sockaddr*)&ctl_sin, sizeof(ctl_sin)) != 0)
+	if (bind(ctl_skt, &ctl_sin, sizeof(ctl_sin)) != 0)
 	{
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): Error when trying to bind() control socket.");
 		close(skt);
