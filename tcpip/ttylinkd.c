@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
 	memcpy(&my_addr, phe->h_addr, phe->h_length);
 
 	/* Create local data socket */
-	memset((char*)&msg_sa, 0, sizeof(msg_sa));
+	memset(&msg_sa, 0, sizeof(msg_sa));
 
 	msg_sa.sa_family = AF_INET;
 	msg_sin = (struct sockaddr_in*)&msg_sa;
@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* Create local control socket */
-	memset((char*)&ctl_sin, 0, sizeof(ctl_sin));
+	memset(&ctl_sin, 0, sizeof(ctl_sin));
 
 	ctl_sin.sin_family = AF_INET;
 	memcpy(&ctl_sin.sin_addr, phe->h_addr, phe->h_length);
@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* Start talking to the talk daemon */
-	memset((char*)&msg, 0, sizeof(msg));
+	memset(&msg, 0, sizeof(msg));
 	msg.vers = TALK_VERSION;
 	msg.id_num = htonl(0);
 	msg.addr.sa_family = ntohs(AF_INET);
@@ -496,7 +496,7 @@ static int send_control(int skt, struct in_addr addr, CTL_MSG msg,
 	}
 
 	/* Create the socket address */
-	memset((char*)&sin, 0, sizeof(sin));
+	memset(&sin, 0, sizeof(sin));
 	sin.sin_addr = addr;
 	sin.sin_family = AF_INET;
 	sin.sin_port = talk_port;
