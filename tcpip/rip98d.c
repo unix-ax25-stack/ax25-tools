@@ -99,7 +99,7 @@ unsigned int mask2bits(unsigned int mask)
 	return 0;
 }
 
-unsigned long int bits2mask(unsigned int bits)
+unsigned int bits2mask(unsigned int bits)
 {
 	struct mask_struct *t;
 
