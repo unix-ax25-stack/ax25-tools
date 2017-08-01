@@ -340,7 +340,7 @@ int main(int argc, char *argv[])
 
 	/* Now look for an invite */
 	msg.type = LOOK_UP;
-	(void) send_control(ctl_skt, rem_addr, msg, &resp);
+	send_control(ctl_skt, rem_addr, msg, &resp);
 
 	/* The person not there? Send an announce and wake him up */
 	msg.type = ANNOUNCE;
@@ -675,7 +675,7 @@ static void do_talk(int skt)
 			if (send_sysop_data(inbuf, i) < 0)
 			{
 				strcpy(outbuf, "User closed connection.\n");
-				(void) write(skt, outbuf, strlen(outbuf));
+				write(skt, outbuf, strlen(outbuf));
 				return;
 			}
 		}
@@ -685,7 +685,7 @@ static void do_talk(int skt)
 			if (i <= 0)
 			{
 				strcpy(outbuf, "User closed connection.\n");
-				(void) write(skt, outbuf, strlen(outbuf));
+				write(skt, outbuf, strlen(outbuf));
 				return;
 			}
 			if (send_user_data(skt, outbuf, i) < 0)

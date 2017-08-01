@@ -183,7 +183,7 @@ void receive_nodes(unsigned char *buffer, int length, ax25_address *neighbour, i
 	quality = port_list[index].default_qual;
 
 	while (fgets(neigh_buffer, 90, fp) != NULL) {
-		(void) strtok(neigh_buffer, " ");	/* skip addr field */
+		strtok(neigh_buffer, " ");	/* skip addr field */
 		callsign = strtok(NULL, " ");
 		device   = strtok(NULL, " ");
 		qual     = atoi(strtok(NULL, " "));

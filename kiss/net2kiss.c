@@ -252,11 +252,10 @@ static int openpty(int *amaster, int *aslave, char *name,
 					return -1;	/* out of ptys */
 			} else {
 				line[5] = 't';
-				(void) chown(line, getuid(),
-					     gr ? gr->gr_gid : -1);
-				(void) chmod(line, S_IRUSR|S_IWUSR|S_IWGRP);
+				chown(line, getuid(), gr ? gr->gr_gid : -1);
+				chmod(line, S_IRUSR|S_IWUSR|S_IWGRP);
 #if 0
-				(void) revoke(line);
+				revoke(line);
 #endif
 				slave = open(line, O_RDWR, 0);
 				if (slave != -1) {
@@ -265,16 +264,14 @@ static int openpty(int *amaster, int *aslave, char *name,
 					if (name)
 						strcpy(name, line);
 					if (termp)
-						(void) tcsetattr(slave,
-								 TCSAFLUSH,
-								 termp);
+						tcsetattr(slave, TCSAFLUSH,
+							  termp);
 					if (winp)
-						(void) ioctl(slave,
-							     TIOCSWINSZ,
-							     (char *)winp);
+						ioctl(slave, TIOCSWINSZ,
+							(char *)winp);
 					return 0;
 				}
-				(void) close(master);
+				close(master);
 				line[5] = 'p';
 			}
 		}
