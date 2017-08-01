@@ -127,8 +127,8 @@ static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, in
 		while (fgets(nodes_buffer, 90, fpnodes) != NULL) {
 			callsign  = strtok(nodes_buffer, " ");
 			mnemonic  = strtok(NULL, " ");
-			(void) strtok(NULL, " ");	/* skip which field */
-			(void) strtok(NULL, " ");	/* skip number field */
+			strtok(NULL, " ");	/* skip which field */
+			strtok(NULL, " ");	/* skip number field */
 			quality   = atoi(strtok(NULL, " "));
 			obs_count = atoi(strtok(NULL, " "));
 			neigh_no  = atoi(strtok(NULL, " "));
