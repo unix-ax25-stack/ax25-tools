@@ -49,7 +49,7 @@ extern int logging;
 
 /* In rip98d.c */
 extern unsigned int mask2bits(unsigned int);
-extern unsigned long int bits2mask(unsigned int);
+extern unsigned int bits2mask(unsigned int);
 
 /* In rip98t.c */
 extern void transmit_routes(int);
