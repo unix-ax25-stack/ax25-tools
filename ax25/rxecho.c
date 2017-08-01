@@ -368,7 +368,7 @@ int main(int argc, char **argv)
 	const int sa_len = sizeof(struct sockaddr_pkt);
 #else
 	struct sockaddr sa_generic;
-	struct sockaddr *psa = (struct sockaddr *)&sa_generic;
+	struct sockaddr *psa = &sa_generic;
 	const int sa_len = sizeof(struct sockaddr);
 #endif
 	char from_dev_name[sizeof(psa->sa_data)];
