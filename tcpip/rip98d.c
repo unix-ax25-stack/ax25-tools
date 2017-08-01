@@ -67,51 +67,9 @@ unsigned int bits2mask(unsigned int bits)
 	return ~0 << (sizeof(unsigned int) * 8 - bits);
 }
 
-static unsigned long int hex2intrev(char *buffer)
+static unsigned int hex2int(char *buffer)
 {
-	unsigned long int result = 0L;
-
-	if (buffer[0] >= 'A')
-		result += (buffer[0] - 'A' + 10) * 16;
-	else
-		result += (buffer[0] - '0') * 16;
-
-	if (buffer[1] >= 'A')
-		result += buffer[1] - 'A' + 10;
-	else
-		result += buffer[1] - '0';
-
-	if (buffer[2] >= 'A')
-		result += (buffer[2] - 'A' + 10) * 16 * 16 * 16;
-	else
-		result += (buffer[2] - '0') * 16 * 16 * 16;
-
-	if (buffer[3] >= 'A')
-		result += (buffer[3] - 'A' + 10) * 16 * 16;
-	else
-		result += (buffer[3] - '0') * 16 * 16;
-
-	if (buffer[4] >= 'A')
-		result += (buffer[4] - 'A' + 10) * 16 * 16 * 16 * 16 * 16;
-	else
-		result += (buffer[4] - '0') * 16 * 16 * 16 * 16 * 16;
-
-	if (buffer[5] >= 'A')
-		result += (buffer[5] - 'A' + 10) * 16 * 16 * 16 * 16;
-	else
-		result += (buffer[5] - '0') * 16 * 16 * 16 * 16;
-
-	if (buffer[6] >= 'A')
-		result += (buffer[6] - 'A' + 10) * 16 * 16 * 16 * 16 * 16 * 16 * 16;
-	else
-		result += (buffer[6] - '0') * 16 * 16 * 16 * 16 * 16 * 16 * 16;
-
-	if (buffer[7] >= 'A')
-		result += (buffer[7] - 'A' + 10) * 16 * 16 * 16 * 16 * 16 * 16;
-	else
-		result += (buffer[7] - '0') * 16 * 16 * 16 * 16 * 16 * 16;
-
-	return result;
+	return strtoul(buffer, NULL, 16);
 }
 
 static int read_routes(void)
@@ -152,8 +110,8 @@ static int read_routes(void)
 		if (n != 10)
 			continue;
 
-		address.s_addr = htonl(hex2intrev(net_addr));
-		netmask        = mask2bits(hex2intrev(mask_addr));
+		address.s_addr = hex2int(net_addr);
+		netmask        = mask2bits(ntohl(hex2int(mask_addr)));
 
 		network = inet_netof(address);
 
