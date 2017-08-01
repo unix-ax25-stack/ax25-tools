@@ -501,7 +501,7 @@ static int send_control(int skt, struct in_addr addr, CTL_MSG msg,
 	sin.sin_family = AF_INET;
 	sin.sin_port = talk_port;
 
-	if (sendto(skt, (char*)&msg, sizeof(msg), 0, (struct sockaddr*)&sin, sizeof(sin)) != sizeof(msg))
+	if (sendto(skt, &msg, sizeof(msg), 0, (struct sockaddr *)&sin, sizeof(sin)) != sizeof(msg))
 	{
 		syslog(LOG_DAEMON | LOG_ERR, "send_control(): sendto failed (%m).");
 		return -1;
