@@ -88,7 +88,7 @@ static void terminate(int sig)
 	exit(0);
 }
 
-unsigned int mask2bits(unsigned long int mask)
+unsigned int mask2bits(unsigned int mask)
 {
 	struct mask_struct *t;
 
