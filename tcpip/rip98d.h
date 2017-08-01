@@ -48,7 +48,7 @@ extern int route_restrict;
 extern int logging;
 
 /* In rip98d.c */
-extern unsigned int mask2bits(unsigned long int);
+extern unsigned int mask2bits(unsigned int);
 extern unsigned long int bits2mask(unsigned int);
 
 /* In rip98t.c */
