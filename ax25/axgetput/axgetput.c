@@ -71,7 +71,7 @@ static void set_tty_flags(void)
 	/* make tty 8bit clean  */
 	if (tcgetattr(fdin, &prev_termios) != -1)
 		prev_termios_stored = 1;
-	memset((char *) &termios, 0, sizeof(termios));
+	memset(&termios, 0, sizeof(termios));
 	termios.c_iflag = IGNBRK | IGNPAR;
 	termios.c_oflag = 0;
 	termios.c_cflag = CBAUD | CS8 | CREAD | CLOCAL;

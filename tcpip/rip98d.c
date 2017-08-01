@@ -238,7 +238,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	memset((char *)&loc_addr, 0, sizeof(loc_addr));
+	memset(&loc_addr, 0, sizeof(loc_addr));
 	loc_addr.sin_family      = AF_INET;
 	loc_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	loc_addr.sin_port        = htons(RIP_PORT);

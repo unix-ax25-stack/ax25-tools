@@ -206,7 +206,7 @@ void receive_routes(int s)
 
 	for (route = first_route; route != NULL; route = route->next) {
 		if (route->action == DEL_ROUTE) {
-			memset((char *)&rt, 0, sizeof(rt));
+			memset(&rt, 0, sizeof(rt));
 
 			trg.sin_family = AF_INET;
 			trg.sin_addr   = route->addr;
@@ -222,7 +222,7 @@ void receive_routes(int s)
 
 	for (route = first_route; route != NULL; route = route->next) {
 		if (route->action == NEW_ROUTE) {
-			memset((char *)&rt, 0, sizeof(rt));
+			memset(&rt, 0, sizeof(rt));
 
 			trg.sin_family = AF_INET;
 			trg.sin_addr   = route->addr;

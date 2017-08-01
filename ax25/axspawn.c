@@ -672,7 +672,7 @@ static int read_ax25(char *s, int size)
 		sprintf(buffer,"\r//COMP 1\r");
 		write_ax25(buffer, strlen(buffer), 1);
 		sleep(1);
-		memset((char *) &termios, 0, sizeof(termios));
+		memset(&termios, 0, sizeof(termios));
 		termios.c_iflag = ICRNL | IXOFF | IGNBRK;
 		termios.c_oflag = 0;
 		termios.c_cflag = CS8 | CREAD | CLOCAL;
@@ -691,7 +691,7 @@ static int read_ax25(char *s, int size)
 		write_ax25(buffer, strlen(buffer), 1);
 		sleep(1);
 		huffman = 0;
-		memset((char *) &termios, 0, sizeof(termios));
+		memset(&termios, 0, sizeof(termios));
 		termios.c_iflag = ICRNL | IXOFF;
 		termios.c_oflag = OPOST | ONLCR;
 		termios.c_cflag = CS8 | CREAD | CLOCAL;
@@ -846,7 +846,7 @@ int write_ax25(char *s, int len, int kick)
 	if (!bin && !strncmp(s, "//BIN ON\r", 9)) {
 		tcgetattr(fdmaster, &save_termios_master);
 		tcgetattr(0, &save_termios);
-		memset((char *) &termios, 0, sizeof(termios));
+		memset(&termios, 0, sizeof(termios));
 		termios.c_iflag = IGNBRK | IGNPAR;
 		termios.c_oflag = 0;
 		termios.c_cflag = CBAUD | CS8 | CREAD | CLOCAL;
@@ -1710,7 +1710,7 @@ again:
 		struct termios termios;
 		char *shell = "/bin/sh";
 
-		memset((char *) &termios, 0, sizeof(termios));
+		memset(&termios, 0, sizeof(termios));
 
 		ioctl(0, TIOCSCTTY, (char *) 0);
 

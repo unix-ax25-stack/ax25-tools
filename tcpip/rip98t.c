@@ -42,7 +42,7 @@ void transmit_routes(int s)
 		if (debug && logging)
 			syslog(LOG_DEBUG, "transmit_routes: sending routing message to %s\n", inet_ntoa(dest_list[i].dest_addr));
 
-		memset((char *)&rem_addr, 0, sizeof(rem_addr));
+		memset(&rem_addr, 0, sizeof(rem_addr));
 		rem_addr.sin_family = AF_INET;
 		rem_addr.sin_addr   = dest_list[i].dest_addr;
 		rem_addr.sin_port   = htons(RIP_PORT);
