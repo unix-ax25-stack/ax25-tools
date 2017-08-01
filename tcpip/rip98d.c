@@ -173,7 +173,8 @@ static int load_dests(void)
 			return FALSE;
 		}
 
-		memcpy((char *)&dest_list[dest_count].dest_addr, host->h_addr, host->h_length);
+		memcpy(&dest_list[dest_count].dest_addr, host->h_addr,
+		       host->h_length);
 		dest_count++;
 	}
 

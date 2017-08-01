@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
 			exit(1);
 		}
 	}
-	memcpy((char*)&rem_addr, rhe->h_addr, rhe->h_length);
+	memcpy(&rem_addr, rhe->h_addr, rhe->h_length);
 
 	/* Get our local address */
 	phe = gethostbyname(hostname);
@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): gethostbyname failed.");
 		exit(1);
 	}
-	memcpy((char*)&my_addr, phe->h_addr, phe->h_length);
+	memcpy(&my_addr, phe->h_addr, phe->h_length);
 
 	/* Create local data socket */
 	memset((char*)&msg_sa, 0, sizeof(msg_sa));
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
 	msg_sa.sa_family = AF_INET;
 	msg_sin = (struct sockaddr_in*)&msg_sa;
 	msg_sin->sin_port = htons(0);
-	memcpy((char*)&(msg_sin->sin_addr), phe->h_addr, phe->h_length);
+	memcpy(&(msg_sin->sin_addr), phe->h_addr, phe->h_length);
 
 	skt = socket(PF_INET, SOCK_STREAM, 0);
 	if (skt < 0)
@@ -297,7 +297,7 @@ int main(int argc, char *argv[])
 	memset((char*)&ctl_sin, 0, sizeof(ctl_sin));
 
 	ctl_sin.sin_family = AF_INET;
-	memcpy((char*)&ctl_sin.sin_addr, phe->h_addr, phe->h_length);
+	memcpy(&ctl_sin.sin_addr, phe->h_addr, phe->h_length);
 	ctl_sin.sin_port = htons(0);
 
 	ctl_skt = socket(PF_INET, SOCK_DGRAM, 0);
@@ -344,7 +344,7 @@ int main(int argc, char *argv[])
 
 	/* The person not there? Send an announce and wake him up */
 	msg.type = ANNOUNCE;
-	memcpy((char*)&(msg.addr), (char*)&msg_sa, sizeof(struct osockaddr));
+	memcpy(&(msg.addr), &msg_sa, sizeof(struct osockaddr));
 	msg.addr.sa_family = htons(AF_INET);
 	msg.id_num = -1;
 	i = send_control(ctl_skt, rem_addr, msg, &resp);

@@ -55,7 +55,9 @@ void transmit_routes(int s)
 
 			while (mess_len < 184 && route != NULL) {
 				if (route->action != DEL_ROUTE) {
-					memcpy(message + mess_len + 0, (char *)&route->addr, sizeof(struct in_addr));
+					memcpy(message + mess_len + 0,
+					       &route->addr,
+					       sizeof(struct in_addr));
 					message[mess_len + 4] = route->bits;
 					message[mess_len + 5] = route->metric;
 
