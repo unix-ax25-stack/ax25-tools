@@ -26,8 +26,8 @@ static int cmp_route(struct route_struct *route, struct in_addr addr, int bits, 
 	unsigned long int old_mask, new_mask;
 	unsigned long int old_addr, new_addr;
 
-	old_mask = ntohl(bits2mask(route->bits));
-	new_mask = ntohl(bits2mask(bits));
+	old_mask = bits2mask(route->bits);
+	new_mask = bits2mask(bits);
 
 	old_addr = route->addr.s_addr;
 	new_addr = addr.s_addr;
@@ -234,7 +234,7 @@ void receive_routes(int s)
 			if (route->bits == 32) {
 				rt.rt_flags |= RTF_HOST;
 			} else {
-				netmask = bits2mask(route->bits);
+				netmask = htonl(bits2mask(route->bits));
 
 				trg.sin_family = AF_INET;
 				memcpy((char *)&trg.sin_addr, (char *)&netmask, sizeof(struct in_addr));

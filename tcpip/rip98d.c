@@ -39,45 +39,6 @@ int logging          = FALSE;
 
 struct route_struct *first_route;
 
-static struct mask_struct {
-	unsigned long int mask;
-	unsigned int bits;
-} mask_table[] = {
-	{0xFFFFFFFF, 32},
-	{0xFFFFFFFE, 31},
-	{0xFFFFFFFC, 30},
-	{0xFFFFFFF8, 29},
-	{0xFFFFFFF0, 28},
-	{0xFFFFFFE0, 27},
-	{0xFFFFFFC0, 26},
-	{0xFFFFFF80, 25},
-	{0xFFFFFF00, 24},
-	{0xFFFFFE00, 23},
-	{0xFFFFFC00, 22},
-	{0xFFFFF800, 21},
-	{0xFFFFF000, 20},
-	{0xFFFFE000, 19},
-	{0xFFFFC000, 18},
-	{0xFFFF8000, 17},
-	{0xFFFF0000, 16},
-	{0xFFFE0000, 15},
-	{0xFFFC0000, 14},
-	{0xFFF80000, 13},
-	{0xFFF00000, 12},
-	{0xFFE00000, 11},
-	{0xFFC00000, 10},
-	{0xFF800000,  9},
-	{0xFF000000,  8},
-	{0xFE000000,  7},
-	{0xFC000000,  6},
-	{0xF8000000,  5},
-	{0xF0000000,  4},
-	{0xE0000000,  3},
-	{0xC0000000,  2},
-	{0x80000000,  1},
-	{0x00000000,  0},
-};
-
 static void terminate(int sig)
 {
 	if (logging) {
@@ -90,24 +51,20 @@ static void terminate(int sig)
 
 unsigned int mask2bits(unsigned int mask)
 {
-	struct mask_struct *t;
+	mask = ~mask;
 
-	for (t = mask_table; t->mask != 0; t++)
-		if (mask == t->mask)
-			return t->bits;
+	if (!mask)
+		return 32;
 
-	return 0;
+	return __builtin_clz(mask);
 }
 
 unsigned int bits2mask(unsigned int bits)
 {
-	struct mask_struct *t;
+	if (!bits)
+		return 0;
 
-	for (t = mask_table; t->mask != 0; t++)
-		if (bits == t->bits)
-			return htonl(t->mask);
-
-	return 0;
+	return ~0 << (sizeof(unsigned int) * 8 - bits);
 }
 
 static unsigned long int hex2intrev(char *buffer)
