@@ -87,7 +87,7 @@ static void NewPort(char *Name)
 		exit(1);
 	}
 
-	MyPort = calloc(sizeof(struct PortDescriptor), 1);
+	MyPort = calloc(1, sizeof(struct PortDescriptor));
 	if (MyPort) MyPort->FrameBuffer = calloc(sizeof (unsigned char), MaxFrameSize);
 	if (!MyPort || !MyPort->FrameBuffer) {
 		perror("cannot allocate port descriptor");
