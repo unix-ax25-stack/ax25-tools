@@ -94,7 +94,8 @@ static int openwindow(char *disp, int constell, int samplesperbit)
 	XColor color, dummy;
 	XSizeHints sizehints;
 
-	if (!(display = XOpenDisplay(NULL)))
+	display = XOpenDisplay(NULL);
+	if (!display)
 		return -1;
 	XSetErrorHandler(x_error_handler);
 	XAllocNamedColor(display, DefaultColormap(display, 0), "red",
@@ -103,16 +104,17 @@ static int openwindow(char *disp, int constell, int samplesperbit)
 	col_background = WhitePixel(display, 0);
 	col_trace = BlackPixel(display, 0);
 	attr.background_pixel = col_background;
-	if (!(window = XCreateWindow(display, XRootWindow(display, 0),
-				     200, 200, WIDTH, HEIGHT, 5,
-				     DefaultDepth(display, 0),
-				     InputOutput, DefaultVisual(display, 0),
-				     CWBackPixel, &attr))) {
+	window = XCreateWindow(display, XRootWindow(display, 0), 200, 200,
+			       WIDTH, HEIGHT, 5, DefaultDepth(display, 0),
+			       InputOutput, DefaultVisual(display, 0),
+			       CWBackPixel, &attr);
+	if (!window) {
 		fprintf(stderr, "smdiag: unable to open X window\n");
 		exit(1);
 	}
-	if (!(pixmap = XCreatePixmap(display, window, WIDTH, HEIGHT,
-				     DefaultDepth(display, 0)))) {
+	pixmap = XCreatePixmap(display, window, WIDTH, HEIGHT,
+			       DefaultDepth(display, 0));
+	if (!pixmap) {
 		fprintf(stderr, "smdiag: unable to open offscreen pixmap\n");
 		exit(1);
 	}
@@ -389,7 +391,8 @@ int main(int argc, char *argv[])
 		} else
 			usleep(100000L);
 		if (display) {
-			if ((cp = getkey())) {
+			cp = getkey();
+			if (cp) {
 				for (; *cp; cp++) {
 					printf("char pressed: '%c'\n", *cp);
 					switch (*cp) {
