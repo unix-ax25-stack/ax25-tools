@@ -484,7 +484,8 @@ int bget(void) {
 		}
 		if (fdin_is_pipe && !is_stream) {
 			sl = stored_file;
-			if (!(stored_file = stored_file->next))
+			stored_file = stored_file->next;
+			if (!stored_file)
 				is_eof = 1;
 			free(sl);
 		}

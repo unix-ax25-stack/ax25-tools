@@ -116,19 +116,23 @@ char *get_fixed_filename(char *line, long size, unsigned int msg_crc, int genera
 
   *filename = 0;
 
-  if ((p = strchr(line, '\"'))) {
+  p = strchr(line, '\"');
+  if (p) {
     p++;
   }
 
   /* security.. */
 
-  if ((q = strrchr((p ? p : line), '/'))) {
+  q = strrchr((p ? p : line), '/');
+  if (q) {
     p = ++q;
   }
-  if ((q = strrchr((p ? p : line), '\\'))) {
+  q = strrchr((p ? p : line), '\\');
+  if (q) {
     p = ++q;
   }
-  if ((q = strrchr((p ? p : line), ':'))) {
+  q = strrchr((p ? p : line), ':');
+  if (q) {
     p = ++q;
   }
   if (!p) {
@@ -144,7 +148,8 @@ char *get_fixed_filename(char *line, long size, unsigned int msg_crc, int genera
   }
   *r = 0;
   strtrim(filename);
-  if ((q = strrchr(filename, '.'))) {
+  q = strrchr(filename, '.');
+  if (q) {
     if (!*(q+1)) {
       /* remove trailing dots */
       *q = 0;

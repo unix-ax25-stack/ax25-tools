@@ -741,10 +741,12 @@ static void kick_wqueue(int dummy)
 		/* recompute waitqueue  */
 		if (wqueue_head->len < bufsize && wqueue_head->next) {
 			int s_len;
-			if (!(s = malloc(bufsize))) {
+			s = malloc(bufsize);
+			if (!s) {
 				break;
 			}
-			if (!(new_head = malloc(sizeof(struct write_queue)))) {
+			new_head = malloc(sizeof(struct write_queue));
+			if (!new_head) {
 				free(s);
 				break;
 			}
@@ -1273,8 +1275,9 @@ static void read_config(void)
 	{
 		fgets(buf, sizeof(buf), fp);
 		p = strchr(buf, '#');
-		if (p || (p = strchr(buf, '\n')))
-			*p='\0';
+		if (!p)
+			p = strchr(buf, '\n');
+		*p='\0';
 
 		if (buf[0] != '\0')
 		{
@@ -1438,7 +1441,8 @@ int main(int argc, char **argv)
 		if (gethostname(buf, sizeof(buf)) < 0) {
 			strcpy(prompt, "Check");
 		} else {
-			if ((p = strchr(buf, '.')))
+			p = strchr(buf, '.');
+			if (p)
 				*p = 0;
 			strncpy(prompt, buf, sizeof(prompt));
 			prompt[sizeof(prompt)-1] = 0;
@@ -1618,7 +1622,8 @@ int main(int argc, char **argv)
 	}
 
 again:
-	if (!(pwd = read_pwd(pw, &pwtype))) {
+	pwd = read_pwd(pw, &pwtype);
+	if (!pwd) {
 		if ((!pwtype || pwtype != PW_CLEARTEXT) && (pwtype != PW_UNIX)) {
 			sleep (EXITDELAY);
 			return 1;
@@ -1644,7 +1649,8 @@ again:
 			return -11;
 		}
 		buf[cnt] = 0;
-		if ((p = strchr(buf, '\n')))
+		p = strchr(buf, '\n');
+		if (p)
 			*p = 0;
 		if ((pwtype & PW_MD5) && !strcmp(buf, "sys") && (pwtype_orig & PW_SYS)) {
 			pwtype = (pwtype_orig & ~PW_MD5);
@@ -1766,11 +1772,14 @@ again:
 				chdir(p);
 			}
 
-			if ((envp[envc] = malloc(strlen(p)+6)))
+			envp[envc] = malloc(strlen(p) + 6);
+			if (envp[envc])
 				sprintf(envp[envc++], "HOME=%s", p);
-			if ((envp[envc] = malloc(strlen(pw->pw_name)+6)))
+			envp[envc] = malloc(strlen(pw->pw_name) + 6);
+			if (envp[envc])
 				sprintf(envp[envc++], "USER=%s", pw->pw_name);
-			if ((envp[envc] = malloc(strlen(pw->pw_name)+9)))
+			envp[envc] = malloc(strlen(pw->pw_name) + 9);
+			if (envp[envc])
 				sprintf(envp[envc++], "LOGNAME=%s", pw->pw_name);
 
 			if (pw->pw_shell && *(pw->pw_shell)) {
@@ -1778,9 +1787,11 @@ again:
 			} else {
 				shell = "/bin/sh";
 			}
-			if ((p = strrchr(shell, '/'))) {
+			p = strrchr(shell, '/');
+			if (p) {
 				if (p[1]) {
-					if ((p = strdup(p)))
+					p = strdup(p);
+					if (p)
 						*p = '-';
 
 				} else p = NULL;
@@ -1788,14 +1799,16 @@ again:
 			if (!p)
 				p = shell;
 			chargv[chargc++] = p;
-			if ((envp[envc] = malloc(strlen(shell)+7)))
+			envp[envc] = malloc(strlen(shell) + 7);
+			if (envp[envc])
 				sprintf(envp[envc++], "SHELL=%s", shell);
 
 			if (pw->pw_uid == 0)
 				p = "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin";
 			else
 				p = "/bin:/usr/bin:/usr/local/bin";
-			if ((envp[envc] = malloc(strlen(p)+6)))
+			envp[envc] = malloc(strlen(p) + 6);
+			if (envp[envc])
 				sprintf(envp[envc++], "PATH=%s", p);
 
 		} else {
@@ -1831,18 +1844,24 @@ again:
 		}
 		chargv[chargc]   = NULL;
 
-		if ((envp[envc] = malloc(30)))
+		envp[envc] = malloc(30);
+		if (envp[envc])
 			sprintf(envp[envc++], "AXCALL=%s", call);
-		if ((envp[envc] = malloc(30)))
+		envp[envc] = malloc(30);
+		if (envp[envc])
 			sprintf(envp[envc++], "CALL=%s", user);
-		if ((envp[envc] = malloc(30)))
+		envp[envc] = malloc(30);
+		if (envp[envc])
 			sprintf(envp[envc++], "PROTOCOL=%s", protocol);
-		if ((envp[envc] = malloc(30)))
+		envp[envc] = malloc(30);
+		if (envp[envc])
 			sprintf(envp[envc++], "TERM=dumb"); /* SuSE bug (dump - tsts) */
 		/* other useful defaults */
-		if ((envp[envc] = malloc(30)))
+		envp[envc] = malloc(30);
+		if (envp[envc])
 			sprintf(envp[envc++], "EDITOR=/usr/bin/ex");
-		if ((envp[envc] = malloc(30)))
+		envp[envc] = malloc(30);
+		if (envp[envc])
 			sprintf(envp[envc++], "LESS=-d -E -F");
 		envp[envc] = NULL;
 

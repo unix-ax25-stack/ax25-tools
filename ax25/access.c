@@ -210,7 +210,8 @@ static void write_example_passwd(char *pwfile, char pwlocation,
 		return;
 	fchown(i, (pwlocation == SYSTEMPW ? 0 : pw->pw_uid), (pwlocation == SYSTEMPW ? 0 : pw->pw_gid));
 	close(i);
-	if ( ! (f = fopen(pwfile, "w")) )
+	f = fopen(pwfile, "w");
+	if (!f)
 		return;
 	fprintf(f, "# %s Password file for axspawn\n", (pwlocation == SYSTEMPW ? "System" : "User"));
 	if (pwlocation == SYSTEMPW) {
@@ -255,7 +256,8 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 			}
 			if (!S_ISREG(statbuf.st_mode) || (statbuf.st_mode & (S_IROTH | S_IWOTH)))
 				continue;
-			if ( !(f = fopen(pwfile, "r")) )
+			f = fopen(pwfile, "r");
+			if (!f)
 				continue;
 		} else {
 			if (only_systempw)
@@ -300,7 +302,8 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 				write_ax25(buf, strlen(buf), 1);
 				/* go on.. if user takes no action, he always gets this message */
 			}
-			if ( !(f = fopen(pwfile, "r")) )
+			f = fopen(pwfile, "r");
+			if (!f)
 				goto end;
 		}
 
@@ -321,7 +324,8 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 				}
 				goto end;
 			}
-			if ((p = strchr(buf, '\n')))
+			p = strchr(buf, '\n');
+			if (p)
 				*p = 0;
 			if (!*buf || isspace(*buf & 0xff))
 				continue;
@@ -332,7 +336,8 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 					only_systempw = 1;
 					continue;
 				}
-				if (!(p = strchr(buf, ':')))
+				p = strchr(buf, ':');
+				if (!p)
 					continue;
 				*p++ = 0;
 				if (strcmp(pw->pw_name, buf))
@@ -345,7 +350,8 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 			if (!Strcasecmp(p_buf, "unix")) {
 				pass = p_buf;
 			} else {
-				if (!(pass = strchr(p_buf, ':')))
+				pass = strchr(p_buf, ':');
+				if (!pass)
 					continue;
 				*pass++ = 0;
 			}
