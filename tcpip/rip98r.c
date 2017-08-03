@@ -23,8 +23,8 @@
 
 static int cmp_route(struct route_struct *route, struct in_addr addr, int bits, int metric)
 {
-	unsigned long int old_mask, new_mask;
-	unsigned long int old_addr, new_addr;
+	unsigned int old_mask, new_mask;
+	unsigned int old_addr, new_addr;
 
 	old_mask = bits2mask(route->bits);
 	new_mask = bits2mask(bits);
