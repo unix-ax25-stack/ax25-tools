@@ -22,7 +22,7 @@ AC_SUBST(UTIL_LIB)
 AC_SUBST(FLTK_LIB)
 AC_CHECK_LIB(z, zlibVersion,Z_LIB="-lz",Z_LIB=)
 AC_CHECK_LIB(ax25, ax25_config_load_ports, AX25_LIB="-lax25", AC_MSG_ERROR([Could not find the libax25 libraries; aborting]))
-AC_CHECK_LIB(util, openpty, UTIL_LIB="-lutil",UTIL_LIB=)
+AC_CHECK_LIB(util, openpty, UTIL_LIB="-lutil",AC_MSG_ERROR([Could not find libutil; aborting]))
 AC_CHECK_LIB(GL, main, GL_LIB="-lGL",
   AC_CHECK_LIB(MesaGL, main, GL_LIB="-lMesaGL", GL_LIB=, ${X_LIBS} ${X_PRE_LIBS} -lXi -lXext -lX11 ${X_EXTRA_LIBS}),${X_LIBS} ${X_PRE_LIBS} -lXi -lXext -lX11 ${X_EXTRA_LIBS})
 if test -n "$GL_LIB"; then
