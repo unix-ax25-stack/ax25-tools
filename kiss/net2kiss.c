@@ -38,7 +38,6 @@
 #include <syslog.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
 #include <endian.h>
 #include <netinet/in.h>
 #include <sys/stat.h>
