@@ -44,7 +44,6 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <signal.h>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <net/if.h>
 #include <netinet/if_ether.h>
