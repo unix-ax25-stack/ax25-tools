@@ -45,6 +45,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <grp.h>
+#include <pty.h>
 #include <string.h>
 #include <termios.h>
 #include <limits.h>
@@ -230,54 +231,6 @@ static void display_packet(unsigned char *bp, unsigned int len)
 	}
 	if (j)
 		printf("\n");
-}
-
-/* ---------------------------------------------------------------------- */
-
-static int openpty(int *amaster, int *aslave, char *name,
-		   struct termios *termp, struct winsize *winp)
-{
-	char line[PATH_MAX];
-	const char *cp1, *cp2;
-	int master, slave;
-	struct group *gr = getgrnam("tty");
-
-	strcpy(line, "/dev/ptyXX");
-	for (cp1 = "pqrstuvwxyzPQRST"; *cp1; cp1++) {
-		line[8] = *cp1;
-		for (cp2 = "0123456789abcdef"; *cp2; cp2++) {
-			line[9] = *cp2;
-			if ((master = open(line, O_RDWR, 0)) == -1) {
-				if (errno == ENOENT)
-					return -1;	/* out of ptys */
-			} else {
-				line[5] = 't';
-				chown(line, getuid(), gr ? gr->gr_gid : -1);
-				chmod(line, S_IRUSR|S_IWUSR|S_IWGRP);
-#if 0
-				revoke(line);
-#endif
-				slave = open(line, O_RDWR, 0);
-				if (slave != -1) {
-					*amaster = master;
-					*aslave = slave;
-					if (name)
-						strcpy(name, line);
-					if (termp)
-						tcsetattr(slave, TCSAFLUSH,
-							  termp);
-					if (winp)
-						ioctl(slave, TIOCSWINSZ,
-							(char *)winp);
-					return 0;
-				}
-				close(master);
-				line[5] = 'p';
-			}
-		}
-	}
-	errno = ENOENT;	/* out of ptys */
-	return -1;
 }
 
 /* ---------------------------------------------------------------------- */
