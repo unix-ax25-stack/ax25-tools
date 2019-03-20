@@ -9,6 +9,7 @@ sbin_PROGRAMS =
 bin_PROGRAMS = axgetput
 
 dist_man_MANS = axgetput.1
+dist_doc_DATA = README TIPS.txt TODO
 
 axgetput_SOURCES = axgetput.c axgetput.h util.h proto_bin.h util.c proto_bin.c includes.h
 
