@@ -22,6 +22,17 @@ ax25-tools (0.0.10)
 	* Some programs need FLTK-libraries (otherwise they're skipped on
 	  compile).
         * Fixed regression in axgetput (bget/bput crc was calculated wrong)
+	* Simplification of CRC calculation.
+	* Lots of stylistic cleanups to the code trying to follow the
+	  coding style of the kernel.
+	* Updated to recent autoconf and automake version to keep the code
+	  buildable on modern distributions.
+	* Improvments to git usage.
+	* Fix possible buffer overflows.
+	* Updates and corrections to man pages.
+	* Code cleanups all across the tree.
+	* Move ax25-tools-docs package back into ax25-tools and ax25-tools-x
+	  packages.
 
  -- Ralf Baechle DL5RB <ralf@linux-mips.org>  Sat, 6 Jun 2015 14:29:07 +0200
  -- Thomas Osterried <ax25@x-berg.in-berlin.de>  Fri, 12 Feb 2016 14:31:33 +0100
