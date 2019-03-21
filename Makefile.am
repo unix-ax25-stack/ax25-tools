@@ -14,6 +14,7 @@ AX25_SYSCONFDIR=@sysconfdir@/ax25/
 AX25_LOCALSTATEDIR=@localstatedir@/ax25/
 
 BUILT_SOURCES = scm-version.h
+dist_noinst_SCRIPTS = setlocalversion
 
 .PHONY:	scm-version.h
 scm-version.h:
