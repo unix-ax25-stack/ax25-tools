@@ -1,5 +1,5 @@
 Name:           ax25-tools
-Version:        @BASEVERSION@@EXTRAVERSION@
+Version:        @BASEVERSION@.@EXTRAVERSION@
 Release:        1
 Summary:        Non-GUI tools used to configure an AX.25 enabled computer
 
