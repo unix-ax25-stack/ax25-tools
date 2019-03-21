@@ -140,6 +140,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/tcp_call
 %{_sbindir}/ttylinkd
 %{_sbindir}/yamcfg
+%config(noreplace) %{_sysconfdir}/ax25/ax25.profile
 %config(noreplace) %{_sysconfdir}/ax25/ax25d.conf
 %config(noreplace) %{_sysconfdir}/ax25/axspawn.conf
 %config(noreplace) %{_sysconfdir}/ax25/nrbroadcast
