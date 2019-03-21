@@ -4,7 +4,7 @@ installconf:
 
 SUBDIRS = ax25 hdlcutil kiss 6pack netrom rose tcpip user_call yamdrv dmascc
 
-EXTRA_DIST = pathnames.h ax25-tools.spec
+EXTRA_DIST = pathnames.h scm-version.h.in ax25-tools.spec
 
 AM_CPPFLAGS = -D_GNU_SOURCE \
 	      -DAX25_SYSCONFDIR=\""$(sysconfdir)/ax25/"\" \
