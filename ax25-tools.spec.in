@@ -59,6 +59,7 @@ line programs; the GUI programs are contained in ax25-tools-x package.
 %package docs
 Summary:	Documentation for ax25-tools and ax25-tools-x
 Group:		Documentation
+BuildArch:	noarch
 
 %description docs
 This package contains the documentation for ax25-tools and ax25-tools-x.
