@@ -10,8 +10,7 @@ Source0:        http://www.linux-ax25.org/pub/%{name}/%{name}-@VERSION@.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-@VERSION@-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	gcc gcc-c++
 BuildRequires:	libax25-devel
-BuildRequires:	libXext-devel, libX11-devel, libXi-devel, fltk-devel
-BuildRequires:	mesa-libGLU-devel
+BuildRequires:	fltk-devel
 
 %description
 ax25-tools is a collection of tools that are used to configure an ax.25 enabled
