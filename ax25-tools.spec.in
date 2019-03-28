@@ -98,7 +98,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS ChangeLog COPYING README
+%doc COPYING
 %{_bindir}/axgetput
 %{_bindir}/bget
 %{_bindir}/bput
@@ -148,19 +148,20 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/ax25/rip98d.conf
 %config(noreplace) %{_sysconfdir}/ax25/rxecho.conf
 %config(noreplace) %{_sysconfdir}/ax25/ttylinkd.conf
-%attr(0755,root,root) %{_localstatedir}/ax25
-%attr(0755,root,root) %{_localstatedir}/ax25/mheard
+%dir %attr(0755,root,root) %{_localstatedir}/ax25
+%dir %attr(0755,root,root) %{_localstatedir}/ax25/mheard
 %config(noreplace) %{_localstatedir}/ax25/mheard/mheard.dat
 
 %files docs
 %defattr(-,root,root,-)
-%doc AUTHORS ChangeLog COPYING
+%doc AUTHORS ChangeLog COPYING README
 %doc yamdrv/README.yamdrv user_call/README.user_call tcpip/ttylinkd.README dmascc/README.dmascc
+%doc ax25/axgetput/TIPS.txt
 %{_mandir}/man?/*
 
 %files x
 %defattr(-,root,root,-)
-%doc AUTHORS ChangeLog COPYING
+%doc COPYING
 %{_bindir}/smdiag
 %{_sbindir}/xfhdlcchpar
 %{_sbindir}/xfhdlcst
