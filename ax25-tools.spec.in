@@ -156,7 +156,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc AUTHORS ChangeLog COPYING README
 %doc yamdrv/README.yamdrv user_call/README.user_call tcpip/ttylinkd.README dmascc/README.dmascc
-%doc ax25/axgetput/TIPS.txt
+%doc ax25/axgetput/TIPS.txt ax25/axgetput/README.axgetput
 %{_mandir}/man?/*
 
 %files x
