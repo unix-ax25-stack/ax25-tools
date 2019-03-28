@@ -157,7 +157,6 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS ChangeLog COPYING
 %doc yamdrv/README.yamdrv user_call/README.user_call tcpip/ttylinkd.README dmascc/README.dmascc
 %{_mandir}/man?/*
-%{_docdir}/*
 
 %files x
 %defattr(-,root,root,-)
