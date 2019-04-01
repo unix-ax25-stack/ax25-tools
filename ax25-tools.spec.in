@@ -4,6 +4,7 @@ Release:        1%{?dist}
 Summary:        Non-GUI tools used to configure an AX.25 enabled computer
 
 Group:          Applications/Communications
+Obsoletes:	ax25-tools-docs < 0.0.10.rc5
 License:        GPLv2+
 URL:            http://www.linux-ax25.org/
 Source0:        http://www.linux-ax25.org/pub/%{name}/%{name}-@VERSION@.tar.gz
@@ -56,19 +57,12 @@ line programs; the GUI programs are contained in ax25-tools-x package.
  * tcp_call - Make a TCP connection
  * yamcfg - configure a YAM interface
 
-%package docs
-Summary:	Documentation for ax25-tools and ax25-tools-x
-Group:		Documentation
-BuildArch:	noarch
-
-%description docs
-This package contains the documentation for ax25-tools and ax25-tools-x.
-
 %package x
 
 Summary:	Tools used to configure an AX.25 enabled computer
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Obsoletes:	ax25-tools-docs < 0.0.10.rc5
 
 %description x
 ax25-tools is a collection of tools that are used to configure an ax.25 enabled
@@ -98,7 +92,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc COPYING
+%doc AUTHORS ChangeLog COPYING README
+%doc yamdrv/README.yamdrv user_call/README.user_call tcpip/ttylinkd.README dmascc/README.dmascc
+%doc ax25/axgetput/TIPS.txt ax25/axgetput/README.axgetput
 %{_bindir}/axgetput
 %{_bindir}/bget
 %{_bindir}/bput
@@ -151,13 +147,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir %attr(0755,root,root) %{_localstatedir}/ax25
 %dir %attr(0755,root,root) %{_localstatedir}/ax25/mheard
 %config(noreplace) %{_localstatedir}/ax25/mheard/mheard.dat
-
-%files docs
-%defattr(-,root,root,-)
-%doc AUTHORS ChangeLog COPYING README
-%doc yamdrv/README.yamdrv user_call/README.user_call tcpip/ttylinkd.README dmascc/README.dmascc
-%doc ax25/axgetput/TIPS.txt ax25/axgetput/README.axgetput
 %{_mandir}/man?/*
+%exclude %{_mandir}/man8/smdiag.8*
 
 %files x
 %defattr(-,root,root,-)
@@ -167,8 +158,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/xfhdlcst
 %{_sbindir}/xfsmdiag
 %{_sbindir}/xfsmmixer
+%{_mandir}/man8/smdiag.8*
 
 %changelog
+* Tue Apr 2 2019 Ralf Baechle <ralf@linux-mips.org>
+- Move doc fils back into the main packages, that seems to be more standard
+  these days.  Suggested by Richard Shaw.
+
 * Tue Jun 4 2013 Ralf Baechle <ralf@linux-mips.org>
 - Move doc files to separate docs package.
 - Reset Release to 1.
