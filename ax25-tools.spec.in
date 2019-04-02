@@ -91,7 +91,6 @@ make DESTDIR=$RPM_BUILD_ROOT installconf
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(-,root,root,-)
 %doc AUTHORS ChangeLog COPYING README
 %doc yamdrv/README.yamdrv user_call/README.user_call tcpip/ttylinkd.README dmascc/README.dmascc
 %doc ax25/axgetput/TIPS.txt ax25/axgetput/README.axgetput
@@ -151,7 +150,6 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_mandir}/man8/smdiag.8*
 
 %files x
-%defattr(-,root,root,-)
 %doc COPYING
 %{_bindir}/smdiag
 %{_sbindir}/xfhdlcchpar
