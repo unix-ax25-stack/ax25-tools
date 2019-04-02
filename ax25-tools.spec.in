@@ -3,7 +3,6 @@ Version:        @BASEVERSION@.@EXTRAVERSION@
 Release:        1%{?dist}
 Summary:        Non-GUI tools used to configure an AX.25 enabled computer
 
-Group:          Applications/Communications
 Obsoletes:	ax25-tools-docs < 0.0.10.rc5
 License:        GPLv2+
 URL:            http://www.linux-ax25.org/
@@ -60,7 +59,6 @@ line programs; the GUI programs are contained in ax25-tools-x package.
 %package x
 
 Summary:	Tools used to configure an AX.25 enabled computer
-Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Obsoletes:	ax25-tools-docs < 0.0.10.rc5
 
