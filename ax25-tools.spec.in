@@ -144,8 +144,8 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/ax25/rip98d.conf
 %config(noreplace) %{_sysconfdir}/ax25/rxecho.conf
 %config(noreplace) %{_sysconfdir}/ax25/ttylinkd.conf
-%dir %attr(0755,root,root) %{_localstatedir}/ax25
-%dir %attr(0755,root,root) %{_localstatedir}/ax25/mheard
+%dir %{_localstatedir}/ax25
+%dir %{_localstatedir}/ax25/mheard
 %config(noreplace) %{_localstatedir}/ax25/mheard/mheard.dat
 %{_mandir}/man?/*
 %exclude %{_mandir}/man8/smdiag.8*
