@@ -87,9 +87,9 @@
 #define MAXCALLS	8
 
 struct config {
-	char		from[14];	/* sockaddr.sa_data is 14 bytes	*/
+	char		from[IFNAMSIZ];
 	int		from_idx;
-	char		to[14];
+	char		to[IFNAMSIZ];
 	int		to_idx;
 	ax25_address	calls[MAXCALLS];/* list of calls to echo	*/
 	int		ncalls;		/* number of calls to echo	*/
