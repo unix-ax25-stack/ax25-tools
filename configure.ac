@@ -55,7 +55,6 @@ AC_STRUCT_TM
 dnl Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MEMCMP
-AC_FUNC_SETPGRP
 AC_FUNC_STRFTIME
 AC_FUNC_WAIT3
 AC_CHECK_FUNCS(gethostname gettimeofday mkdir select socket strdup strerror strspn strstr strtol strtoul uname)
