@@ -22,7 +22,6 @@
 
 #include <netax25/ax25.h>
 #include <netrom/netrom.h>
-#include <netrose/rose.h>
 
 #include <netax25/axlib.h>
 #include <netax25/axconfig.h>
