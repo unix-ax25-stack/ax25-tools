@@ -26,14 +26,7 @@ frames. Passing 0 causes the normal AX.25 Text PID to be used.
 .LP
 .B SOCK_DGRAM
 gives access to AX.25 UI frames. For access to special frames (of
-any form) SOCK_RAW can be used. There is no
-.B SOCK_PACKET
-support under AX.25.
-Instead an
-.B AF_INET
-socket of type
-.B SOCK_PACKET
-should be used.
+any form) SOCK_RAW can be used.
 .LP
 AX.25 addresses consist of 6 ascii characters and a number called the SSID.
 These are encoded into a sockaddr_ax25 structure which is provided to the
