@@ -28,7 +28,9 @@ frames. Passing 0 causes the normal AX.25 Text PID to be used.
 gives access to AX.25 UI frames. For access to special frames (of
 any form) SOCK_RAW can be used.
 .LP
-AX.25 addresses consist of 6 ascii characters and a number called the SSID.
+AX.25 addresses consist of 6
+.B ASCII
+characters and a number called the SSID.
 These are encoded into a sockaddr_ax25 structure which is provided to the
 relevant system calls. When digipeaters are included a callsign path can be
 much more complex. When this is the case a struct full_sockaddr_ax25 should
