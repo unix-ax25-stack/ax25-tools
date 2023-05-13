@@ -880,7 +880,7 @@ int write_ax25(char *s, int len, int kick)
 		p = s; i = 0; j = 0;
 		if (last_ended_with_CR) {
 			/*
-			 * \r\n was splited. wrote already \r, now ommiting \n
+			 * \r\n was splited. wrote already \r, now omitting \n
 			 */
 			if (*s == '\n') {
 				s++, p++;

@@ -1,6 +1,6 @@
 README file for ttylinkd: The ttylink daemon, dated 5 Mar 1997
 
-This program allows you to recieve ttylink requests from NOS or other
+This program allows you to receive ttylink requests from NOS or other
 stations.  It uses the normal Un*x talk protocol for the sysop end and inetd
 for the user's end.
 
