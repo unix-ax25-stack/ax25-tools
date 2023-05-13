@@ -435,7 +435,7 @@ int main(int argc, char *argv[])
 	buf[2] = '\0';
 	if (write(skt, buf, 3) != 3)
 	{
-		printf("Connnection lost\n");
+		printf("Connection lost\n");
 		close(skt);
 		close(ctl_skt);
 		return 0;

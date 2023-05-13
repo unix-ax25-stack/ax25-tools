@@ -172,7 +172,7 @@ static void usage(int all) {
 	if (mode % 2) {
 		fprintf(stderr, "  filename is usually got from the remote side by the protocol\n");
 		fprintf(stderr, "  but can be forced if you like to ignore this.\n");
-		fprintf(stderr, "  filename should be ommitted if output is sent to a pipe\n.");
+		fprintf(stderr, "  filename should be omitted if output is sent to a pipe\n.");
 	} else {
 		fprintf(stderr, "  -b value is the blocksize (framelen) of the transmitted data\n");
 		fprintf(stderr, "     default %d, which is a useful choice for ampr ax25.\n", BLOCKSIZ_DEFAULT);
@@ -180,7 +180,7 @@ static void usage(int all) {
 		fprintf(stderr, "     otherwise, the data will be read to memory until EOF.\n");
 		fprintf(stderr, "  -s is only available if stdin is a pipe\n");
 		fprintf(stderr, "  if filename specified in filter, the given name will be suggested instead.\n");
-		fprintf(stderr, "  filename may be ommited if used as filter.\n");
+		fprintf(stderr, "  filename may be omited if used as filter.\n");
 	}
 	fputc('\n', stderr);
 	fprintf(stderr, "Tips: - compressed download:\n");

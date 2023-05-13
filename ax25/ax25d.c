@@ -1005,7 +1005,7 @@ BadArgsFree:
 	AXL = axl_build;		/* Assign our built list to AXL */
 
 	if (Logging)
-		syslog(LOG_INFO, "new config file loaded successfuly");
+		syslog(LOG_INFO, "new config file loaded successfully");
 
 	update_maxfd();
 	return 0;
