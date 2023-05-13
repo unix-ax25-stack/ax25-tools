@@ -180,7 +180,7 @@ static void usage(int all) {
 		fprintf(stderr, "     otherwise, the data will be read to memory until EOF.\n");
 		fprintf(stderr, "  -s is only available if stdin is a pipe\n");
 		fprintf(stderr, "  if filename specified in filter, the given name will be suggested instead.\n");
-		fprintf(stderr, "  filename may be omited if used as filter.\n");
+		fprintf(stderr, "  filename may be omitted if used as filter.\n");
 	}
 	fputc('\n', stderr);
 	fprintf(stderr, "Tips: - compressed download:\n");

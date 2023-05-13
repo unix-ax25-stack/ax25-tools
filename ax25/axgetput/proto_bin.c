@@ -224,7 +224,7 @@ int bput(void)
 					return 1;
 				}
 				if (term_line && len == len_termline && !memcmp(buf, term_line, len_termline)) {
-					/* sucessfully read until termination string  */
+					/* successfully read until termination string  */
 					break;
 				}
 			}

@@ -1,6 +1,6 @@
 /*
  *  This is my version of axl.c, written for the LBBS code to make it
- *    compatable with the kernel AX25 driver.  It appears to work, with
+ *    compatible with the kernel AX25 driver.  It appears to work, with
  *    my setup, so it'll probably not work else where :-).
  *
  *  This was inspired by the example code written by Alan Cox (GW4PTS)

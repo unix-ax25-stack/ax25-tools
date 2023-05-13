@@ -27,7 +27,7 @@ ax25-tools (0.0.10)
 	  coding style of the kernel.
 	* Updated to recent autoconf and automake version to keep the code
 	  buildable on modern distributions.
-	* Improvments to git usage.
+	* Improvements to git usage.
 	* Fix possible buffer overflows.
 	* Updates and corrections to man pages.
 	* Code cleanups all across the tree.

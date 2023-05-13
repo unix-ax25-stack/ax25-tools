@@ -11,8 +11,8 @@
  *
  * 1.01 12/30/95 Ron Curry - Fixed FD_STATE bug where FD_STATE was being used for
  * three state machines causing spurious writes to wrong TNC port. FD_STATE is
- * now used for real serial port, FD0_STATE for first psuedo tty, and FD1_STATE
- * for second psuedo tty. This was an easy fix but a MAJOR bug.
+ * now used for real serial port, FD0_STATE for first pseudo tty, and FD1_STATE
+ * for second pseudo tty. This was an easy fix but a MAJOR bug.
  *
  * 1.02 3/1/96 Jonathan Naylor - Make hardware handshaking default to off.
  * Allowed for true multiplexing of the data from the two pseudo ttys.
