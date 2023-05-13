@@ -272,7 +272,7 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 				write_ax25(buf, strlen(buf), 1);
 				sprintf(buf, "        with unique passwords (which may be changed).\r");
 				write_ax25(buf, strlen(buf), 1);
-				sprintf(buf, "        Please edit ~/.%s, and enable your prefered authentication type;\r", PWFILE);
+				sprintf(buf, "        Please edit ~/.%s, and enable your preferred authentication type;\r", PWFILE);
 				write_ax25(buf, strlen(buf), 1);
 				sprintf(buf, "        MD5 is recommended.\r");
 				write_ax25(buf, strlen(buf), 1);
@@ -280,12 +280,12 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 				goto end;
 			}
 			if (!S_ISREG(statbuf.st_mode)) {
-				sprintf(buf, "Error: password file .%s should be a regular file. Skiping..\r", PWFILE);
+				sprintf(buf, "Error: password file .%s should be a regular file. Skipping..\r", PWFILE);
 				write_ax25(buf, strlen(buf), 1);
 				goto end;
 			}
 			if (statbuf.st_uid != 0 && statbuf.st_uid != pw->pw_uid) {
-				sprintf(buf, "Error: your password file .%s is not owned by you. Skiping..\r", PWFILE);
+				sprintf(buf, "Error: your password file .%s is not owned by you. Skipping..\r", PWFILE);
 				write_ax25(buf, strlen(buf), 1);
 				goto end;
 			}

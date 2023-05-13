@@ -117,7 +117,7 @@ static int read_routes(void)
 
 		if (network == 0 || network == 127) {
 			if (debug && logging)
-				syslog(LOG_DEBUG, "rejecting route to %s/%ld - should not be propogated\n", inet_ntoa(address), netmask);
+				syslog(LOG_DEBUG, "rejecting route to %s/%ld - should not be propagated\n", inet_ntoa(address), netmask);
 			continue;
 		}
 

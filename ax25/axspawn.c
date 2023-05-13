@@ -1815,7 +1815,7 @@ again:
 			chargv[chargc++] = "/bin/login";
 			chargv[chargc++] = "-p";
 			/* there exist several conectps:
-			* Historicaly, the special character '+' in the password
+			* Historically, the special character '+' in the password
 			* field indicated that users may login via ax25, netrom, rose,
 			* etc.. - but not via other protocols like telnet.
 			* This secures the digipeater from abuse by inet access of

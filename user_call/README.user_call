@@ -28,7 +28,7 @@ optional digipeaters.
 
 The <remote address> for netrom_call may be of two forms, either the remote
 node callsign, or a combination of the remote node alias and remote node
-callsign seperated by a ':'. Netrom_call only connects to the remote
+callsign separated by a ':'. Netrom_call only connects to the remote
 callisgn, the full address is sent to the local user for information.
 
 The <remote callsign> for rose_call is the "service" at the remote Rose
