@@ -172,6 +172,24 @@ rawsend:
 			return 1;
 		}
 	} else {
+		if (crcmode != -1) {
+			buffer[0] = 0x85;
+			buffer[1] = crcmode;
+			buflen    = 2;
+			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				return 1;
+			}
+		}
+		if (crcmode != -1) {
+			buffer[0] = 0x85;
+			buffer[1] = crcmode;
+			buflen    = 2;
+			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				return 1;
+			}
+		}
 		if (txdelay != -1) {
 			buffer[0] = PARAM_TXDELAY;
 			buffer[1] = txdelay;
@@ -226,21 +244,10 @@ rawsend:
 				return 1;
 			}
 		}
-
 		if (feclevel != -1) {
 			buffer[0] = PARAM_FECLEVEL;
 			buffer[1] = feclevel;
 
-			buflen    = 2;
-			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
-				perror("kissparms: sendto");
-				return 1;
-			}
-		}
-
-		if (crcmode != -1) {
-			buffer[0] = 0x85;
-			buffer[1] = crcmode;
 			buflen    = 2;
 			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
 				perror("kissparms: sendto");
