@@ -135,6 +135,7 @@
 
 #include <netax25/axlib.h>
 #include <netax25/axconfig.h>
+#include <netax25/agwpe.h>
 #include <netax25/nrconfig.h>
 #include <netax25/rsconfig.h>
 #include <netax25/daemon.h>
@@ -1356,8 +1357,27 @@ close_link:
 						close(new);
 						exit(0);
 					}
-login:
+ login:
 					/* setproctitle("ax25d [%s]: login", User); */
+
+					/* Hand the accepted connection to the child.
+					 * The netAX.25 shim in libax25 turns the socket
+					 * into a pipe pair; after fork()+exec() the
+					 * child needs the calls and the AGWPE port to
+					 * keep sending.  This is how it finds out.  */
+					if (myAX25Name[0] == '\0') {
+						addrlen = sizeof(struct full_sockaddr_ax25);
+						getsockname(new, (struct sockaddr *)&sockaddr, &addrlen);
+						strcpy(myAX25Name, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
+					}
+					{
+						char inherit[64];
+
+						snprintf(inherit, sizeof(inherit), "%s|%s|%u|1",
+							 myAX25Name, User,
+							 (unsigned)AGWPE_PORT_LOOP);
+						setenv("AXSOCK_INHERIT", inherit, 1);
+					}
 
 					SetupOptions(new, raxl);
 					WorkoutArgs(raxl->af_type, raxl->shell, &argc, argv);
@@ -1392,12 +1412,19 @@ login:
 
 					/* Make root secure, before we exec() */
 					/* Strip any supplementary gid's */
-					if (setgroups(0, grps) == -1)
+					/* setgroups() needs root; a daemon that
+					 * already runs as the target user must
+					 * skip the whole privilege drop.  */
+					if (geteuid() == 0) {
+						if (setgroups(0, grps) == -1)
+							exit(1);
+						if (setgid(raxl->gid) == -1)
+							exit(1);
+						if (setuid(raxl->uid) == -1)
+							exit(1);
+					} else if (geteuid() != raxl->uid) {
 						exit(1);
-					if (setgid(raxl->gid) == -1)
-						exit(1);
-					if (setuid(raxl->uid) == -1)
-						exit(1);
+					}
 					execve(raxl->exec, argv, NULL);
 					exit(1);
 

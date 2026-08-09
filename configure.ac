@@ -22,9 +22,18 @@ AC_SUBST(UTIL_LIB)
 AC_SUBST(FLTK_LIB)
 AC_CHECK_LIB(z, zlibVersion,Z_LIB="-lz",Z_LIB=)
 AC_CHECK_LIB(ax25, ax25_config_load_ports, AX25_LIB="-lax25", AC_MSG_ERROR([Could not find the libax25 libraries; aborting]))
-AC_CHECK_LIB(util, openpty, UTIL_LIB="-lutil",AC_MSG_ERROR([Could not find libutil; aborting]))
+dnl openpty is in libutil on Linux but in libc on other systems.
+AC_CHECK_FUNC(openpty, UTIL_LIB=, AC_CHECK_LIB(util, openpty, UTIL_LIB="-lutil", AC_MSG_ERROR([Could not find libutil; aborting])))
 AC_CHECK_LIB([fltk], [main], [FLTK_LIB=`fltk-config --ldflags`], FLTK_LIB=)
 AM_CONDITIONAL([HAVE_FLTK], [test -n "$FLTK_LIB"])
+
+dnl Only Linux has a kernel AX.25 stack.  On other systems the kernel
+dnl dependent programs are simply not built.  We run the netAX.25 shim
+dnl instead, so always build them here.
+AC_MSG_CHECKING([for kernel AX.25 stack])
+ac_have_kernel_ax25=yes
+AC_MSG_RESULT([$ac_have_kernel_ax25])
+AM_CONDITIONAL(HAVE_KERNEL_AX25, test "x$ac_have_kernel_ax25" = "xyes")
 
 dnl Checks for header files.
 dnl AC_PATH_X

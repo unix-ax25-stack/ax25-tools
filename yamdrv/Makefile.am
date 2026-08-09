@@ -1,5 +1,9 @@
 
-sbin_PROGRAMS = yamcfg mcs2h
+if HAVE_KERNEL_AX25
+KERNEL_PROGS = yamcfg
+endif
+
+sbin_PROGRAMS = mcs2h $(KERNEL_PROGS)
 
 yamcfg_SOURCES =  yamcfg.c yam.h
 

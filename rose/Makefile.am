@@ -1,12 +1,19 @@
 installconf:
 
-sbin_PROGRAMS = rsattach rsdwnlnk rsmemsiz rsparms rsuplnk
+if HAVE_KERNEL_AX25
+KERNEL_PROGS = rsattach rsmemsiz rsparms
+endif
+
+sbin_PROGRAMS = rsdwnlnk rsuplnk $(KERNEL_PROGS)
 
 LDADD = $(AX25_LIB)
 
 rsmemsiz_LDADD =
 
-sbin_SCRIPTS = rsusers.sh
+sbin_SCRIPTS =
+if HAVE_KERNEL_AX25
+sbin_SCRIPTS += rsusers.sh
+endif
 
 
 dist_man_MANS = rose.4 rsattach.8 rsparms.8 rsdwnlnk.8 rsuplnk.8

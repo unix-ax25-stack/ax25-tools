@@ -25,8 +25,11 @@ installconf:
 	done
 
 
-sbin_PROGRAMS = ax25d axctl axparms axspawn axwrapper beacon bpqparms mheardd \
-		rxecho
+if HAVE_KERNEL_AX25
+KERNEL_PROGS = ax25d axctl axparms axspawn bpqparms mheardd rxecho axkill
+endif
+
+sbin_PROGRAMS = axwrapper beacon $(KERNEL_PROGS)
 
 bin_PROGRAMS = mheard
 
@@ -52,6 +55,7 @@ EXTRA_DIST = $(etcsrcfiles) $(varfiles)
 ax25d_SOURCES = ax25d.c
 axctl_SOURCES = axctl.c
 axparms_SOURCES = axparms.c
+axkill_SOURCES = axkill.c
 axspawn_SOURCES = axspawn.c axspawn.h access.c access.h md5.c md5.h
 axwrapper_SOURCES = axwrapper.c
 beacon_SOURCES = beacon.c

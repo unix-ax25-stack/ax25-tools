@@ -19,6 +19,8 @@
 
 #include <netinet/in.h>
 
+#include <sys/file.h>
+
 #include <netax25/ax25.h>
 #include <netrose/rose.h>
 
@@ -405,6 +407,11 @@ int main(int argc, char **argv)
 			continue;
 		}
 
+		/* ax25netd may be updating the same file at the same time;
+		 * the exclusive flock keeps the two writers from tearing
+		 * each other's records.  */
+		flock(fileno(fp), LOCK_EX);
+
 		if (mheard->position == 0xFFFFFF) {
 			fseek(fp, 0L, SEEK_END);
 			mheard->position = ftell(fp);
@@ -413,6 +420,9 @@ int main(int argc, char **argv)
 		fseek(fp, mheard->position, SEEK_SET);
 
 		fwrite(&mheard->entry, sizeof(struct mheard_struct), 1, fp);
+
+		fflush(fp);
+		flock(fileno(fp), LOCK_UN);
 
 		fclose(fp);
 	}

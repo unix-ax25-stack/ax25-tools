@@ -9,7 +9,11 @@ installconf:
 	done
 
 
-sbin_PROGRAMS = netromd nodesave nrattach nrparms nrsdrv
+if HAVE_KERNEL_AX25
+KERNEL_PROGS = netromd nodesave nrattach nrparms
+endif
+
+sbin_PROGRAMS = nrsdrv $(KERNEL_PROGS)
 
 LDADD = $(AX25_LIB)
 
