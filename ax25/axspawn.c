@@ -150,7 +150,11 @@
 #include <time.h>
 #include <pwd.h>
 #include <grp.h>
+#if defined(__APPLE__)
+#include <util.h>
+#else
 #include <pty.h>
+#endif
 #include <utmp.h>
 #include <paths.h>
 #include <errno.h>
@@ -851,7 +855,7 @@ int write_ax25(char *s, int len, int kick)
 		memset(&termios, 0, sizeof(termios));
 		termios.c_iflag = IGNBRK | IGNPAR;
 		termios.c_oflag = 0;
-		termios.c_cflag = CBAUD | CS8 | CREAD | CLOCAL;
+		termios.c_cflag = B19200 | CS8 | CREAD | CLOCAL;
 		termios.c_cflag = ~(CSTOPB|PARENB|PARODD|HUPCL);
 		termios.c_lflag = 0;
 		termios.c_cc[VMIN] = 1;
@@ -981,6 +985,7 @@ static void cleanup(char *tty)
 	FILE *fp;
 
 
+#ifndef __APPLE__
 	setutent();
 	ut.ut_type = LOGIN_PROCESS;
 	strncpy(ut.ut_id, tty + 3, sizeof(ut.ut_id));
@@ -1003,6 +1008,7 @@ static void cleanup(char *tty)
 	}
 
 	endutent();
+#endif
 }
 
 
@@ -1212,8 +1218,20 @@ end_mkdirs:
 
 		if (getpwuid(uid) != NULL) goto retry;	/* oops?! */
 
+#ifndef __APPLE__
 		if (putpwent(&pw, fp) < 0)
 			goto out;
+#else
+		fputs(pw.pw_name, fp);
+		fputs(":x:", fp);
+		fprintf(fp, "%d:%d:", uid, user_gid);
+		fputs(pw.pw_gecos, fp);
+		fputs(":", fp);
+		fputs(pw.pw_dir, fp);
+		fputs(":", fp);
+		fputs(pw.pw_shell, fp);
+		fputs("\n", fp);
+#endif
 
 		fclose(fp);
 
@@ -1732,6 +1750,7 @@ again:
 		cfsetospeed(&termios, B19200);
 		tcsetattr(0, TCSANOW, &termios);
 
+#ifndef __APPLE__
 		setutent();
 		ut_line.ut_type = LOGIN_PROCESS;
 		ut_line.ut_pid  = getpid();
@@ -1745,6 +1764,7 @@ again:
 		ut_line.ut_addr = 0;
 		pututline(&ut_line);
 		endutent();
+#endif
 
 		/* become process group leader, if we not already are */
 		if (getpid() != getsid(0)) {
