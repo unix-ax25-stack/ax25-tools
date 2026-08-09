@@ -1,7 +1,13 @@
 
 installconf:
 
-sbin_PROGRAMS = kissattach kissnetd kissparms mkiss net2kiss
+if HAVE_KERNEL_AX25
+KERNEL_PROGS = kissattach kissparms net2kiss
+install-exec-hook:
+	(cd $(DESTDIR)$(sbindir) ; ln -sf kissattach spattach)
+endif
+
+sbin_PROGRAMS = kissnetd mkiss $(KERNEL_PROGS)
 
 LDADD= $(AX25_LIB)
 net2kiss_LDADD = $(UTIL_LIB)
@@ -15,6 +21,3 @@ AM_CPPFLAGS = -D_GNU_SOURCE \
 
 AX25_SYSCONFDIR=${sysconfdir}/ax25/
 AX25_LOCALSTATEDIR=${localstatedir}/ax25/
-
-install-exec-hook:
-	(cd $(DESTDIR)$(sbindir) ; ln -sf kissattach spattach)

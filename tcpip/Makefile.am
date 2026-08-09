@@ -8,7 +8,11 @@ installconf:
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_SYSCONFDIR)/$$p; \
 	done
 
-sbin_PROGRAMS = rip98d ttylinkd
+if HAVE_KERNEL_AX25
+KERNEL_PROGS = rip98d
+endif
+
+sbin_PROGRAMS = ttylinkd $(KERNEL_PROGS)
 
 dist_man_MANS = rip98d.conf.5 rip98d.8 ttylinkd.conf.5 ttylinkd.8
 
