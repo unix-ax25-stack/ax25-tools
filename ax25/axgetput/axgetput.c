@@ -74,7 +74,11 @@ static void set_tty_flags(void)
 	memset(&termios, 0, sizeof(termios));
 	termios.c_iflag = IGNBRK | IGNPAR;
 	termios.c_oflag = 0;
+#if defined(CBAUD)
 	termios.c_cflag = CBAUD | CS8 | CREAD | CLOCAL;
+#else
+	termios.c_cflag = ~CSIZE | CS8 | CREAD | CLOCAL;
+#endif
 	termios.c_cflag = ~(CSTOPB|PARENB|PARODD|HUPCL);
 	termios.c_lflag = 0;
 	termios.c_cc[VMIN] = 1;

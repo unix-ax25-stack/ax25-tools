@@ -79,6 +79,7 @@ static void key_rts(int fd)
 	if (!flowcontrol)
 		return;
 
+#if defined(TIOCMGET) && defined(TIOCMSET) && defined(TIOCMIWAIT)
 	/* Wait for CTS to be low */
 	while (1) {
 		/* Get CTS status */
@@ -105,6 +106,11 @@ static void key_rts(int fd)
 		syslog(LOG_INFO|LOG_ERR, "TIOCMGET failed: flowcontrol disabled (%m)\n");
 		flowcontrol = 0;
 	}
+#else
+	/* Modem-control ioctls (TIOCMGET/TIOCMSET/TIOCMIWAIT) are not
+	 * available on this platform; flow control is disabled.  */
+	flowcontrol = 0;
+#endif
 }
 
 static void unkey_rts(int fd)
@@ -114,6 +120,7 @@ static void unkey_rts(int fd)
 	if (!flowcontrol)
 		return;
 
+#if defined(TIOCMGET) && defined(TIOCMSET) && defined(TIOCMIWAIT)
 	if (debugging) {
 		fprintf(stderr,"Transmission finished: unkeying RTS\n");
 	}
@@ -124,6 +131,7 @@ static void unkey_rts(int fd)
 		syslog(LOG_INFO|LOG_ERR, "TIOCMGET failed: flowcontrol disabled (%m)\n");
 		flowcontrol = 0;
 	}
+#endif
 }
 
 static void nrs_esc(unsigned char *s, int len)
