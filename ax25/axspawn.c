@@ -1676,11 +1676,53 @@ again:
 			pwd = NULL;
 			goto again;
 		}
-		if (!strstr(buf, pass_want)) {
-			sprintf(buf,"authentication failed\r");
-			write_ax25(buf, strlen(buf), 1);
-			sleep (EXITDELAY);
-			return -11;
+		/*
+		 *	Compare the answer exactly.
+		 *
+		 *	This used to be strstr(), so any answer that merely
+		 *	*contained* the expected characters was accepted. The
+		 *	intent was sensible on radio, where everything is
+		 *	overheard: /auth sys asks for five characters at named
+		 *	positions of a long password, the user types those
+		 *	five, and a listener learns no more than that. The
+		 *	padding was meant to hide even them.
+		 *
+		 *	But the same padding serves an attacker better than the
+		 *	user. buf holds 2048 bytes, which is room for some 2044
+		 *	different five character sequences, so one connection
+		 *	covered about two percent of the search space of a
+		 *	numeric password. A few dozen connections were enough -
+		 *	and this program hands out a login shell, with root
+		 *	permitted through md5 or baycom passwords.
+		 *
+		 *	The good part survives the strict comparison untouched:
+		 *	five positions out of twenty still tell an eavesdropper
+		 *	only those five characters. Only the padding is gone.
+		 *
+		 *	Line endings need no care here - read_ax25() turns every
+		 *	\r into \n and the caller cuts at the first one, so
+		 *	neither is left in buf. Leading and trailing blanks are
+		 *	trimmed all the same: strstr() tolerated them, they
+		 *	cannot smuggle a candidate past the comparison, and a
+		 *	terminal that adds one should not lock its user out.
+		 */
+		{
+			char *s = buf;
+			char *e;
+
+			while (*s == ' ' || *s == '\t')
+				s++;
+			e = s + strlen(s);
+			while (e > s && (e[-1] == ' ' || e[-1] == '\t'))
+				e--;
+			*e = '\0';
+
+			if (strcmp(s, pass_want)) {
+				sprintf(buf,"authentication failed\r");
+				write_ax25(buf, strlen(buf), 1);
+				sleep (EXITDELAY);
+				return -11;
+			}
 		}
 		if (pwd)
 			free(pwd);
