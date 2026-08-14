@@ -1360,26 +1360,23 @@ close_link:
  login:
 					/* setproctitle("ax25d [%s]: login", User); */
 
-					/* Hand the accepted connection to the child.
-					 * The netAX.25 shim in libax25 turns the socket
-					 * into a pipe pair; after fork()+exec() the
-					 * child needs the calls and the AGWPE port to
-					 * keep sending.  This is how it finds out.  */
-					if (myAX25Name[0] == '\0') {
-						addrlen = sizeof(struct full_sockaddr_ax25);
-						getsockname(new, (struct sockaddr *)&sockaddr, &addrlen);
-						strcpy(myAX25Name, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
-					}
-					{
-						char inherit[64];
+ 					/* Hand the accepted connection to the child.
+ 					 * The netAX.25 shim in libax25 turns the socket
+ 					 * into a pipe pair; the child simply reads and
+ 					 * writes the pipe (its atfork hook forgets the
+ 					 * socket table), while this parent keeps its
+ 					 * peer reader thread and dispatches inbound
+ 					 * traffic for it.  No AXSOCK_INHERIT: that
+ 					 * handover was dead code (its environment was
+ 					 * wiped by execve(..., NULL) below) and the
+ 					 * peer reader path makes it unnecessary.  */
+ 					if (myAX25Name[0] == '\0') {
+ 						addrlen = sizeof(struct full_sockaddr_ax25);
+ 						getsockname(new, (struct sockaddr *)&sockaddr, &addrlen);
+ 						strcpy(myAX25Name, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
+ 					}
 
-						snprintf(inherit, sizeof(inherit), "%s|%s|%u|1",
-							 myAX25Name, User,
-							 (unsigned)AGWPE_PORT_LOOP);
-						setenv("AXSOCK_INHERIT", inherit, 1);
-					}
-
-					SetupOptions(new, raxl);
+ 					SetupOptions(new, raxl);
 					WorkoutArgs(raxl->af_type, raxl->shell, &argc, argv);
 
 					if (Logging && !(paxl->flags & FLAG_NOLOGGING)) {
