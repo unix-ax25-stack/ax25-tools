@@ -1114,7 +1114,7 @@ int main(int argc, char *argv[])
 				gid_t grps[2];
 				char *argv[MAX_ARGS];
 				char inherit[64];
-				char *envp[2];
+				char *envp[8];
 				int argc;
 				int new;
 				int i;
@@ -1418,6 +1418,45 @@ close_link:
 						struct full_sockaddr_ax25 pn;
 						socklen_t pl = sizeof(pn);
 						char me[20], him[20];
+						int envc = 0;
+
+						/* Which library we are is the one
+						 * thing the child must inherit.  A
+						 * station that runs the shim by
+						 * preloading it would otherwise lose
+						 * it here and the child would find no
+						 * AX.25 at all.  Only the names of the
+						 * platform we were built for: the
+						 * other set would be noise in the
+						 * environment of every service.
+						 */
+						static const char *const pass[] = {
+#ifdef __APPLE__
+							"DYLD_INSERT_LIBRARIES",
+							"DYLD_FORCE_FLAT_NAMESPACE",
+							"DYLD_LIBRARY_PATH",
+#else
+							"LD_PRELOAD",
+							"LD_LIBRARY_PATH",
+#endif
+							NULL
+						};
+						int pi;
+
+						for (pi = 0; pass[pi] != NULL; pi++) {
+							char *v = getenv(pass[pi]);
+							size_t n;
+
+							if (v == NULL || *v == '\0')
+								continue;
+							n = strlen(pass[pi]) + strlen(v) + 2;
+							if ((envp[envc] = malloc(n)) == NULL)
+								continue;
+							sprintf(envp[envc], "%s=%s",
+								pass[pi], v);
+							envc++;
+						}
+						envp[envc] = NULL;
 
 						memset(&pn, 0, sizeof(pn));
 						*me = *him = '\0';
@@ -1429,8 +1468,8 @@ close_link:
 						if (*me && *him) {
 							sprintf(inherit, "AXSOCK_INHERIT=%d %s %s",
 								STDIN_FILENO, me, him);
-							envp[0] = inherit;
-							envp[1] = NULL;
+							envp[envc++] = inherit;
+							envp[envc] = NULL;
 						}
 					}
 
