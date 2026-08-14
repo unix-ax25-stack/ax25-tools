@@ -1113,9 +1113,13 @@ int main(int argc, char *argv[])
 				pid_t pid;
 				gid_t grps[2];
 				char *argv[MAX_ARGS];
+				char inherit[64];
+				char *envp[2];
 				int argc;
 				int new;
 				int i;
+
+				envp[0] = NULL;
 
 				/*
 				 * Setting up a non-blocking accept() so is does not hang up
@@ -1393,6 +1397,43 @@ close_link:
 						}
 					}
 
+					/* Tell the child who is at each end of the
+					 * descriptor it is about to inherit.
+					 *
+					 * It cannot find out for itself when the
+					 * connection is not a kernel socket: over a
+					 * socketpair getpeername(0) answers AF_UNIX
+					 * and axspawn, which asks exactly that to
+					 * learn who is logging in, refuses the call.
+					 * libax25 picks this up and answers for the
+					 * descriptor, so no child has to be changed.
+					 *
+					 * Built here rather than taken from environ:
+					 * a service run for a caller on the air has
+					 * no business inheriting what this daemon was
+					 * started with, which is why the execve()
+					 * below passed NULL in the first place.
+					 */
+					{
+						struct full_sockaddr_ax25 pn;
+						socklen_t pl = sizeof(pn);
+						char me[20], him[20];
+
+						memset(&pn, 0, sizeof(pn));
+						*me = *him = '\0';
+						addrlen = sizeof(struct full_sockaddr_ax25);
+						if (getsockname(new, (struct sockaddr *)&sockaddr, &addrlen) == 0)
+							strcpy(me, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
+						if (getpeername(new, (struct sockaddr *)&pn, &pl) == 0)
+							strcpy(him, ax25_ntoa(&pn.fsa_ax25.sax25_call));
+						if (*me && *him) {
+							sprintf(inherit, "AXSOCK_INHERIT=%d %s %s",
+								STDIN_FILENO, me, him);
+							envp[0] = inherit;
+							envp[1] = NULL;
+						}
+					}
+
 					dup2(new, STDIN_FILENO);
 					dup2(new, STDOUT_FILENO);
 					close(new);
@@ -1422,7 +1463,7 @@ close_link:
 					} else if (geteuid() != raxl->uid) {
 						exit(1);
 					}
-					execve(raxl->exec, argv, NULL);
+					execve(raxl->exec, argv, envp);
 					exit(1);
 
 				default:
