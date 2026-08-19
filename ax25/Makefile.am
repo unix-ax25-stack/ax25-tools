@@ -25,11 +25,18 @@ installconf:
 	done
 
 
+# These three speak to the kernel stack directly: axparms and rxecho
+# through route and interface ioctls, bpqparms through linux/bpqether.h.
+# Nothing outside Linux to point them at.
 if HAVE_KERNEL_AX25
-KERNEL_PROGS = ax25d axctl axparms axspawn bpqparms mheardd rxecho axkill
+KERNEL_PROGS = axparms bpqparms rxecho
 endif
 
-sbin_PROGRAMS = axwrapper beacon $(KERNEL_PROGS)
+# The rest reach the stack through libax25, which serves them from the
+# kernel or from AGWPE depending on what is there - mheardd included, whose
+# packet socket the shim answers with the AGWPE monitor.
+sbin_PROGRAMS = axwrapper beacon ax25d axctl axkill axspawn mheardd \
+		$(KERNEL_PROGS)
 
 bin_PROGRAMS = mheard
 

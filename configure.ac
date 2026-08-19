@@ -27,11 +27,20 @@ AC_CHECK_FUNC(openpty, UTIL_LIB=, AC_CHECK_LIB(util, openpty, UTIL_LIB="-lutil",
 AC_CHECK_LIB([fltk], [main], [FLTK_LIB=`fltk-config --ldflags`], FLTK_LIB=)
 AM_CONDITIONAL([HAVE_FLTK], [test -n "$FLTK_LIB"])
 
-dnl Only Linux has a kernel AX.25 stack.  On other systems the kernel
-dnl dependent programs are simply not built.  We run the netAX.25 shim
-dnl instead, so always build them here.
-AC_MSG_CHECKING([for kernel AX.25 stack])
-ac_have_kernel_ax25=yes
+dnl The kernel dependent programs configure the Linux AX.25 stack through
+dnl ioctls and headers that exist nowhere else - SIOCADDRT, SIOCSIFHWADDR,
+dnl linux/bpqether.h and their like.  This asks whether they can be built
+dnl here, not whether a stack is running: on a Linux without the ax25
+dnl module loaded they still build, and libax25 decides per process at run
+dnl time whether AF_AX25 goes to the kernel or to AGWPE.  The programs that
+dnl work through libax25 rather than through those ioctls are outside the
+dnl conditional and are built everywhere.  Same test as in libax25 and
+dnl ax25-apps.
+AC_MSG_CHECKING([whether native kernel AX.25 support is available])
+case `uname -s` in
+	Linux) ac_have_kernel_ax25=yes ;;
+	*)     ac_have_kernel_ax25=no ;;
+esac
 AC_MSG_RESULT([$ac_have_kernel_ax25])
 AM_CONDITIONAL(HAVE_KERNEL_AX25, test "x$ac_have_kernel_ax25" = "xyes")
 
