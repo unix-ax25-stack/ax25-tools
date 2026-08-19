@@ -29,11 +29,26 @@
 #include <netax25/axconfig.h>
 #include <netax25/daemon.h>
 #include <netax25/mheard.h>
+#include <netax25/axmon.h>
 
 #include <config.h>
 #include <scm-version.h>
 
 #include "../pathnames.h"
+
+/* No packet socket outside Linux: the shim in libax25 intercepts
+ * socket(PF_PACKET, SOCK_PACKET, ...) and feeds the raw AX.25 frames the
+ * AGWPE server reports into it.  The values are the ones Linux uses, so
+ * that a frame means the same thing on either kind of system.  */
+#ifndef PF_PACKET
+#define	PF_PACKET	17
+#endif
+#ifndef SOCK_PACKET
+#define	SOCK_PACKET	10
+#endif
+#ifndef ETH_P_AX25
+#define	ETH_P_AX25	0x0002
+#endif
 
 #define	KISS_MASK	0x0F
 #define	KISS_DATA	0x00
@@ -105,7 +120,7 @@ int main(int argc, char **argv)
 	struct mheard_list_struct *mheard;
 	char buffer[1500];
 	char *data;
-	int size, s;
+	int size, s, framed;
 	char *port = NULL;
 	struct sockaddr sa;
 	socklen_t asize;
@@ -196,12 +211,6 @@ int main(int argc, char **argv)
 			fclose(fp);
 	}
 
-	s = socket(PF_PACKET, SOCK_PACKET, htons(ETH_P_AX25));
-	if (s == -1) {
-		perror("mheardd: socket");
-		return 1;
-	}
-
 	if (!daemon_start(FALSE)) {
 		fprintf(stderr, "mheardd: cannot become a daemon\n");
 		return 1;
@@ -213,10 +222,28 @@ int main(int argc, char **argv)
 		syslog(LOG_INFO, "starting");
 	}
 
+	/* The monitor is opened here and not before daemon_start(): behind
+	 * the libax25 AGWPE shim it is fed by a reader thread, and of a
+	 * multithreaded process only the forking thread survives fork() -
+	 * a monitor opened earlier would simply go quiet in the daemon.  A
+	 * kernel packet socket does not care either way.  */
+	s = socket(PF_PACKET, SOCK_PACKET, htons(ETH_P_AX25));
+	if (s == -1) {
+		if (logging)
+			syslog(LOG_ERR, "socket: %m");
+		perror("mheardd: socket");
+		return 1;
+	}
+
+	/* With a kernel packet socket each read returns one frame; through
+	 * the shim they arrive length prefixed.  */
+	framed = axmon_framed(s);
+
 	for (;;) {
 		asize = sizeof(sa);
 
-		size = recvfrom(s, buffer, sizeof(buffer), 0, &sa, &asize);
+		size = axmon_read(s, framed, buffer, sizeof(buffer), &sa,
+				  &asize);
 		if (size == -1) {
 			if (logging) {
 				syslog(LOG_ERR, "recv: %m");

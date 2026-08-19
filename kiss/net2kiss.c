@@ -39,13 +39,16 @@
 #include <syslog.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <endian.h>
 #include <netinet/in.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <grp.h>
+#if defined(__APPLE__)
+#include <util.h>		/* openpty() lives here, not in pty.h */
+#else
 #include <pty.h>
+#endif
 #include <string.h>
 #include <termios.h>
 #include <limits.h>
@@ -55,10 +58,27 @@
 
 #include <net/ethernet.h>
 
+#include <netax25/axmon.h>
+
+/* No packet socket outside Linux: the shim in libax25 intercepts the
+ * socket(PF_INET, SOCK_PACKET, ...) below and feeds the raw AX.25 frames
+ * the AGWPE server reports into it.  The values are the ones Linux uses,
+ * so that a frame means the same thing on either kind of system.  */
+#ifndef SOCK_PACKET
+#define	SOCK_PACKET	10
+#endif
+#ifndef ETH_P_AX25
+#define	ETH_P_AX25	0x0002
+#endif
+#ifndef ETH_P_ALL
+#define	ETH_P_ALL	0x0003
+#endif
+
 
 /* --------------------------------------------------------------------- */
 
 static int fdif, fdpty;
+static int framed;		/* monitor delivers length prefixed frames */
 static struct ifreq ifr;
 static char *progname;
 static int verbose;
@@ -448,8 +468,8 @@ static int doio(int fdif, int fdpty, char *ifaddr)
 		}
 		if (FD_ISSET(fdif, &rmask)) {
 			from_len = sizeof(from);
-			i = recvfrom(fdif, bp = ibuf, sizeof(ibuf), 0, &from,
-				     &from_len);
+			i = axmon_read(fdif, framed, bp = ibuf, sizeof(ibuf),
+				       &from, &from_len);
 			if (i < 0) {
 				if (errno == EWOULDBLOCK)
 					continue;
@@ -560,6 +580,11 @@ int main(int argc, char *argv[])
 	fdif = socket(PF_INET, SOCK_PACKET, proto);
 	if (fdif < 0)
 		die("socket");
+	/* With a kernel packet socket each read returns one frame; through
+	 * the libax25 AGWPE shim they arrive length prefixed.  */
+	framed = axmon_framed(fdif);
+	if (framed && verbose)
+		printf("raw monitor via libax25 AGWPE shim (framed)\n");
 	memset(&sa, 0, sizeof(struct sockaddr));
 	memcpy(sa.sa_data, name_iface, sizeof(sa.sa_data));
 	sa.sa_family = AF_INET;
