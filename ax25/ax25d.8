@@ -31,6 +31,38 @@ no messages are logged.
 .TP 15
 .BI \-v
 Display the version.
+.SH ENVIRONMENT
+.LP
+The program
+.B ax25d
+starts for a caller does
+.B not
+inherit the environment the daemon was started with: a service run for a
+station on the air has no business seeing the sysop's shell.  The environment
+is built here instead, and holds nothing but what is listed below.
+.TP
+.B AXSOCK_INHERIT
+Who is at each end of the connection the child inherits on descriptor 0,
+as
+.IR "fd local peer" .
+A child asking
+.BI getpeername( 0 )
+for the calling station \-\-
+.BR axspawn (8)
+does, before it picks a unix account \-\- gets AF_UNIX for an answer where the
+connection is not a kernel socket.
+.B libax25
+reads this variable when it loads and answers for the descriptor, so no child
+has to be changed.  See
+.BR axsock (7).
+.TP
+.BR LD_PRELOAD ", " LD_LIBRARY_PATH
+.RB ( DYLD_INSERT_LIBRARIES
+and
+.B DYLD_LIBRARY_PATH
+on macOS) are passed on when they are set, and only these.  A station that
+runs the userspace AX.25 shim by preloading it would otherwise lose it at
+exactly this edge, and the child would find no AX.25 at all.
 .SH FILES
 .LP
 /etc/ax25/ax25d.conf
@@ -40,7 +72,8 @@ Display the version.
 .BR ax25wrapper (8),
 .BR netrom (4),
 .BR rose (4),
-.BR ax25d.conf (5).
+.BR ax25d.conf (5),
+.BR axsock (7).
 .SH AUTHOR
 Darryl Miles G7LED <dlm@frink.demon.co.uk>
 .br
