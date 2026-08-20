@@ -1432,8 +1432,12 @@ close_link:
 						 */
 						static const char *const pass[] = {
 #ifdef __APPLE__
+							/* Not DYLD_FORCE_FLAT_NAMESPACE:
+							 * dyld stopped honouring it, and
+							 * libax25 reaches an inserted
+							 * program by interposing instead
+							 * - see axsock(7).  */
 							"DYLD_INSERT_LIBRARIES",
-							"DYLD_FORCE_FLAT_NAMESPACE",
 							"DYLD_LIBRARY_PATH",
 #else
 							"LD_PRELOAD",
