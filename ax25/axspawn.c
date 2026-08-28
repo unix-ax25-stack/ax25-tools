@@ -643,6 +643,14 @@ static int _write_ax25(const char *s, int len)
 	return i > 0 ? i : 0;	/* on error, -1 is returned  */
 }
 
+/*
+ * Set once the far end has closed.  read_ax25() cannot say so in its return
+ * value: with compression switched on a frame that decodes to nothing is
+ * zero bytes as well, and the callers index the buffer with what they get.
+ * The difference matters - one means hang up, the other means read again.
+ */
+static int peer_gone;
+
 static int read_ax25(char *s, int size)
 {
 	int len;
@@ -655,6 +663,10 @@ static int read_ax25(char *s, int size)
 	len = read(0, s, size);
 	if (len < 0)
 		return len;
+	if (len == 0) {
+		peer_gone = 1;
+		return 0;
+	}
 
 	if (huffman) {
 		if (!decstathuf(s, decomp, len, &declen))  {
@@ -1558,7 +1570,7 @@ int main(int argc, char **argv)
 
 	if (wait_for_tcp) {
 		/* incoming TCP/IP connection? */
-		if (read_ax25(buf, sizeof(buf)) < 0)
+		if (read_ax25(buf, sizeof(buf)) < 0 || peer_gone)
 			exit(0);
 	}
 
@@ -1573,7 +1585,7 @@ int main(int argc, char **argv)
 		sprintf(buf, "Login (%s): ", user);
 		write_ax25(buf, strlen(buf), 1);
 		cnt = read_ax25(buf, sizeof(buf) - 1);
-		if (cnt < 0)
+		if (cnt < 0 || peer_gone)
 				exit(1);
 		buf[cnt] = 0;
 
@@ -1992,7 +2004,17 @@ again:
 				if (FD_ISSET(0, &fds_read))
 				{
 					cnt = read_ax25(buf, sizeof(buf));
-					if (cnt < 0)	/* Connection died */
+					/* End of file is how a closed connection
+					 * arrives when it is not a kernel socket:
+					 * a socketpair has no exception condition
+					 * to report, so fds_err above stays quiet
+					 * and this is the only notice we get.  It
+					 * used to fall through to a write() of
+					 * zero bytes, and since end of file stays
+					 * readable, select() answered at once and
+					 * the loop span at 100% CPU for as long
+					 * as the process lived. */
+					if (cnt < 0 || peer_gone)	/* Connection died */
 					{
 						kill(pid, SIGHUP);
 						cleanup(ptyslave+5);
@@ -2004,7 +2026,11 @@ again:
 				if (FD_ISSET(fdmaster, &fds_read))
 				{
 					cnt = read(fdmaster, buf, (huffman ? 254 : sizeof(buf)));
-					if (cnt < 0)
+					/* Same again: the pty master usually says
+					 * EIO when the child is gone, but end of
+					 * file is just as final and span the same
+					 * way. */
+					if (cnt <= 0)
 					{
 						/* give the last packet in the timer controlled sendqueue a chance.. */
 						if (wqueue_length) {
