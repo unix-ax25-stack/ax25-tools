@@ -192,6 +192,7 @@ static char Node[11];				/* Room for 'GB9ZZZ-15\0' (NETROM) and 10 bytes ROSE '6
 static char myAX25Name[10];			/* Room for 'GB9ZZZ-15\0' */
 static char *Port;
 static int Logging		= FALSE;
+static int foreground		= FALSE;	/* -f: no fork, for a supervisor */
 
 static int ReadConfig(void);
 
@@ -1046,10 +1047,14 @@ int main(int argc, char *argv[])
 	char *p;
 	char *mesg;
 
-	while ((cnt = getopt(argc, argv, "c:lv")) != EOF) {
+	while ((cnt = getopt(argc, argv, "c:flv")) != EOF) {
 		switch (cnt) {
 		case 'c':
 			ConfigFile = optarg;
+			break;
+
+		case 'f':
+			foreground = TRUE;
 			break;
 
 		case 'l':
@@ -1061,7 +1066,7 @@ int main(int argc, char *argv[])
 			return 1;
 
 		default:
-			fprintf(stderr, "Usage: ax25d [-v] [-c altfile] [-l]\n");
+			fprintf(stderr, "Usage: ax25d [-v] [-f] [-c altfile] [-l]\n");
 			return 1;
 		}
 	}
@@ -1075,7 +1080,31 @@ int main(int argc, char *argv[])
 
 	rs_config_load_ports();
 
-	if (!daemon_start(TRUE)) {
+	/*
+	 * -f keeps the process in the foreground, which is what a supervisor
+	 * wants: systemd follows the process it started, and a daemon that
+	 * disappears behind a fork has to be described to it instead.
+	 *
+	 * It is not merely convenient.  daemon_start() skips the fork when
+	 * getppid() is 1 - it takes that for "started by init" - and under
+	 * systemd the parent is pid 1, so the fork does not happen and a unit
+	 * written as Type=forking waits for it until it gives up.  With -f
+	 * and Type=simple neither side is guessing.
+	 *
+	 * The rest of what daemon_start() does is still wanted, and is done
+	 * here: SIGCHLD ignored so that finished sessions leave no zombies,
+	 * out of whatever directory we were started in, and no inherited
+	 * umask.
+	 */
+	if (foreground) {
+		signal(SIGCHLD, SIG_IGN);
+		if (chdir("/") < 0) {
+			fprintf(stderr, "ax25d: cannot chdir to /: %s\n",
+				strerror(errno));
+			return 1;
+		}
+		umask(0);
+	} else if (!daemon_start(TRUE)) {
 		fprintf(stderr, "ax25d: cannot become a daemon\n");
 		return 1;
 	}
