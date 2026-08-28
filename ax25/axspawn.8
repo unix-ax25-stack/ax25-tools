@@ -6,6 +6,16 @@ axspawn \- Allow automatic login to a Linux system.
 .SH DESCRIPTION
 .LP
 .B Axspawn
+is started by
+.BR ax25d (8)
+for an incoming connection, which hands it the link on standard input and
+standard output; which stations reach it, and under which account, is decided
+by an entry in
+.BR ax25d.conf (5)
+and not here.  It is not a program to run by hand \-\- without a connection on
+its input there is nobody to log in.
+.LP
+.B Axspawn
 will check if the peer is an AX.25 connect, the callsign a valid Amateur
 Radio callsign, strip the SSID, check if UID/GID are valid, allow a
 password-less login if the password-entry in /etc/passwd is \(lq+\(rq or
@@ -120,6 +130,7 @@ Theses are options and not part of the preferences because you _may_ like to hav
 .fi
 .SH "SEE ALSO"
 .BR axspawn.conf (5),
-.BR ax25d (8).
+.BR ax25d (8),
+.BR ax25d.conf (5).
 .SH AUTHOR
 Joerg Reuter DL1BKE <jreuter@poboxes.com>
