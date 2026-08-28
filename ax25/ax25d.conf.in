@@ -6,6 +6,17 @@
 #
 # Please note that the programs node and finger are not part of ax25-tools.
 #
+# The usual program for a login is axspawn(8), which is part of ax25-tools.
+# It takes the connection on its standard input and puts the caller into a
+# unix account.  It ignores an argument of its own, so a substitution is
+# worth passing anyway: %S is the caller with the SSID, which is what makes
+# a session recognisable in ps(1) - "axspawn DL1ABC-7" rather than one of
+# several identical lines.  See ax25d.conf(5) for the full list.
+#
+#[OH2BNS-9 VIA 1]
+#NOCALL  * * * * * *  L
+#default * * * * * *  -	root  @SBINDIR@/axspawn	axspawn %S
+#
 [OH2BNS VIA 1]
 NOCALL   * * * * * *  L
 default  * * * * * *  -	root  @SBINDIR@/ttylinkd	ttylinkd

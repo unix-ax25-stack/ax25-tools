@@ -198,6 +198,44 @@ This is only valid under NET/ROM and Rose, under AX.25 a % is substituted instea
 .B %r
 The nodename of the remote station in lower case with the SSID.
 This is only valid under NET/ROM and Rose, under AX.25 a % is substituted instead.
+.RE
+.PP
+A trailing
+.B %
+with nothing after it stands for itself.  Older versions read past the end of
+the line at that point and appended whatever happened to follow it in memory,
+which showed up as an argument of random characters in
+.BR ps (1);
+a configuration written that way was never wrong, only unlucky.
+.SH "THE USUAL LOGIN"
+.LP
+The program a station is normally handed to is
+.BR axspawn (8),
+which comes with ax25-tools.  It takes the connection on its standard input
+and standard output and puts the caller into a unix account, creating one on
+first use where it is configured to.
+.PP
+.RS
+.nf
+[DB0FHN\-9 VIA wampes]
+NOCALL   * * * * * *  L
+default  * * * * * *  \-  root  /usr/sbin/axspawn  axspawn %S
+.fi
+.RE
+.LP
+.B axspawn
+ignores an argument of its own, so the substitution costs nothing and buys
+something: it is what
+.BR ps (1)
+shows, and with
+.B %S
+each session is named by the callsign that owns it, SSID and all.
+.B %U
+would drop the SSID, and two callers differing only in theirs would be
+indistinguishable in the process list.  On a NET/ROM entry
+.B %R
+names the node a caller came in over, which answers a different question and
+is worth having beside it rather than instead of it.
 .TP 5
 .B %%
 A %.
@@ -288,4 +326,5 @@ or
 .BR axports (5),
 .BR nrports (5),
 .BR rsports (5),
-.BR ax25d (8).
+.BR ax25d (8),
+.BR axspawn (8).
