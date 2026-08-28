@@ -8,7 +8,9 @@ endif
 
 SUBDIRS = ax25 kiss 6pack netrom rose tcpip user_call yamdrv $(KERNEL_SUBDIRS)
 
-EXTRA_DIST = pathnames.h scm-version.h.in ax25-tools.spec
+EXTRA_DIST = pathnames.h scm-version.h.in ax25-tools.spec \
+		README.compile README-hints-for-non-kernel-AX25-hosts.txt \
+		README-linux-systemd.txt
 
 AM_CPPFLAGS = -D_GNU_SOURCE \
 	      -DAX25_SYSCONFDIR=\""$(sysconfdir)/ax25/"\" \
