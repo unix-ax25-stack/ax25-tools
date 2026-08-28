@@ -25,12 +25,49 @@ can be forced to re-read its configuration file by sending it a SIGHUP.
 .BI "\-c altconffile"
 Specifies an alternate configuration file name.
 .TP 15
+.BI \-f
+Stay in the foreground: do not fork, and do not detach from the terminal.
+This is what a supervisor wants \-\- see RUNNING UNDER A SUPERVISOR below.
+.TP 15
 .BI \-l
 Specifies that messages should be logged into the system log file. By default
 no messages are logged.
 .TP 15
 .BI \-v
 Display the version.
+.SH "RUNNING UNDER A SUPERVISOR"
+.LP
+Without
+.B \-f
+the daemon backgrounds itself \-\- but not always, and that is the trap.
+.BR daemon_start (3)
+skips the fork when
+.BR getppid ()
+answers 1, which it takes for "started by init".  Under
+.B systemd
+the parent of a service
+.I is
+process 1, so no fork happens, and a unit written as
+.B Type=forking
+waits for one until it gives up: the service never comes up, although the
+programs it starts for callers run.
+.LP
+With
+.B \-f
+neither side has to guess.  The process systemd starts is the process it
+follows:
+.PP
+.RS
+.nf
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/ax25d \-f \-l
+Restart=on-failure
+.fi
+.RE
+.LP
+Sessions still fork, as they must; only the daemon itself stays put.  It
+ignores SIGCHLD either way, so finished sessions leave no zombies behind.
 .SH ENVIRONMENT
 .LP
 The program
