@@ -267,6 +267,15 @@ static void SignalTERM(int code)
 	exit(0);
 }
 
+/* One character into the argument being built, and never past its end.  What
+ * is copied here comes out of the configuration file and out of callsigns, so
+ * the length is not ours to trust.
+ */
+#define ARGCHAR(c)	do {						\
+				if (cnt < (int) sizeof(buffer) - 1)	\
+					buffer[cnt++] = (c);		\
+			} while (0)
+
 static void WorkoutArgs(int af_type, char *shell, int *argc, char **argv)
 {
 	char buffer[1024];	/* Maximum arg size */
@@ -296,73 +305,85 @@ static void WorkoutArgs(int af_type, char *shell, int *argc, char **argv)
 			switch (*cp) {
 			case 'd':	/* portname */
 				for (sp = Port; *sp != '\0' && *sp != '-'; sp++)
-					buffer[cnt++] = *sp;
+					ARGCHAR(*sp);
 				break;
 
 			case 'U':	/* username in UPPER */
 				for (sp = User; *sp != '\0' && *sp != '-'; sp++)
-					buffer[cnt++] = toupper(*sp);
+					ARGCHAR(toupper(*sp));
 				break;
 
 			case 'u':	/* USERNAME IN lower */
 				for (sp = User; *sp != '\0' && *sp != '-'; sp++)
-					buffer[cnt++] = tolower(*sp);
+					ARGCHAR(tolower(*sp));
 				break;
 
 			case 'S':	/* username in UPPER (with SSID) */
 				for (sp = User; *sp != '\0'; sp++)
-					buffer[cnt++] = toupper(*sp);
+					ARGCHAR(toupper(*sp));
 				break;
 
 			case 's':	/* USERNAME IN lower (with SSID) */
 				for (sp = User; *sp != '\0'; sp++)
-					buffer[cnt++] = tolower(*sp);
+					ARGCHAR(tolower(*sp));
 				break;
 
 			case 'P':	/* nodename in UPPER */
 				if (af_type == AF_NETROM) {
 					for (sp = Node; *sp != '\0' && *sp != '-'; sp++)
-						buffer[cnt++] = toupper(*sp);
+						ARGCHAR(toupper(*sp));
 				} else {
-					buffer[cnt++] = '%';
+					ARGCHAR('%');
 				}
 				break;
 
 			case 'p':	/* NODENAME IN lower */
 				if (af_type == AF_NETROM) {
 					for (sp = Node; *sp != '\0' && *sp != '-'; sp++)
-						buffer[cnt++] = tolower(*sp);
+						ARGCHAR(tolower(*sp));
 				} else {
-					buffer[cnt++] = '%';
+					ARGCHAR('%');
 				}
 				break;
 
 			case 'R':	/* nodename in UPPER (with SSID) */
 				if (af_type == AF_NETROM) {
 					for (sp = Node; *sp != '\0'; sp++)
-						buffer[cnt++] = toupper(*sp);
+						ARGCHAR(toupper(*sp));
 				} else {
-					buffer[cnt++] = '%';
+					ARGCHAR('%');
 				}
 				break;
 
 			case 'r':	/* NODENAME IN lower (with SSID) */
 				if (af_type == AF_NETROM) {
 					for (sp = Node; *sp != '\0'; sp++)
-						buffer[cnt++] = tolower(*sp);
+						ARGCHAR(tolower(*sp));
 				} else {
-					buffer[cnt++] = '%';
+					ARGCHAR('%');
 				}
 				break;
 
 			case '\0':
+				/* A '%' at the very end of the line.  Keep it,
+				 * but step back onto the terminator: cp was
+				 * advanced onto it above, and the loop's own
+				 * cp++ would carry it past the end of the
+				 * string, after which the condition reads
+				 * whatever follows in memory and copies it
+				 * into the argument.  That is where the
+				 * "axspawn %?w??" in ps came from. */
+				ARGCHAR('%');
+				cp--;
+				break;
+
 			case '%':
 			default:
-				buffer[cnt++] = '%';
+				ARGCHAR('%');
 				break;
 			}
 		} else {
-			buffer[cnt++] = *cp;
+			ARGCHAR(*cp);
 		}
 	}
 
