@@ -1822,8 +1822,9 @@ again:
 
 		/* become process group leader, if we not already are */
 		if (getpid() != getsid(0)) {
-			if (setsid() == -1)
+			if (setsid() == -1) {
 				exit(1);
+			}
 		}
 
 		chargc = 0;
@@ -2040,6 +2041,21 @@ again:
 								sprintf(buf,"\r//COMP 0\r");
 								write_ax25(buf, strlen(buf), 1);
 								sleep(EXITDELAY);
+						}
+						int cstatus = 0, cried = -1, tre = 0;
+						do {
+							errno = 0;
+							cried = waitpid(pid, &cstatus, WNOHANG);
+							if (cried == 0) {
+								usleep(2000);
+								tre++;
+							}
+						} while (cried == 0 && tre < 25);
+						if (cried == 0) {
+							/* child (login) is STILL ALIVE: pty EIO/EOF was
+							 * transient (login briefly re-setting up its
+							 * controlling tty). Do NOT tear the session down. */
+							continue;
 						}
 						cleanup(ptyslave+5);
 						return 1;	/* Child died */
