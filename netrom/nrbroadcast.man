@@ -38,9 +38,9 @@ resident on my machine are to be broadcast.
 .RE
 .SH FILES
 .LP
-/etc/ax25/nrbroadcast
+@@@AX25_SYSCONFDIR@@@/nrbroadcast
 .br
-/etc/ax25/axports
+@@@AX25_SYSCONFDIR@@@/axports
 .SH "SEE ALSO"
 .BR call (1),
 .BR netrom (4),

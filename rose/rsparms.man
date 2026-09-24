@@ -50,9 +50,9 @@ would set the callsign used by Rose internode traffic to VK2KTJ-10.
 Display the version information.
 .SH FILES
 .LP
-/etc/ax25/axports
+@@@AX25_SYSCONFDIR@@@/axports
 .br
-/etc/ax25/rsports
+@@@AX25_SYSCONFDIR@@@/rsports
 .SH "SEE ALSO"
 .BR call (1),
 .BR rose (4),

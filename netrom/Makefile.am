@@ -20,7 +20,22 @@ LDADD = $(AX25_LIB)
 dist_man_MANS = netrom.4 nrbroadcast.5 netromd.8 nodesave.8 \
 	   nrattach.8 nrparms.8 nrsdrv.8
 
-EXTRA_DIST = $(etcfiles)
+man_sed = sed -e 's|@@@AX25_SYSCONFDIR@@@|$(AX25_MAN_SC)|g' \
+	      -e 's|@@@AX25_LOCALSTATEDIR@@@|$(AX25_MAN_SD)|g'
+
+AX25_MAN_SC = $(sysconfdir)/ax25
+AX25_MAN_SD = $(localstatedir)/ax25
+
+nrbroadcast.5: $(srcdir)/nrbroadcast.man
+	$(man_sed) < $(srcdir)/nrbroadcast.man > $@
+netromd.8: $(srcdir)/netromd.man
+	$(man_sed) < $(srcdir)/netromd.man > $@
+nrparms.8: $(srcdir)/nrparms.man
+	$(man_sed) < $(srcdir)/nrparms.man > $@
+
+CLEANFILES = nrbroadcast.5 netromd.8 nrparms.8
+
+EXTRA_DIST = $(etcfiles) nrbroadcast.man netromd.man nrparms.man
 
 netromd_SOURCES = \
 	netromd.c \

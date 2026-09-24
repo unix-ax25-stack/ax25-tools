@@ -18,7 +18,22 @@ dist_man_MANS = rip98d.conf.5 rip98d.8 ttylinkd.conf.5 ttylinkd.8
 
 dist_doc_DATA = ttylinkd.README ttylinkd.INSTALL
 
-EXTRA_DIST = $(etcfiles)
+man_sed = sed -e 's|@@@AX25_SYSCONFDIR@@@|$(AX25_MAN_SC)|g' \
+	      -e 's|@@@AX25_LOCALSTATEDIR@@@|$(AX25_MAN_SD)|g'
+
+AX25_MAN_SC = $(sysconfdir)/ax25
+AX25_MAN_SD = $(localstatedir)/ax25
+
+rip98d.conf.5: $(srcdir)/rip98d.conf.man
+	$(man_sed) < $(srcdir)/rip98d.conf.man > $@
+rip98d.8: $(srcdir)/rip98d.man
+	$(man_sed) < $(srcdir)/rip98d.man > $@
+ttylinkd.8: $(srcdir)/ttylinkd.man
+	$(man_sed) < $(srcdir)/ttylinkd.man > $@
+
+EXTRA_DIST = $(etcfiles) rip98d.conf.man rip98d.man ttylinkd.man
+
+CLEANFILES = rip98d.conf.5 rip98d.8 ttylinkd.8
 
 rip98d_SOURCES = 	\
 	rip98d.c	\

@@ -56,11 +56,11 @@ default is 256 for ax25_call and rose_call, 236 for netrom_call and
 1024 for tcp_call.
 .SH FILES
 .br
-/etc/ax25/axports
+@@@AX25_SYSCONFDIR@@@/axports
 .br
-/etc/ax25/nrports
+@@@AX25_SYSCONFDIR@@@/nrports
 .br
-/etc/ax25/rsports
+@@@AX25_SYSCONFDIR@@@/rsports
 .SH "SEE ALSO"
 .BR ax25(4), netrom(4), rose(4), tcp(4).
 .SH AUTHOR

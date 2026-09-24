@@ -8,3 +8,6 @@ nrattach
 nrbroadcast
 nrparms
 nrsdrv
+/nrbroadcast.5
+/netromd.8
+/nrparms.8

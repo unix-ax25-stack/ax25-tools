@@ -12,6 +12,33 @@ ax25d.conf: ax25d.conf.in
 	$(subst_path) < $(srcdir)/ax25d.conf.in > ax25d.conf.tmp
 	mv ax25d.conf.tmp ax25d.conf
 
+man_sed = sed -e 's|@@@AX25_SYSCONFDIR@@@|$(AX25_MAN_SC)|g' \
+	      -e 's|@@@AX25_LOCALSTATEDIR@@@|$(AX25_MAN_SD)|g'
+
+AX25_MAN_SC = $(sysconfdir)/ax25
+AX25_MAN_SD = $(localstatedir)/ax25
+
+ax25d.8: $(srcdir)/ax25d.man
+	$(man_sed) < $(srcdir)/ax25d.man > $@
+axctl.8: $(srcdir)/axctl.man
+	$(man_sed) < $(srcdir)/axctl.man > $@
+axparms.8: $(srcdir)/axparms.man
+	$(man_sed) < $(srcdir)/axparms.man > $@
+axspawn.8: $(srcdir)/axspawn.man
+	$(man_sed) < $(srcdir)/axspawn.man > $@
+axspawn.conf.5: $(srcdir)/axspawn.conf.man
+	$(man_sed) < $(srcdir)/axspawn.conf.man > $@
+mheard.1: $(srcdir)/mheard.man
+	$(man_sed) < $(srcdir)/mheard.man > $@
+mheardd.8: $(srcdir)/mheardd.man
+	$(man_sed) < $(srcdir)/mheardd.man > $@
+rxecho.8: $(srcdir)/rxecho.man
+	$(man_sed) < $(srcdir)/rxecho.man > $@
+rxecho.conf.5: $(srcdir)/rxecho.conf.man
+	$(man_sed) < $(srcdir)/rxecho.conf.man > $@
+ax25d.conf.5: $(srcdir)/ax25d.conf.man
+	$(man_sed) < $(srcdir)/ax25d.conf.man > $@
+
 installconf: $(etcfiles)
 	$(mkinstalldirs) $(DESTDIR)$(AX25_SYSCONFDIR)
 	@list='$(etcfiles)'; for p in $$list; do \
@@ -56,8 +83,12 @@ dist_man_MANS = ax25.4 ax25d.conf.5 axspawn.conf.5 rxecho.conf.5 \
 
 
 
-CLEANFILES = ax25d.conf
-EXTRA_DIST = $(etcsrcfiles) $(varfiles)
+CLEANFILES = ax25d.conf ax25d.conf.5 axspawn.conf.5 rxecho.conf.5 \
+	   ax25d.8 axctl.8 axparms.8 axspawn.8 mheard.1 mheardd.8 rxecho.8
+EXTRA_DIST = $(etcsrcfiles) $(varfiles) \
+	   ax25d.conf.man axspawn.conf.man rxecho.conf.man \
+	   ax25d.man axctl.man axparms.man axspawn.man \
+	   mheard.man mheardd.man rxecho.man
 
 ax25d_SOURCES = ax25d.c
 axctl_SOURCES = axctl.c

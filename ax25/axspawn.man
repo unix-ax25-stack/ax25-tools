@@ -24,7 +24,7 @@ empty; in every other case login will prompt for a password.
 .B Axspawn
 can create user accounts automatically. You may specify the user shell,
 first and maximum user id, group ID in the config file and (unlike WAMPES)
-create a file \(lq/etc/ax25/ax25.profile\(rq which will be copied to
+create a file \(lq@@@AX25_SYSCONFDIR@@@/ax25.profile\(rq which will be copied to
 ~/.profile.
 .SH SECURITY
 .LP
@@ -48,17 +48,17 @@ axspawn also has the well known authentication mechanisms of the AX.25 bbs
 and
 .B md5
 standards.
-axspawn searches in /etc/ax25/bcpasswd (first) and ~user/.bcpasswd (second)
+axspawn searches in @@@AX25_SYSCONFDIR@@@/bcpasswd (first) and ~user/.bcpasswd (second)
 for a match of the required authentication mechanism and password.
 md5 and baycom passwords may differ. md5 passwords gain over baycom passwords.
 
 Note: you could "lock" special "friends" out by specifying an empty password
-in /etc/ax25/bcpasswd (line "n0call:md5:"). -> md5 Passwords are enforced. But
+in @@@AX25_SYSCONFDIR@@@/bcpasswd (line "n0call:md5:"). -> md5 Passwords are enforced. But
 the length is shorter than the minimum (len 8 for md5, len 20 for baycom);
-user's password file is not searched because in /etc/ax25/bcpasswd its already
+user's password file is not searched because in @@@AX25_SYSCONFDIR@@@/bcpasswd its already
 found..
 
-Syntax and caveeats for /etc/ax25/bcpasswd:
+Syntax and caveeats for @@@AX25_SYSCONFDIR@@@/bcpasswd:
   - Has to be a regular file (no symlink). Not world-readable/writable.
   - Example lines:
     # Thomas
@@ -120,11 +120,11 @@ Theses are options and not part of the preferences because you _may_ like to hav
 .nf
 /etc/passwd
 .br
-/etc/ax25/ax25.profile
+@@@AX25_SYSCONFDIR@@@/ax25.profile
 .br
-/etc/ax25/axspawn.conf
+@@@AX25_SYSCONFDIR@@@/axspawn.conf
 .fi
-/etc/ax25/bcpasswd
+@@@AX25_SYSCONFDIR@@@/bcpasswd
 .fi
 ~/.bcpasswd
 .fi

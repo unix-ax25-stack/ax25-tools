@@ -61,9 +61,9 @@ neighbour prevents the deletion from occurring. To unlock a neighbour entry,
 the same command is used but with the + replaced by a -.
 .SH FILES
 .LP
-/etc/ax25/axports
+@@@AX25_SYSCONFDIR@@@/axports
 .br
-/etc/ax25/nrports
+@@@AX25_SYSCONFDIR@@@/nrports
 .SH "SEE ALSO"
 .BR call (1),
 .BR netrom (4),

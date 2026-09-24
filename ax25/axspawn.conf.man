@@ -9,7 +9,7 @@ file controls the operation of the axspawn(8) program. The operation of the
 config file can best be seen in an example:
 .LP
 .RS
-# this is /etc/ax25/axspawn.conf
+# this is @@@AX25_SYSCONFDIR@@@/axspawn.conf
 .br
 #
 .br
@@ -102,6 +102,6 @@ you want your users to be able to call out from your machine disable
 \(lqassociate\(rq.
 .SH FILES
 .LP
-/etc/ax25/axspawn.conf
+@@@AX25_SYSCONFDIR@@@/axspawn.conf
 .SH "SEE ALSO"
 .BR axspawn (8).

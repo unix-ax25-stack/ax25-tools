@@ -26,9 +26,9 @@ Enables logging of errors to the system log, the default is off.
 Display the version.
 .SH FILES
 .nf
-/etc/ax25/axports
+@@@AX25_SYSCONFDIR@@@/axports
 .br
-/etc/ax25/rxecho.conf
+@@@AX25_SYSCONFDIR@@@/rxecho.conf
 .fi
 .SH "SEE ALSO"
 .BR axports (5),

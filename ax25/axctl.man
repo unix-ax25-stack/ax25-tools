@@ -53,7 +53,7 @@ connection.
 Will abort an existing AX.25 connection.
 .SH FILES
 .LP
-/etc/ax25/axports
+@@@AX25_SYSCONFDIR@@@/axports
 .SH "SEE ALSO"
 .BR call (1),
 .BR getsockopt (2),
