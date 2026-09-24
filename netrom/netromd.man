@@ -12,7 +12,7 @@ every port which is expected to carry NET/ROM traffic. The purpose of
 is to send and receive NET/ROM routing broadcasts. To operate correctly a
 set of parameters that corresponds to each AX.25 port needs to be passed to
 the program. This information is encoded in a configuration file, by default
-which is /etc/ax25/nrbroadcast with each line representing one
+which is @@@AX25_SYSCONFDIR@@@/nrbroadcast with each line representing one
 port, see the manual page for
 .BR nrbroadcast (5).
 .LP
@@ -83,9 +83,9 @@ Display the version.
 .br
 /proc/net/nr_nodes
 .br
-/etc/ax25/axports
+@@@AX25_SYSCONFDIR@@@/axports
 .br
-/etc/ax25/nrbroadcast
+@@@AX25_SYSCONFDIR@@@/nrbroadcast
 .fi
 .SH "SEE ALSO"
 .BR ax25 (4),

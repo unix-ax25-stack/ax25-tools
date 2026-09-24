@@ -31,10 +31,10 @@ end of the link.
 .TP 10
 .BI "\-f file"
 Use <file> for the configuration file, instead of the default
-/etc/ax25/ttylinkd.conf
+@@@AX25_SYSCONFDIR@@@/ttylinkd.conf
 .SH FILES
 .LP
-/etc/ax25/ttylinkd.conf  the configuration file for ttylinkd
+@@@AX25_SYSCONFDIR@@@/ttylinkd.conf  the configuration file for ttylinkd
 .SH "SEE ALSO"
 .BR talk (1),
 .BR splitscreen (1),

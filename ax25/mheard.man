@@ -67,9 +67,9 @@ Sort list by the time last heard, this is the default.
 Display the version.
 .SH FILES
 .LP
-/var/ax25/mheard/mheard.dat
+@@@AX25_SYSCONFDIR@@@/mheard/mheard.dat
 .br
-/etc/ax25/axports
+@@@AX25_SYSCONFDIR@@@/axports
 .SH "SEE ALSO"
 .BR ax25 (4),
 .BR mheardd (8).

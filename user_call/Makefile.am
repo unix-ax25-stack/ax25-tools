@@ -8,6 +8,19 @@ dist_man_MANS = ax25_call.8 netrom_call.8 rose_call.8 tcp_call.8
 
 dist_doc_DATA= README.user_call
 
+man_sed = sed -e 's|@@@AX25_SYSCONFDIR@@@|$(AX25_MAN_SC)|g' \
+	      -e 's|@@@AX25_LOCALSTATEDIR@@@|$(AX25_MAN_SD)|g'
+
+AX25_MAN_SC = $(sysconfdir)/ax25
+AX25_MAN_SD = $(localstatedir)/ax25
+
+ax25_call.8: $(srcdir)/ax25_call.man
+	$(man_sed) < $(srcdir)/ax25_call.man > $@
+
+CLEANFILES = ax25_call.8
+
+EXTRA_DIST = ax25_call.man
+
 LDADD = $(AX25_LIB) $(Z_LIB)
 
 ax25_call_SOURCES =	ax25_call.c \

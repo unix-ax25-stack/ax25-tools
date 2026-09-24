@@ -11,7 +11,7 @@ configuration file as a list of host names or IP numbers that are to be
 transmitted to, and messages received from.
 .SH FILES
 .LP
-/etc/ax25/rip98d.conf
+@@@AX25_SYSCONFDIR@@@/rip98d.conf
 .SH "SEE ALSO"
 .BR arp (8),
 .BR ifconfig (8),

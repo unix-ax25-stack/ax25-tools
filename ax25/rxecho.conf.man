@@ -16,7 +16,7 @@ the callsign list is replaced by a \(lq*\(rq then all packets are copied.
 The configuration file may contain comments that begin with a #.
 .SH FILES
 .LP
-/etc/ax25/rxecho.conf
+@@@AX25_SYSCONFDIR@@@/rxecho.conf
 .SH "SEE ALSO"
 .BR axports (8),
 .BR rxecho (8).

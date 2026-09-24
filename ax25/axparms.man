@@ -100,7 +100,7 @@ belongs to.
 .br
 /proc/net/ax25_calls
 .br
-/etc/ax25/axports
+@@@AX25_SYSCONFDIR@@@/axports
 .SH "SEE ALSO"
 .BR call (1),
 .BR getsockopt (2),
