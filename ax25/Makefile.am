@@ -12,7 +12,7 @@ ax25d.conf: ax25d.conf.in
 	$(subst_path) < $(srcdir)/ax25d.conf.in > ax25d.conf.tmp
 	mv ax25d.conf.tmp ax25d.conf
 
-installconf:
+installconf: $(etcfiles)
 	$(mkinstalldirs) $(DESTDIR)$(AX25_SYSCONFDIR)
 	@list='$(etcfiles)'; for p in $$list; do \
 	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_SYSCONFDIR)/$$p"; \
