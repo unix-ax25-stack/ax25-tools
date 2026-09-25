@@ -1,5 +1,16 @@
 
+# The state directory is created on install so the runtime tools do not
+# have to make it themselves: mheardd keeps mheard/mheard.dat here and
+# ax25rtd keeps its route cache and control socket under ax25rtd/.
+install-data-local:
+	$(mkinstalldirs) $(DESTDIR)$(AX25_LOCALSTATEDIR)
+	$(mkinstalldirs) $(DESTDIR)$(AX25_LOCALSTATEDIR)/mheard
+	$(mkinstalldirs) $(DESTDIR)$(AX25_LOCALSTATEDIR)/ax25rtd
+
 installconf:
+	$(mkinstalldirs) $(DESTDIR)$(AX25_LOCALSTATEDIR)
+	$(mkinstalldirs) $(DESTDIR)$(AX25_LOCALSTATEDIR)/mheard
+	$(mkinstalldirs) $(DESTDIR)$(AX25_LOCALSTATEDIR)/ax25rtd
 	@for app in $(SUBDIRS); do $(MAKE) -C $$app installconf; done
 
 if HAVE_KERNEL_AX25
