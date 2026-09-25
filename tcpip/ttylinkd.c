@@ -108,7 +108,8 @@ int main(int argc, char *argv[])
 	int local_id, remote_id;
 	char buf[256];
 	char user[NAME_SIZE];
-	struct sockaddr sa, msg_sa;
+	struct sockaddr_storage sa;
+	struct sockaddr msg_sa;
 	struct sockaddr_in *peer_sin=NULL, *msg_sin;
 	struct sockaddr_ax25 *peer_sax;
 	struct sockaddr_rose *peer_srose;
@@ -157,7 +158,8 @@ int main(int argc, char *argv[])
 					return 0;
 					break;
 				}
-				strncpy(user, argv[++i], NAME_SIZE);
+				strncpy(user, argv[++i], NAME_SIZE-1);
+				user[NAME_SIZE-1] = '\0';
 				break;
 			default:
 				fprintf(stderr, "%s: Unknown flag, type %s -h for help\n", argv[0], argv[0]);
@@ -169,14 +171,14 @@ int main(int argc, char *argv[])
 	if (user[0] == '\0')
 	{
 		sa_len = sizeof(sa);
-		if (getpeername(STDOUT_FILENO, &sa, &sa_len) < 0)
+		if (getpeername(STDOUT_FILENO, (struct sockaddr *)&sa, &sa_len) < 0)
 		{
 			fprintf(stderr, "%s: getpeername() failed, you must specify a callsign in stdin mode.\n", argv[0]);
 			syslog(LOG_CRIT | LOG_DAEMON, "main(): getpeername() failed.");
 			return 0;
 		} else {
-			userfamily = sa.sa_family;
-			switch (sa.sa_family) {
+			userfamily = ((struct sockaddr *)&sa)->sa_family;
+			switch (((struct sockaddr *)&sa)->sa_family) {
 			case AF_INET:
 				peer_sin = (struct sockaddr_in*)&sa;
 				write(STDOUT_FILENO, buf, strlen(buf));
@@ -336,6 +338,7 @@ int main(int argc, char *argv[])
 	msg.ctl_addr.sa_family = ntohs(AF_INET);
 	msg.pid = htonl(getpid());
 	strncpy(msg.l_name, user, NAME_SIZE-1);
+	msg.l_name[NAME_SIZE-1] = '\0';
 	strncpy(msg.r_name, sysop_user, NAME_SIZE-1);
 
 
@@ -453,12 +456,12 @@ int main(int argc, char *argv[])
 	werasec = buf[2];
 
 	/* Tell the sysop who this person is */
-	if (sa.sa_family == AF_AX25)
+	if (((struct sockaddr *)&sa)->sa_family == AF_AX25)
 	{
 		sprintf(buf, "Incoming ttylink from %s.\n", user);
 		write(skt, buf, strlen(buf));
 	}
-	if (sa.sa_family == AF_INET)
+	if (((struct sockaddr *)&sa)->sa_family == AF_INET)
 	{
 		sprintf(buf, "Incoming ttylink from %s@%s.\n", user, inet_ntoa(peer_sin->sin_addr));
 		write(skt, buf, strlen(buf));

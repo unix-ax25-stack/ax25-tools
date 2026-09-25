@@ -23,12 +23,17 @@
 #include "../pathnames.h"
 #include "netromd.h"
 
+static void put_mnemonic(char *dst, const char *alias)
+{
+	memset(dst, ' ', MNEMONIC_LEN);
+	strncpy(dst, alias, MNEMONIC_LEN);
+}
+
 static int build_header(char *message)
 {
 	message[0] = (char) NODES_SIG;
 
-	strcpy(message + 1, nr_config_get_alias(NULL));
-	strncat(message + 1, "       ", MNEMONIC_LEN - strlen(message + 1));
+	put_mnemonic(message + 1, nr_config_get_alias(NULL));
 
 	return 7;
 }
@@ -73,8 +78,7 @@ static void build_mine(int s, struct full_sockaddr_ax25 *dest, int dlen, int loc
 		}
 		len += CALLSIGN_LEN;
 
-		strcpy(message + len, nr_config_get_alias(port));
-		strncat(message + len, "       ", MNEMONIC_LEN - strlen(message + len));
+		put_mnemonic(message + len, nr_config_get_alias(port));
 		len += MNEMONIC_LEN;
 
 		ax25_aton_entry(nr_config_get_addr(NULL), message + len);
@@ -164,8 +168,7 @@ static void build_others(int s, int min_obs, struct full_sockaddr_ax25 *dest, in
 			}
 			len += CALLSIGN_LEN;
 
-			strcpy(message + len, mnemonic);
-			strncat(message + len, "       ", MNEMONIC_LEN - strlen(message + len));
+			put_mnemonic(message + len, mnemonic);
 			len += MNEMONIC_LEN;
 
 			if (ax25_aton_entry(neighbour, message + len) == -1) {
