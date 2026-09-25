@@ -33,7 +33,7 @@ int fdin_is_pipe;
 
 char myname[PATH_MAX+1];
 char filename[PATH_MAX+1];
-char err_msg[2048];
+char err_msg[PATH_MAX + 256];
 
 int is_stream;
 int mode;
