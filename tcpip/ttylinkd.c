@@ -337,8 +337,8 @@ int main(int argc, char *argv[])
 	msg.ctl_addr = *(struct sockaddr*)&ctl_sin;*/
 	msg.ctl_addr.sa_family = ntohs(AF_INET);
 	msg.pid = htonl(getpid());
-	strncpy(msg.l_name, user, NAME_SIZE-1);
-	msg.l_name[NAME_SIZE-1] = '\0';
+	memcpy(msg.l_name, user, NAME_SIZE - 1);
+	msg.l_name[NAME_SIZE - 1] = '\0';
 	strncpy(msg.r_name, sysop_user, NAME_SIZE-1);
 
 

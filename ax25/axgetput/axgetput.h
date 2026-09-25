@@ -16,7 +16,7 @@ extern int fdout_is_pipe;
 
 extern char myname[PATH_MAX+1];
 extern char filename[PATH_MAX+1];
-extern char err_msg[2048];
+extern char err_msg[PATH_MAX + 256];
 
 extern int is_stream;
 extern int mode;

@@ -239,7 +239,7 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 	char pwfile[PATH_MAX + 1];
 	int len;
 	char pwlocation;
-	char buf[2048];
+	char buf[PATH_MAX + 256];
 	int only_systempw = 0;
 	char *pass = NULL;
 	char *p_buf;
