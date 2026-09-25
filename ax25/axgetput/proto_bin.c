@@ -164,13 +164,13 @@ int bput(void)
 		if (!stat(filename, &statbuf)) {
 			/* file exist  */
 			if (unlink(filename)) {
-				sprintf(err_msg, "error: cannot unlink %s (%s)\n", filename, strerror(errno));
+				snprintf(err_msg, sizeof(err_msg), "error: cannot unlink %s (%s)\n", filename, strerror(errno));
 				goto abort;
 			}
 		}
 		fddata = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0640);
 		if (fddata < 0) {
-			sprintf(err_msg, "error: cannot open %s (%s)\n", filename, strerror(errno));
+			snprintf(err_msg, sizeof(err_msg), "error: cannot open %s (%s)\n", filename, strerror(errno));
 			write(fderr, "\r#NO#\r", 6);
 			return 1;
 		}
@@ -331,7 +331,7 @@ int bget(void) {
 	if (!fdin_is_pipe && *filename) {
 		fddata = open(filename, O_RDONLY);
 		if (fddata == -1) {
-			sprintf(err_msg, "error: cannot open %s (%s)\n", filename, strerror(errno));
+			snprintf(err_msg, sizeof(err_msg), "error: cannot open %s (%s)\n", filename, strerror(errno));
 			return 1;
 		}
 		if (!fstat(fddata, &statbuf))

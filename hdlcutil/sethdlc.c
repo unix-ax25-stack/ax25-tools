@@ -272,7 +272,8 @@ static void do_set_params(int argc, char **argv)
 	while (argc >= 2) {
 		if (!strcasecmp(argv[0], "mode")) {
 			strncpy(newm.data.modename, argv[1],
-				sizeof(newm.data.modename));
+				sizeof(newm.data.modename) - 1);
+			newm.data.modename[sizeof(newm.data.modename) - 1] = '\0';
 			set |= 1;
 		} else if (!strcasecmp(argv[0], "io") && mask & HDLCDRV_PARMASK_IOBASE) {
 			newp.data.mp.iobase = strtoul(argv[1], NULL, 0);

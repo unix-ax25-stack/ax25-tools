@@ -319,7 +319,7 @@ char *read_pwd (struct passwd *pw, int *pwtype)
 				   is disabled by administrative configuration.
 				 */
 				if  (!((*pwtype) & PW_CLEARTEXT)) {
-					sprintf(buf, "Failed to find a suitable password in %s\r", pwfile);
+					snprintf(buf, sizeof(buf), "Failed to find a suitable password in %s\r", pwfile);
 					write_ax25(buf, strlen(buf), 1);
 				}
 				goto end;
