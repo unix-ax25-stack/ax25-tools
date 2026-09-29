@@ -4,8 +4,8 @@ Hints for hosts without a kernel AX.25 stack
 The AX.25 stack leaves the Linux kernel in 7.1, and macOS and BSD never had
 one.  Programs written against libax25 still expect socket(AF_AX25, ...) to
 work, and libax25 can answer them itself.  This file is the short version;
-axsock(7) is the whole story, axports(5), agwpe.conf(5) and wampes.conf(5)
-say which backend serves which port.
+axsock(7) is the whole story, axports(5), ax25netd_agwpe.conf(5) and
+wampes.conf(5) say which backend serves which port.
 
 libax25 can intercept the AX.25 socket calls and serve them from userspace
 instead of from the kernel stack - from an AGWPE server (direwolf, or
@@ -27,8 +27,14 @@ it is left out.  So on Linux say --enable-userspace-ax25 when
 
 AXSOCK_BACKEND=kernel|agwpe|wampes overrides that choice for one process.
 Which userspace backend serves a port follows from the configuration:
-agwpe.conf(5) describes the AGWPE upstreams, wampes.conf(5) the WAMPES
-nodes, and a port named in wampes.conf is handed to its node at bind(2).
+ax25netd_agwpe.conf(5) describes the AGWPE upstreams, wampes.conf(5) the
+WAMPES nodes, and a port named in wampes.conf is handed to its node at
+bind(2).  The AGWPE backend itself reads ax25common.conf(5) for the loop
+port it connects to - the same file ax25netd(8) reads - so it cannot end
+up at an endpoint the daemon does not serve.  That is a unix socket by
+default, /var/run/ax25/sockets/ax25netd.sock.  AXSOCK_HOST overrides it
+when a program should talk to a radio program directly instead, a
+leading / being a socket and anything else a TCP host.
 
 ax25-apps and ax25-tools have no such option - they use whatever the
 libax25 they were built and linked against provides.
