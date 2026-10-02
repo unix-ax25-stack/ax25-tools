@@ -1245,6 +1245,14 @@ int main(int argc, char *argv[])
 
 				addrlen = sizeof(struct full_sockaddr_ax25);
 				getsockname(new, (struct sockaddr *)&sockaddr, &addrlen);
+				/* The local call, read here where the socket
+				 * table still exists: the child of fork() below
+				 * gets an empty one from the shim and would hand
+				 * axspawn the wrong identity - see the
+				 * AXSOCK_INHERIT comment at login:.
+				 */
+				if (paxl->af_type == AF_AX25)
+					strcpy(myAX25Name, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
 
 				switch (paxl->af_type) {
 				case AF_AX25:
@@ -1417,13 +1425,15 @@ close_link:
  					/* Hand the accepted connection to the child.
  					 * The netAX.25 shim in libax25 turns the socket
  					 * into a pipe pair; the child simply reads and
- 					 * writes the pipe (its atfork hook forgets the
- 					 * socket table), while this parent keeps its
+ 					 * writes the pipe, while this parent keeps its
  					 * peer reader thread and dispatches inbound
- 					 * traffic for it.  No AXSOCK_INHERIT: that
- 					 * handover was dead code (its environment was
- 					 * wiped by execve(..., NULL) below) and the
- 					 * peer reader path makes it unnecessary.  */
+ 					 * traffic for it.  The child cannot ask the
+ 					 * shim who is calling: fork() made it forget
+ 					 * the socket table, and the descriptor it holds
+ 					 * is a socketpair whose kernel getpeername
+ 					 * answers AF_UNIX, which is what axspawn
+ 					 * refuses.  So the call pair travels down in
+ 					 * AXSOCK_INHERIT instead.  */
  					if (myAX25Name[0] == '\0') {
  						addrlen = sizeof(struct full_sockaddr_ax25);
  						getsockname(new, (struct sockaddr *)&sockaddr, &addrlen);
@@ -1461,13 +1471,9 @@ close_link:
 					 * Built here rather than taken from environ:
 					 * a service run for a caller on the air has
 					 * no business inheriting what this daemon was
-					 * started with, which is why the execve()
-					 * below passed NULL in the first place.
+					 * started with.
 					 */
 					{
-						struct full_sockaddr_ax25 pn;
-						socklen_t pl = sizeof(pn);
-						char me[20], him[20];
 						int envc = 0;
 
 						/* Which library we are is the one
@@ -1512,16 +1518,21 @@ close_link:
 						}
 						envp[envc] = NULL;
 
-						memset(&pn, 0, sizeof(pn));
-						*me = *him = '\0';
-						addrlen = sizeof(struct full_sockaddr_ax25);
-						if (getsockname(new, (struct sockaddr *)&sockaddr, &addrlen) == 0)
-							strcpy(me, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
-						if (getpeername(new, (struct sockaddr *)&pn, &pl) == 0)
-							strcpy(him, ax25_ntoa(&pn.fsa_ax25.sax25_call));
-						if (*me && *him) {
+						/* The call pair axspawn asks for with
+						 * getpeername(0).  The shim forgets its
+						 * socket table in the child at fork(),
+						 * and the descriptor the child holds is
+						 * a socketpair whose kernel getpeername
+						 * answers AF_UNIX, so asking the child
+						 * gets nothing.  Both callsigns were
+						 * read in the parent, while the table
+						 * was still there.
+						 */
+						if (paxl->af_type == AF_AX25 &&
+						    myAX25Name[0] != '\0' &&
+						    User[0] != '\0') {
 							sprintf(inherit, "AXSOCK_INHERIT=%d %s %s",
-								STDIN_FILENO, me, him);
+								STDIN_FILENO, myAX25Name, User);
 							envp[envc++] = inherit;
 							envp[envc] = NULL;
 						}
