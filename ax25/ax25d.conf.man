@@ -183,6 +183,18 @@ The username (callsign) of the remote station in upper case with the SSID.
 .B %s
 The username (callsign) of the remote station in lower case with the SSID.
 .TP 5
+.B %L
+The callsign of the local end of the connection, in upper case with the SSID.
+Under AX.25, NET/ROM and Rose it is the callsign the connection was accepted
+on.  It names the local station only; for the remote node a NET/ROM or Rose
+caller came in over, use
+.BR %R .
+.TP 5
+.B %l
+The callsign of the local end of the connection, in lower case with the SSID.
+See
+.BR %L .
+.TP 5
 .B %P
 The nodename of the remote station in upper case without the SSID.
 This is only valid under NET/ROM and Rose, under AX.25 a % is substituted instead.
@@ -236,6 +248,19 @@ indistinguishable in the process list.  On a NET/ROM entry
 .B %R
 names the node a caller came in over, which answers a different question and
 is worth having beside it rather than instead of it.
+.PP
+A service that bridges to another network has a second use for
+.BR %L :
+it is the one substitution that says which of the node's own callsigns the
+caller reached.  An entry that hands the connection to
+.BR ax25_call (8)
+as the caller, on the local call it arrived for, is then
+.RS
+.nf
+[DB0FHN\-9 VIA wampes]
+default  * * * * * *  \-  root  /usr/sbin/ax25_call  ax25_call %d %S %L
+.fi
+.RE
 .TP 5
 .B %%
 A %.

@@ -190,6 +190,7 @@ static char *ConfigFile		= CONF_AX25D_FILE;
 static char User[10];				/* Room for 'GB9ZZZ-15\0' */
 static char Node[11];				/* Room for 'GB9ZZZ-15\0' (NETROM) and 10 bytes ROSE '6505551234\0' */
 static char myAX25Name[10];			/* Room for 'GB9ZZZ-15\0' */
+static char LocalCall[10];			/* Room for 'GB9ZZZ-15\0' (%L) */
 static char *Port;
 static int Logging		= FALSE;
 static int foreground		= FALSE;	/* -f: no fork, for a supervisor */
@@ -325,6 +326,24 @@ static void WorkoutArgs(int af_type, char *shell, int *argc, char **argv)
 
 			case 's':	/* USERNAME IN lower (with SSID) */
 				for (sp = User; *sp != '\0'; sp++)
+					ARGCHAR(tolower(*sp));
+				break;
+
+			case 'L':	/* local call in UPPER (with SSID) */
+				if (LocalCall[0] == '\0') {
+					ARGCHAR('%');
+					break;
+				}
+				for (sp = LocalCall; *sp != '\0'; sp++)
+					ARGCHAR(toupper(*sp));
+				break;
+
+			case 'l':	/* local call in lower (with SSID) */
+				if (LocalCall[0] == '\0') {
+					ARGCHAR('%');
+					break;
+				}
+				for (sp = LocalCall; *sp != '\0'; sp++)
 					ARGCHAR(tolower(*sp));
 				break;
 
@@ -1251,8 +1270,20 @@ int main(int argc, char *argv[])
 				 * axspawn the wrong identity - see the
 				 * AXSOCK_INHERIT comment at login:.
 				 */
+				switch (paxl->af_type) {
+				case AF_AX25:
+				case AF_NETROM:
+					strcpy(LocalCall, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
+					break;
+				case AF_ROSE:
+					strcpy(LocalCall, ax25_ntoa(&sockaddr.rose.srose_call));
+					break;
+				}
+				/* Only AX.25 hands the call down through
+				 * AXSOCK_INHERIT; NET/ROM and ROSE keep it
+				 * for %L alone. */
 				if (paxl->af_type == AF_AX25)
-					strcpy(myAX25Name, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
+					strcpy(myAX25Name, LocalCall);
 
 				switch (paxl->af_type) {
 				case AF_AX25:
