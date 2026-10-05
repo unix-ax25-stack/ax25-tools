@@ -475,6 +475,26 @@ static int doio(int fdif, int fdpty, char *ifaddr)
 					continue;
 				die("recvfrom");
 			}
+			if (i == 0) {
+				/* End of file.  Not a frame: a KISS
+				 * framed packet carries at least a
+				 * channel byte, so a zero length can
+				 * only be the stream ending.  What ends
+				 * it is the monitor losing its server,
+				 * and a forwarding that stays up and
+				 * forwards nothing is worse than one
+				 * that stops and says so - the client
+				 * on the other end cannot tell the two
+				 * apart.  Not die(): it reports
+				 * errno, which is 0 here, because the
+				 * end of a stream is not an error. */
+				if (verbose)
+					printf("raw monitor closed\n");
+				fprintf(stderr, "%s: the AX.25 monitor closed\n",
+					progname);
+				syslog(LOG_WARNING, "the AX.25 monitor closed\n");
+				exit(1);
+			}
 			if (verbose)
 				display_kiss_packet(from.sa_data, ibuf, i);
 			ob_wpx = ob_wp;
