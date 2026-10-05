@@ -120,7 +120,8 @@ int main(int argc, char **argv)
 	struct mheard_list_struct *mheard;
 	char buffer[1500];
 	char *data;
-	int size, s, framed;
+	int size, f, s;
+	struct axmon mon;
 	char *port = NULL;
 	struct sockaddr sa;
 	socklen_t asize;
@@ -226,249 +227,300 @@ int main(int argc, char **argv)
 	 * the libax25 AGWPE shim it is fed by a reader thread, and of a
 	 * multithreaded process only the forking thread survives fork() -
 	 * a monitor opened earlier would simply go quiet in the daemon.  A
-	 * kernel packet socket does not care either way.  */
-	s = socket(PF_PACKET, SOCK_PACKET, htons(ETH_P_AX25));
-	if (s == -1) {
-		if (logging)
-			syslog(LOG_ERR, "socket: %m");
-		perror("mheardd: socket");
+	 * kernel packet socket does not care either way.
+	 *
+	 * Every source, not one: a host with a kernel AX.25 stack as well
+	 * as an ax25netd has frames on both, and a heard list built from
+	 * one of them is a heard list with a hole in it that no output
+	 * shows.  The port list below is applied to the frames of either,
+	 * which is why it is passed as NULL here rather than as a name:
+	 * -p takes a set of ports to include or to exclude, not one port
+	 * to bind to, and that is a different question from the one
+	 * axmon_open() asks.  */
+	if (axmon_open(htons(ETH_P_AX25), NULL, &mon) < 0) {
+		if (logging) {
+			syslog(LOG_ERR, "cannot watch for AX.25 frames: %m");
+			closelog();
+		} else
+			perror("mheardd: cannot watch for AX.25 frames");
 		return 1;
 	}
 
-	/* With a kernel packet socket each read returns one frame; through
-	 * the shim they arrive length prefixed.  */
-	framed = axmon_framed(s);
-
 	for (;;) {
-		asize = sizeof(sa);
+		unsigned ready = 0;
 
-		size = axmon_read(s, framed, buffer, sizeof(buffer), &sa,
-				  &asize);
-		if (size == 0) {
-			/* The monitor ended.  Not an error, and not a
-			 * frame: a KISS framed packet has at least a
-			 * channel byte, so a zero length can only be the
-			 * end of the stream.  Returning would let the
-			 * daemon be restarted over a lost ax25netd;
-			 * staying in the loop instead meant a daemon
-			 * that is alive, has a socket, and reports
-			 * nothing at all - no frames, no syslog line,
-			 * nothing to say that anything had ended.  */
-			if (logging)
-				syslog(LOG_ERR, "the AX.25 monitor closed");
-			else
-				fprintf(stderr, "mheardd: the AX.25 monitor "
-					"closed\n");
-			return 1;
-		}
-		if (size == -1) {
+		if (axmon_poll(&mon, -1, &ready) < 0) {
+			if (errno == EINTR)
+				continue;	/* SIGTERM, mostly */
 			if (logging) {
-				syslog(LOG_ERR, "recv: %m");
+				syslog(LOG_ERR, "poll: %m");
 				closelog();
 			}
 			return 1;
 		}
 
-		port = ax25_config_get_name(sa.sa_data);
-		if (port == NULL) {
-			if (logging)
-				syslog(LOG_WARNING, "unknown port '%s'\n", sa.sa_data);
-			continue;
-		}
-		if (*ports) {
-			char testport[sizeof(sa.sa_data)+2];
-			sprintf(testport, "|%s|", sa.sa_data);
-			if (ports_excl) {
-				if (strstr(ports, testport)) {
-					continue;
+		for (f = 0; f < mon.nfd && ready; f++) {
+			if ((ready & (1u << f)) == 0)
+				continue;
+			asize = sizeof(sa);
+
+			/* With a kernel packet socket each read returns one frame;
+			 * through the shim they arrive length prefixed.  */
+			size = axmon_read(mon.fd[f], mon.framed[f], buffer,
+					  sizeof(buffer), &sa, &asize);
+			if (size == 0) {
+				/* The monitor ended.  Not an error, and not a
+				 * frame: a KISS framed packet has at least a
+				 * channel byte, so a zero length can only be the
+				 * end of the stream.
+				 *
+				 * Which source matters, and so does whether
+				 * another is left.  On a host with a kernel stack
+				 * as well as an ax25netd, the kernel's ports are
+				 * still on the air and still have a socket behind
+				 * them, and a daemon that exits over one of two
+				 * sources has stopped hearing half the band
+				 * without saying which half.  */
+				int left = axmon_alive(&mon) - 1;
+
+				if (logging)
+					syslog(LOG_ERR, "the %s closed%s",
+						mon.kind[f] == AXMON_KERNEL
+							? "AX.25 packet socket"
+							: "AX.25 monitor",
+						left > 0 ? ", watching the other "
+							  "source" : "");
+				else
+					fprintf(stderr, "mheardd: the %s closed%s\n",
+						mon.kind[f] == AXMON_KERNEL
+							? "AX.25 packet socket"
+							: "AX.25 monitor",
+						left > 0 ? ", watching the other "
+							  "source" : "");
+				close(mon.fd[f]);
+				mon.fd[f] = -1;
+				ready &= ~(1u << f);
+				if (left == 0) {
+					if (logging)
+						closelog();
+					return 1;
 				}
-			} else {
-				if (!strstr(ports, testport)) {
+				continue;
+			}
+			if (size == -1) {
+				/* End of a source and failure of a source are
+				 * different, and only one of them is worth
+				 * giving up a daemon over.  */
+				if (errno == EINTR || errno == ECONNRESET)
 					continue;
+				if (logging) {
+					syslog(LOG_ERR, "recv: %m");
+					closelog();
+				}
+				return 1;
+			}
+
+			port = ax25_config_get_name(sa.sa_data);
+			if (port == NULL) {
+				if (logging)
+					syslog(LOG_WARNING, "unknown port '%s'\n", sa.sa_data);
+				continue;
+			}
+			if (*ports) {
+				char testport[sizeof(sa.sa_data)+2];
+				sprintf(testport, "|%s|", sa.sa_data);
+				if (ports_excl) {
+					if (strstr(ports, testport)) {
+						continue;
+					}
+				} else {
+					if (!strstr(ports, testport)) {
+						continue;
+					}
 				}
 			}
-		}
 
-		data = buffer;
+			data = buffer;
 
-		if ((*data & KISS_MASK) != KISS_DATA)
-			continue;
+			if ((*data & KISS_MASK) != KISS_DATA)
+				continue;
 
-		data++;
-		size--;
+			data++;
+			size--;
 
-		if (size < (AXLEN + AXLEN + 1)) {
-			if (logging)
-				syslog(LOG_WARNING, "packet too short\n");
-			continue;
-		}
+			if (size < (AXLEN + AXLEN + 1)) {
+				if (logging)
+					syslog(LOG_WARNING, "packet too short\n");
+				continue;
+			}
 
-		mheard = findentry((ax25_address *)(data + AXLEN), port);
+			mheard = findentry((ax25_address *)(data + AXLEN), port);
 
-		if (!ax25_validate(data + 0) || !ax25_validate(data + AXLEN)) {
-			if (logging)
-				syslog(LOG_WARNING, "invalid callsign on port %s\n", port);
-			continue;
-		}
+			if (!ax25_validate(data + 0) || !ax25_validate(data + AXLEN)) {
+				if (logging)
+					syslog(LOG_WARNING, "invalid callsign on port %s\n", port);
+				continue;
+			}
 
-		memcpy(&mheard->entry.from_call, data + AXLEN, sizeof(ax25_address));
-		memcpy(&mheard->entry.to_call,   data + 0,     sizeof(ax25_address));
-		strcpy(mheard->entry.portname,   port);
-		mheard->entry.ndigis = 0;
+			memcpy(&mheard->entry.from_call, data + AXLEN, sizeof(ax25_address));
+			memcpy(&mheard->entry.to_call,   data + 0,     sizeof(ax25_address));
+			strcpy(mheard->entry.portname,   port);
+			mheard->entry.ndigis = 0;
 
-		extseq = ((data[AXLEN + ALEN] & SSSID_SPARE) != SSSID_SPARE);
-		end    = (data[AXLEN + ALEN] & HDLCAEB);
+			extseq = ((data[AXLEN + ALEN] & SSSID_SPARE) != SSSID_SPARE);
+			end    = (data[AXLEN + ALEN] & HDLCAEB);
 
-		data += (AXLEN + AXLEN);
-		size -= (AXLEN + AXLEN);
+			data += (AXLEN + AXLEN);
+			size -= (AXLEN + AXLEN);
 
-		while (!end) {
-			memcpy(&mheard->entry.digis[mheard->entry.ndigis], data, sizeof(ax25_address));
-			mheard->entry.ndigis++;
+			while (!end) {
+				memcpy(&mheard->entry.digis[mheard->entry.ndigis], data, sizeof(ax25_address));
+				mheard->entry.ndigis++;
 
-			end = (data[ALEN] & HDLCAEB);
+				end = (data[ALEN] & HDLCAEB);
 
-			data += AXLEN;
-			size -= AXLEN;
-		}
+				data += AXLEN;
+				size -= AXLEN;
+			}
 
-		if (size == 0) {
-			if (logging)
-				syslog(LOG_WARNING, "packet too short\n");
-			continue;
-		}
+			if (size == 0) {
+				if (logging)
+					syslog(LOG_WARNING, "packet too short\n");
+				continue;
+			}
 
-		ctlen = ftype(data, &type, extseq);
+			ctlen = ftype(data, &type, extseq);
 
-		mheard->entry.count++;
+			mheard->entry.count++;
 
-		switch (type) {
-		case SABM:
-			mheard->entry.type = MHEARD_TYPE_SABM;
-			mheard->entry.uframes++;
-			break;
-		case SABME:
-			mheard->entry.type = MHEARD_TYPE_SABME;
-			mheard->entry.uframes++;
-			break;
-		case DISC:
-			mheard->entry.type = MHEARD_TYPE_DISC;
-			mheard->entry.uframes++;
-			break;
-		case UA:
-			mheard->entry.type = MHEARD_TYPE_UA;
-			mheard->entry.uframes++;
-			break;
-		case DM:
-			mheard->entry.type = MHEARD_TYPE_DM;
-			mheard->entry.uframes++;
-			break;
-		case RR:
-			mheard->entry.type = MHEARD_TYPE_RR;
-			mheard->entry.sframes++;
-			break;
-		case RNR:
-			mheard->entry.type = MHEARD_TYPE_RNR;
-			mheard->entry.sframes++;
-			break;
-		case REJ:
-			mheard->entry.type = MHEARD_TYPE_REJ;
-			mheard->entry.sframes++;
-			break;
-		case FRMR:
-			mheard->entry.type = MHEARD_TYPE_FRMR;
-			mheard->entry.uframes++;
-			break;
-		case I:
-			mheard->entry.type = MHEARD_TYPE_I;
-			mheard->entry.iframes++;
-			break;
-		case UI:
-			mheard->entry.type = MHEARD_TYPE_UI;
-			mheard->entry.uframes++;
-			break;
-		default:
-			if (logging)
-				syslog(LOG_WARNING, "unknown packet type %02X\n", *data);
-			mheard->entry.type = MHEARD_TYPE_UNKNOWN;
-			break;
-		}
-
-		data += ctlen;
-		size -= ctlen;
-
-		if (type == I || type == UI) {
-			unsigned char pid = *data;
-
-			switch (pid) {
-			case PID_TEXT:
-				mheard->entry.mode |= MHEARD_MODE_TEXT;
+			switch (type) {
+			case SABM:
+				mheard->entry.type = MHEARD_TYPE_SABM;
+				mheard->entry.uframes++;
 				break;
-			case PID_SEGMENT:
-				mheard->entry.mode |= MHEARD_MODE_SEGMENT;
+			case SABME:
+				mheard->entry.type = MHEARD_TYPE_SABME;
+				mheard->entry.uframes++;
 				break;
-			case PID_ARP:
-				mheard->entry.mode |= MHEARD_MODE_ARP;
+			case DISC:
+				mheard->entry.type = MHEARD_TYPE_DISC;
+				mheard->entry.uframes++;
 				break;
-			case PID_NETROM:
-				mheard->entry.mode |= MHEARD_MODE_NETROM;
+			case UA:
+				mheard->entry.type = MHEARD_TYPE_UA;
+				mheard->entry.uframes++;
 				break;
-			case PID_IP:
-				mheard->entry.mode |= (type == I) ? MHEARD_MODE_IP_VC : MHEARD_MODE_IP_DG;
+			case DM:
+				mheard->entry.type = MHEARD_TYPE_DM;
+				mheard->entry.uframes++;
 				break;
-			case PID_ROSE:
-				mheard->entry.mode |= MHEARD_MODE_ROSE;
+			case RR:
+				mheard->entry.type = MHEARD_TYPE_RR;
+				mheard->entry.sframes++;
 				break;
-			case PID_TEXNET:
-				mheard->entry.mode |= MHEARD_MODE_TEXNET;
+			case RNR:
+				mheard->entry.type = MHEARD_TYPE_RNR;
+				mheard->entry.sframes++;
 				break;
-			case PID_FLEXNET:
-				mheard->entry.mode |= MHEARD_MODE_FLEXNET;
+			case REJ:
+				mheard->entry.type = MHEARD_TYPE_REJ;
+				mheard->entry.sframes++;
 				break;
-			case PID_PSATPB:
-				mheard->entry.mode |= MHEARD_MODE_PSATPB;
+			case FRMR:
+				mheard->entry.type = MHEARD_TYPE_FRMR;
+				mheard->entry.uframes++;
 				break;
-			case PID_PSATFT:
-				mheard->entry.mode |= MHEARD_MODE_PSATFT;
+			case I:
+				mheard->entry.type = MHEARD_TYPE_I;
+				mheard->entry.iframes++;
+				break;
+			case UI:
+				mheard->entry.type = MHEARD_TYPE_UI;
+				mheard->entry.uframes++;
 				break;
 			default:
 				if (logging)
-					syslog(LOG_WARNING, "unknown PID %02X\n", *data);
-				mheard->entry.mode |= MHEARD_MODE_UNKNOWN;
+					syslog(LOG_WARNING, "unknown packet type %02X\n", *data);
+				mheard->entry.type = MHEARD_TYPE_UNKNOWN;
 				break;
 			}
+
+			data += ctlen;
+			size -= ctlen;
+
+			if (type == I || type == UI) {
+				unsigned char pid = *data;
+
+				switch (pid) {
+				case PID_TEXT:
+					mheard->entry.mode |= MHEARD_MODE_TEXT;
+					break;
+				case PID_SEGMENT:
+					mheard->entry.mode |= MHEARD_MODE_SEGMENT;
+					break;
+				case PID_ARP:
+					mheard->entry.mode |= MHEARD_MODE_ARP;
+					break;
+				case PID_NETROM:
+					mheard->entry.mode |= MHEARD_MODE_NETROM;
+					break;
+				case PID_IP:
+					mheard->entry.mode |= (type == I) ? MHEARD_MODE_IP_VC : MHEARD_MODE_IP_DG;
+					break;
+				case PID_ROSE:
+					mheard->entry.mode |= MHEARD_MODE_ROSE;
+					break;
+				case PID_TEXNET:
+					mheard->entry.mode |= MHEARD_MODE_TEXNET;
+					break;
+				case PID_FLEXNET:
+					mheard->entry.mode |= MHEARD_MODE_FLEXNET;
+					break;
+				case PID_PSATPB:
+					mheard->entry.mode |= MHEARD_MODE_PSATPB;
+					break;
+				case PID_PSATFT:
+					mheard->entry.mode |= MHEARD_MODE_PSATFT;
+					break;
+				default:
+					if (logging)
+						syslog(LOG_WARNING, "unknown PID %02X\n", *data);
+					mheard->entry.mode |= MHEARD_MODE_UNKNOWN;
+					break;
+				}
+			}
+
+			if (mheard->entry.first_heard == 0)
+				time(&mheard->entry.first_heard);
+
+			time(&mheard->entry.last_heard);
+
+			fp = fopen(DATA_MHEARD_FILE, "r+");
+			if (fp == NULL) {
+				if (logging)
+					syslog(LOG_ERR, "cannot open mheard data file\n");
+				continue;
+			}
+
+			/* ax25netd may be updating the same file at the same time;
+			 * the exclusive flock keeps the two writers from tearing
+			 * each other's records.  */
+			flock(fileno(fp), LOCK_EX);
+
+			if (mheard->position == 0xFFFFFF) {
+				fseek(fp, 0L, SEEK_END);
+				mheard->position = ftell(fp);
+			}
+
+			fseek(fp, mheard->position, SEEK_SET);
+
+			fwrite(&mheard->entry, sizeof(struct mheard_struct), 1, fp);
+
+			fflush(fp);
+			flock(fileno(fp), LOCK_UN);
+
+			fclose(fp);
 		}
-
-		if (mheard->entry.first_heard == 0)
-			time(&mheard->entry.first_heard);
-
-		time(&mheard->entry.last_heard);
-
-		fp = fopen(DATA_MHEARD_FILE, "r+");
-		if (fp == NULL) {
-			if (logging)
-				syslog(LOG_ERR, "cannot open mheard data file\n");
-			continue;
-		}
-
-		/* ax25netd may be updating the same file at the same time;
-		 * the exclusive flock keeps the two writers from tearing
-		 * each other's records.  */
-		flock(fileno(fp), LOCK_EX);
-
-		if (mheard->position == 0xFFFFFF) {
-			fseek(fp, 0L, SEEK_END);
-			mheard->position = ftell(fp);
-		}
-
-		fseek(fp, mheard->position, SEEK_SET);
-
-		fwrite(&mheard->entry, sizeof(struct mheard_struct), 1, fp);
-
-		fflush(fp);
-		flock(fileno(fp), LOCK_UN);
-
-		fclose(fp);
 	}
 }
 
