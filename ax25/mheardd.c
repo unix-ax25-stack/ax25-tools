@@ -236,8 +236,25 @@ int main(int argc, char **argv)
 	 * which is why it is passed as NULL here rather than as a name:
 	 * -p takes a set of ports to include or to exclude, not one port
 	 * to bind to, and that is a different question from the one
-	 * axmon_open() asks.  */
-	if (axmon_open(htons(ETH_P_AX25), NULL, &mon) < 0) {
+	 * axmon_open() asks.
+	 *
+	 * AXMON_MASK_NONE, and it is the one place in the suite that asks:
+	 * what is recorded below is who talked to whom, with which control
+	 * field and which PID, and the information field is not one of
+	 * those - it is the majority of the bytes on the wire, on a band
+	 * where most of the traffic is exactly that.  So ask ax25netd to
+	 * leave it out.  The addresses, the control byte and the PID are
+	 * what every line of the heard list is built from, and they stay.
+	 *
+	 * It only reaches the ax25netd source, and that is the whole of it
+	 * on a host where ax25netd carries the ports.  A kernel packet
+	 * socket beside it hands over what the kernel assembled; there is
+	 * no bit that says otherwise, and cutting a frame at this end
+	 * would make one that decodes as a different frame.  See
+	 * axmon.h.
+	 */
+	if (axmon_open_mask(htons(ETH_P_AX25), NULL, AXMON_MASK_NONE,
+			    &mon) < 0) {
 		if (logging) {
 			syslog(LOG_ERR, "cannot watch for AX.25 frames: %m");
 			closelog();
