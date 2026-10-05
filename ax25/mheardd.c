@@ -244,6 +244,23 @@ int main(int argc, char **argv)
 
 		size = axmon_read(s, framed, buffer, sizeof(buffer), &sa,
 				  &asize);
+		if (size == 0) {
+			/* The monitor ended.  Not an error, and not a
+			 * frame: a KISS framed packet has at least a
+			 * channel byte, so a zero length can only be the
+			 * end of the stream.  Returning would let the
+			 * daemon be restarted over a lost ax25netd;
+			 * staying in the loop instead meant a daemon
+			 * that is alive, has a socket, and reports
+			 * nothing at all - no frames, no syslog line,
+			 * nothing to say that anything had ended.  */
+			if (logging)
+				syslog(LOG_ERR, "the AX.25 monitor closed");
+			else
+				fprintf(stderr, "mheardd: the AX.25 monitor "
+					"closed\n");
+			return 1;
+		}
 		if (size == -1) {
 			if (logging) {
 				syslog(LOG_ERR, "recv: %m");
