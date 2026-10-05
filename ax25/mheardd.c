@@ -268,11 +268,12 @@ int main(int argc, char **argv)
 			 * through the shim they arrive length prefixed.  */
 			size = axmon_read(mon.fd[f], mon.framed[f], buffer,
 					  sizeof(buffer), &sa, &asize);
-			if (size == 0) {
-				/* The monitor ended.  Not an error, and not a
-				 * frame: a KISS framed packet has at least a
-				 * channel byte, so a zero length can only be the
-				 * end of the stream.
+			if (size <= 0) {
+				/*
+				 * The monitor ended, or a read on it failed.
+				 * Not a frame either way: a KISS framed packet
+				 * has at least a channel byte, so a zero length
+				 * can only be the end of the stream.
 				 *
 				 * Which source matters, and so does whether
 				 * another is left.  On a host with a kernel stack
@@ -280,44 +281,49 @@ int main(int argc, char **argv)
 				 * still on the air and still have a socket behind
 				 * them, and a daemon that exits over one of two
 				 * sources has stopped hearing half the band
-				 * without saying which half.  */
-				int left = axmon_alive(&mon) - 1;
+				 * without saying which half.
+				 *
+				 * A failed read is the same thing.  ECONNRESET
+				 * used to be answered by trying again, which is
+				 * not a second answer but the same one for ever:
+				 * a reset connection stays reset, and the loop
+				 * spins on a source that will never read
+				 * again.  An ECONNRESET here is a peer that went
+				 * away mid frame - the document says so - so
+				 * the source is over and is retired like any
+				 * other end.  */
+				const char *which = axmon_source_name(&mon, f);
+				const char *rest;
+				int err = (size < 0) ? errno : 0;
+				int left;
 
-				if (logging)
-					syslog(LOG_ERR, "the %s closed%s",
-						mon.kind[f] == AXMON_KERNEL
-							? "AX.25 packet socket"
-							: "AX.25 monitor",
-						left > 0 ? ", watching the other "
-							  "source" : "");
-				else
-					fprintf(stderr, "mheardd: the %s closed%s\n",
-						mon.kind[f] == AXMON_KERNEL
-							? "AX.25 packet socket"
-							: "AX.25 monitor",
-						left > 0 ? ", watching the other "
-							  "source" : "");
-				close(mon.fd[f]);
-				mon.fd[f] = -1;
+				if (err == EINTR)
+					continue;		/* SIGTERM, mostly */
 				ready &= ~(1u << f);
+				left = axmon_retire(&mon, f);
+				rest = left > 0 ? ", watching the other source" : "";
+				if (logging) {
+					if (err == 0)
+						syslog(LOG_ERR, "the %s closed%s",
+							which, rest);
+					else
+						syslog(LOG_ERR, "the %s failed: %s%s",
+							which, strerror(err), rest);
+				} else if (err == 0) {
+					fprintf(stderr,
+						"mheardd: the %s closed%s\n",
+						which, rest);
+				} else {
+					fprintf(stderr,
+						"mheardd: the %s failed: %s%s\n",
+						which, strerror(err), rest);
+				}
 				if (left == 0) {
 					if (logging)
 						closelog();
 					return 1;
 				}
 				continue;
-			}
-			if (size == -1) {
-				/* End of a source and failure of a source are
-				 * different, and only one of them is worth
-				 * giving up a daemon over.  */
-				if (errno == EINTR || errno == ECONNRESET)
-					continue;
-				if (logging) {
-					syslog(LOG_ERR, "recv: %m");
-					closelog();
-				}
-				return 1;
 			}
 
 			port = ax25_config_get_name(sa.sa_data);
