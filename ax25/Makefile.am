@@ -22,6 +22,8 @@ ax25d.8: $(srcdir)/ax25d.man
 	$(man_sed) < $(srcdir)/ax25d.man > $@
 axctl.8: $(srcdir)/axctl.man
 	$(man_sed) < $(srcdir)/axctl.man > $@
+axkill.8: $(srcdir)/axkill.man
+	$(man_sed) < $(srcdir)/axkill.man > $@
 axparms.8: $(srcdir)/axparms.man
 	$(man_sed) < $(srcdir)/axparms.man > $@
 axspawn.8: $(srcdir)/axspawn.man
@@ -78,16 +80,16 @@ AX25_SYSCONFDIR=$(sysconfdir)/ax25/
 AX25_LOCALSTATEDIR=$(localstatedir)/ax25/
 
 dist_man_MANS = ax25.4 ax25d.conf.5 axspawn.conf.5 rxecho.conf.5 \
-	   ax25d.8 axctl.8 axparms.8 axspawn.8 axwrapper.8 beacon.8 \
+	   ax25d.8 axctl.8 axkill.8 axparms.8 axspawn.8 axwrapper.8 beacon.8 \
 	   bpqparms.8 mheard.1 mheardd.8 rxecho.8
 
 
 
 CLEANFILES = ax25d.conf ax25d.conf.5 axspawn.conf.5 rxecho.conf.5 \
-	   ax25d.8 axctl.8 axparms.8 axspawn.8 mheard.1 mheardd.8 rxecho.8
+	   ax25d.8 axctl.8 axkill.8 axparms.8 axspawn.8 mheard.1 mheardd.8 rxecho.8
 EXTRA_DIST = $(etcsrcfiles) $(varfiles) \
 	   ax25d.conf.man axspawn.conf.man rxecho.conf.man \
-	   ax25d.man axctl.man axparms.man axspawn.man \
+	   ax25d.man axctl.man axkill.man axparms.man axspawn.man \
 	   mheard.man mheardd.man rxecho.man
 
 ax25d_SOURCES = ax25d.c

@@ -1,0 +1,128 @@
+.\" Man page for axkill
+.\"
+.TH AXKILL 8 "06 Oct 2026" Linux "Linux System Managers Manual"
+.SH NAME
+axkill \- terminate a running AX.25 connection
+.SH SYNOPSIS
+.B axkill
+[\-v]
+.I port dest src
+.br
+.B axkill
+[\-v]
+.IR port : dest
+.I src
+.SH DESCRIPTION
+.B axkill
+aborts an established AX.25 connection without touching the program that owns
+it.  The connection is the one from
+.I src
+to
+.I dest
+on
+.IR port ,
+and all three have to be right: the kernel has no way to find the connection
+itself, and a request that names another one simply finds nothing.
+.PP
+The request travels down to the program through the same channel
+.BR axctl (8)
+uses, and on a port served by
+.BR ax25netd (8)
+it arrives as an AGWPE
+.B Q
+control frame, so the session is torn down there and a radio link is
+disconnected at the upstream rather than only in this program's opinion.
+That is the point of the tool: a mailbox session that has stopped answering
+can be cleared without restarting the program that opened it.
+.PP
+Nothing is reported when it works.  There is no output on success, because
+there is no question the caller did not already know the answer to \(em and a
+line of output on success would be read as a warning by whatever runs this
+from a script.
+.SH ARGUMENTS
+.TP
+.I port
+The port, as it is written in
+.BR axports (5):
+an
+.BR ax25netd (8)
+upstream name, optionally with a channel behind a colon
+.RB ( radio0:2 ),
+a
+.B wampes
+node or
+.BR wampes: port ,
+or a kernel AX.25 interface name.
+.TP
+.I dest
+The destination callsign of the connection.
+.TP
+.I src
+The source callsign of the connection.
+.TP
+.B \-v
+Print the version and exit.
+.PP
+.I port
+and
+.I dest
+may be written as one argument,
+.IR port : dest .
+The split is at the
+.I last
+colon, not the first: a callsign contains no colon, and the one colon a port
+name may carry is the channel of an axports entry, so
+.B radio0:2:DB0AAA
+is the port
+.B radio0:2
+and the destination
+.BR DB0AAA .
+Cutting at the first colon would leave the
+.B 2
+in the destination, which is not a callsign and would be refused \(em and
+.B radio0:2
+would look like a port with a destination in it that nobody meant.
+.PP
+The channel of a port is therefore addressed through the
+.BR axports (5)
+entry and not on this command line:
+.B radio0:2
+has to be a line in that file.  There is no
+.B /2
+form here.  That spelling is
+.BR ax25tcpd (8)'s,
+and it exists because there the channel is chosen when the connect is typed
+rather than configured once; here the connection is looked up by the three
+addresses it already has, and a fourth piece of syntax to say which of
+sixteen channels it is on would be one more thing to get wrong in a command
+whose whole job is to find something that is hard to see.
+.SH EXIT STATUS
+0 when the request was made.  This says the request was delivered to the
+stack, not that a connection was there to be killed: the ioctl succeeds
+whether or not anything matched, so a wrong callsign is not reported and
+leaves no trace.  1 when the port name is not one
+.BR axports (5)
+knows, or the stack refuses the request.
+.SH EXAMPLES
+.TP
+.B axkill radio0 DB0XYZ DL9SAU-4
+Kill the link from DL9SAU-4 to DB0XYZ that
+.B call
+made over
+.BR radio0 .
+.TP
+.B axkill radio0:2:DB0XYZ DL9SAU-5
+The same on channel 2, written as one argument.
+.SH "SEE ALSO"
+.BR axctl (8),
+.BR axports (5),
+.BR ax25netd (8),
+.BR ax25netctl (8),
+.BR call (1),
+.BR mheard (1),
+.BR ax25 (4),
+.BR axparms (8).
+.SH AUTHORS
+.nf
+Jorg Reuter DL1BKE <jreuter@poboxes.com>
+.fi
