@@ -3,6 +3,8 @@
 axctl \- Configure/Kill running AX.25 connections.
 .SH SYNOPSIS
 .B axctl [-v] port dest src window|t1|t2|t3|n2|idle|paclen|kill [parm]
+.br
+.B axctl [-v] port:dest src window|t1|t2|t3|n2|idle|paclen|kill [parm]
 .SH DESCRIPTION
 .LP
 The
@@ -18,6 +20,39 @@ Many of the options are similar to those found in
 and perform the same function. Only one parameter may be changed on each
 invocation of
 .B axctl.
+.LP
+.B port
+and
+.B dest
+may be written as one argument,
+.IR port : dest .
+The split is at the
+.I last
+colon, not the first: a callsign contains no colon, and the one colon a port
+name may carry is the channel of an
+.BR axports (5)
+entry, so
+.B radio0:2:DB0AAA
+is the port
+.B radio0:2
+and the destination
+.BR DB0AAA .
+Where the two spellings could both be argued for \(em five arguments, where
+"port dest src cmd" and "port:dest src cmd parm" are the same shape \(em the
+first is taken, so that the
+.I port
+of a long command line that carries a channel is not read as a port with a
+destination in it.
+.LP
+The channel of a port is addressed through the
+.BR axports (5)
+entry and not on this command line:
+.B radio0:2
+has to be a line in that file.  See
+.BR axkill (8)
+for why there is no
+.B /2
+spelling here.
 .SH OPTIONS
 .TP 20
 .BI \-v
@@ -60,7 +95,9 @@ Will abort an existing AX.25 connection.
 .BR setsockopt (2),
 .BR ax25 (4),
 .BR axparms (8),
-.BR axports (5).
+.BR axkill (8),
+.BR axports (5),
+.BR ax25netctl (8).
 .SH AUTHORS
 .nf
 Joerg Reuter DL1BKE <jreuter@poboxes.com>
