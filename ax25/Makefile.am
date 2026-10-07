@@ -52,6 +52,7 @@ installconf: $(etcfiles)
 	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_LOCALSTATEDIR)/mheard/$$p"; \
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(AX25_LOCALSTATEDIR)/mheard/$$p; \
 	done
+	-chown daemon:daemon $(DESTDIR)$(AX25_LOCALSTATEDIR)/mheard/$(varfiles)
 
 
 # These three speak to the kernel stack directly: axparms and rxecho
