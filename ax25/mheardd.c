@@ -101,6 +101,7 @@ static struct mheard_list_struct *mheard_list;
 #define	MHEARD_LIST_SIZE 1000
 static int    mheard_list_size = MHEARD_LIST_SIZE/10;
 static int    logging = FALSE;
+static int    foreground = FALSE;	/* -f: no fork, for a supervisor */
 
 static int ftype(char *, int *, int);
 static struct mheard_list_struct *findentry(ax25_address *, char *);
@@ -133,12 +134,15 @@ int main(int argc, char **argv)
 	int ports_excl = 0;
 
 	*ports = 0;
-	while ((s = getopt(argc, argv, "fln:p:v")) != -1) {
+	while ((s = getopt(argc, argv, "fFln:p:v")) != -1) {
 		switch (s) {
 		case 'l':
 			logging = TRUE;
 			break;
 		case 'f':
+			foreground = TRUE;
+			break;
+		case 'F':
 			flush = TRUE;
 			break;
 		case 'n':
@@ -170,7 +174,7 @@ int main(int argc, char **argv)
 			fprintf(stderr, "mheardd: option -n needs an argument\n");
 			return 1;
 		case '?':
-			fprintf(stderr, "Usage: mheardd [-f] [-l] [-n number] [-p [!]port1[,port2,..]] [-v]\n");
+			fprintf(stderr, "Usage: mheardd [-f] [-F] [-l] [-n number] [-p [!]port1[,port2,..]] [-v]\n");
 			return 1;
 		}
 	}
@@ -212,7 +216,38 @@ int main(int argc, char **argv)
 			fclose(fp);
 	}
 
-	if (!daemon_start(FALSE)) {
+	/*
+	 * -f keeps the process in the foreground, which is what a supervisor
+	 * wants: systemd follows the process it started, and a daemon that
+	 * disappears behind a fork has to be described to it instead.
+	 *
+	 * It is not merely convenient.  daemon_start() skips the fork when
+	 * getppid() is 1 - it takes that for "started by init" - and under
+	 * systemd the parent of a service is pid 1, so no fork happens and a
+	 * unit written as Type=forking waits for one until it gives up.  With
+	 * -f and Type=simple neither side is guessing.
+	 *
+	 * The switch is also the one whose meaning changed in this program:
+	 * -f used to delete mheard.dat at startup, so a script asking for
+	 * the foreground got an empty list with it.  A script that still
+	 * asks for the foreground now starts the daemon in front of the old
+	 * list instead of emptying it - the empty list is what -F is for,
+	 * see mheardd(8).
+	 *
+	 * The rest of what daemon_start() does is still wanted, and is done
+	 * here: out of whatever directory this was started in, and no
+	 * inherited umask.  Nothing else: this program starts no children, so
+	 * there is no SIGCHLD to ignore, and a foreground process stays in
+	 * the session it was started in on purpose.
+	 */
+	if (foreground) {
+		if (chdir("/") < 0) {
+			fprintf(stderr, "mheardd: cannot chdir to /: %s\n",
+				strerror(errno));
+			return 1;
+		}
+		umask(0);
+	} else if (!daemon_start(FALSE)) {
 		fprintf(stderr, "mheardd: cannot become a daemon\n");
 		return 1;
 	}

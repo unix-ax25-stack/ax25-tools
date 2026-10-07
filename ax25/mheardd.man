@@ -2,7 +2,7 @@
 .SH NAME
 mheardd \- collect information about packet activity
 .SH SYNOPSIS
-.B mheardd [-f] [-l] [-n number] [-p [!]port1[,port2,..]] [-v]
+.B mheardd [-f] [-F] [-l] [-n number] [-p [!]port1[,port2,..]] [-v]
 .SH DESCRIPTION
 .LP
 .B Mheardd
@@ -37,6 +37,28 @@ that decodes as a different frame.  See
 .SH OPTIONS
 .TP 10
 .BI \-f
+Stay in the foreground: do not fork, and do not detach from the terminal.
+This is what a supervisor wants \-\- see
+.BR ax25d (8)
+for why a unit cannot simply be written as
+.B Type=forking
+\-\- and it is what
+.B \-f
+already means in ax25d(8), ax25netd(8) and ax25tcpd(8).
+Earlier versions of this program used
+.B \-f
+for something else: it deleted the mheard logging file at program
+startup, which is what
+.B \-F
+does now.  The foreground switch took the letter so that one option does
+not mean two things in one suite, and a script which expects the file to
+be deleted has to ask for
+.B \-F
+as well \-\- mheardd started with
+.B \-f
+alone keeps the old list and stays in the foreground on top of it.
+.TP 10
+.BI \-F
 Deletes the existing mheard logging file at program startup, this is not the
 default.
 .TP 10
