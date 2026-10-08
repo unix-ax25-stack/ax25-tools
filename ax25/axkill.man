@@ -32,6 +32,8 @@ it arrives as an AGWPE
 .B Q
 control frame, so the session is torn down there and a radio link is
 disconnected at the upstream rather than only in this program's opinion.
+A port served by a WAMPES node has no such channel: the request is refused
+rather than handed to the node.
 That is the point of the tool: a mailbox session that has stopped answering
 can be cleared without restarting the program that opened it.
 .PP
