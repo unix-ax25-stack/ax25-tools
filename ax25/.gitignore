@@ -19,6 +19,7 @@ rxecho
 /rxecho.conf.5
 /ax25d.8
 /axctl.8
+/axkill.8
 /axparms.8
 /axspawn.8
 /mheard.1
