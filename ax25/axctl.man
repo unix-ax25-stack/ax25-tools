@@ -53,6 +53,17 @@ has to be a line in that file.  See
 for why there is no
 .B /2
 spelling here.
+.PP
+The parameter commands act on an AX.25 connection of the in-kernel stack,
+which is where the window, the timers and the rest of them live.  A
+connection on a port served by a WAMPES node has them with the node and not
+with the kernel, and the request is refused; on a port served by
+.BR ax25netd (8)
+it travels to the daemon, which has no place to keep it.  Only
+.B kill
+reaches a userspace connection, and
+.BR axkill (8)
+is the tool written for that.
 .SH OPTIONS
 .TP 20
 .BI \-v
@@ -86,6 +97,13 @@ connection.
 .TP 20
 .BI "kill"
 Will abort an existing AX.25 connection.
+.SH EXIT STATUS
+0 when the request was accepted.  That says the request reached the stack,
+not that a connection matched it: a wrong callsign is not reported and leaves
+no trace.  1 when the port name is not one
+.BR axports (5)
+knows, when the command word is not recognised, or when the stack refuses the
+request.
 .SH FILES
 .LP
 @@@AX25_SYSCONFDIR@@@/axports
