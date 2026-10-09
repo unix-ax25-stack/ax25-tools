@@ -208,7 +208,14 @@ static void update_maxfd(void)
 
 	FD_ZERO(&fdread);
 
-	for (maxfd = -1, paxl = AXL; paxl != NULL && paxl->fd >= 0; paxl = paxl->next) {
+	for (maxfd = -1, paxl = AXL; paxl != NULL; paxl = paxl->next) {
+		/* A listener that lost an accept() is marked -1 and stays in
+		 * the list until the reload.  The old loop stopped at the first
+		 * such entry, so every listener behind it went unwatched and the
+		 * daemon sat idle while calls for it arrived. */
+		if (paxl->fd < 0)
+			continue;
+
 		FD_SET(paxl->fd, &fdread);
 
 		if (paxl->fd > maxfd)
@@ -598,8 +605,17 @@ static int ReadConfig(void)
 			break;
 
 		default:
-			if (hunt && !error)
-				goto BadLine;
+			if (hunt) {
+				if (!error)
+					goto BadLine;
+				/* The port this stanza belongs to could not be
+				 * opened.  Its entries have nowhere to go, so skip
+				 * them: falling through to the port parser below
+				 * read an entry as a port header and answered "bad
+				 * config entry" for every following line, dropping
+				 * the whole section. */
+				continue;
+			}
 			break;
 		}
 
@@ -732,29 +748,38 @@ static int ReadConfig(void)
 			axl_port->fd = socket(axl_port->af_type,
 					      SOCK_SEQPACKET, 0);
 			if (axl_port->fd < 0) {
-				fprintf(stderr, "ax25d: socket: %s\n", strerror(errno));
+				fprintf(stderr,
+					"ax25d: socket on port %s: %s - retrying in 60s\n",
+					axl_port->port, strerror(errno));
 				free(axl_port->port);
 				free(axl_port);
+				axl_port = NULL;
 				error = TRUE;
 				reload_timer(60);
 				continue;
 			}
 
 			if (bind(axl_port->fd, (struct sockaddr *)&sockaddr, addrlen) < 0) {
-				fprintf(stderr, "ax25d: bind: %s on port %s\n", strerror(errno), axl_port->port);
+				fprintf(stderr,
+					"ax25d: bind: %s on port %s - retrying in 60s\n",
+					strerror(errno), axl_port->port);
 				close(axl_port->fd);
 				free(axl_port->port);
 				free(axl_port);
+				axl_port = NULL;
 				error = TRUE;
 				reload_timer(60);
 				continue;
 			}
 
 			if (listen(axl_port->fd, SOMAXCONN) < 0) {
-				fprintf(stderr, "ax25d: listen: %s\n", strerror(errno));
+				fprintf(stderr,
+					"ax25d: listen on port %s: %s - retrying in 60s\n",
+					axl_port->port, strerror(errno));
 				close(axl_port->fd);
 				free(axl_port->port);
 				free(axl_port);
+				axl_port = NULL;
 				error = TRUE;
 				reload_timer(60);
 				continue;
@@ -1213,11 +1238,18 @@ int main(int argc, char *argv[])
 				ioctl(paxl->fd, FIONBIO, &i);
 
 				if (new < 0) {
+					int save;
+
 					if (errno == EWOULDBLOCK)
 						continue;	/* It's gone ??? */
 
+					save = errno;
+					fprintf(stderr,
+						"ax25d: accept on port %s (fd %d): %s - closing the listener, retrying in 10s\n",
+						paxl->port, paxl->fd, strerror(save));
 					if (Logging)
-						syslog(LOG_ERR, "accept error %m, closing socket on port %s", paxl->port);
+						syslog(LOG_ERR, "accept error %s, closing socket on port %s",
+						       strerror(save), paxl->port);
 					close(paxl->fd);
 					paxl->fd = -1;
 					reload_timer(10);
