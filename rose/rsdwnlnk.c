@@ -245,7 +245,7 @@ int main(int argc, char **argv)
 			n = read(s, buffer + 2, sizeof(buffer) - 2);
 			if (n == -1)
 				break;
-			if (buffer[2] == 0xF0) {
+			if ((unsigned char) buffer[2] == 0xF0) {
 				buffer[2] = 0;
 				write(STDOUT_FILENO, buffer + 2, n);
 			} else {

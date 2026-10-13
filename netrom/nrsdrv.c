@@ -74,12 +74,12 @@ static void terminate(int sig)
 
 static void key_rts(int fd)
 {
-	int status;
-
 	if (!flowcontrol)
 		return;
 
 #if defined(TIOCMGET) && defined(TIOCMSET) && defined(TIOCMIWAIT)
+	int status;
+
 	/* Wait for CTS to be low */
 	while (1) {
 		/* Get CTS status */
@@ -115,12 +115,12 @@ static void key_rts(int fd)
 
 static void unkey_rts(int fd)
 {
-	int status;
-
 	if (!flowcontrol)
 		return;
 
 #if defined(TIOCMGET) && defined(TIOCMSET) && defined(TIOCMIWAIT)
+	int status;
+
 	if (debugging) {
 		fprintf(stderr,"Transmission finished: unkeying RTS\n");
 	}

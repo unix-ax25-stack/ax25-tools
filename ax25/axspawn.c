@@ -992,12 +992,11 @@ static int get_assoc(struct sockaddr_ax25 *sax25)
 
 static void cleanup(char *tty)
 {
+#ifndef __APPLE__
 	struct utmp ut, *ut_line;
 	struct timeval tv;
 	FILE *fp;
 
-
-#ifndef __APPLE__
 	setutent();
 	ut.ut_type = LOGIN_PROCESS;
 	strncpy(ut.ut_id, tty + 3, sizeof(ut.ut_id));
@@ -1412,7 +1411,6 @@ int main(int argc, char **argv)
 	char buf[2048];
 	int  k, cnt, digits, letters, invalid, ssid, ssidcnt;
 	socklen_t addrlen;
-	struct timeval tv;
 	pid_t pid = -1;
 	char *p;
 	fd_set fds_read, fds_err;
@@ -1421,7 +1419,6 @@ int main(int argc, char **argv)
 	char *chargv[20];
 	int envc = 0;
 	char *envp[20];
-	struct utmp ut_line;
 	struct winsize win = { 0, 0, 0, 0};
 	struct sockaddr_ax25 sax25;
 	union {
@@ -1805,6 +1802,9 @@ again:
 		tcsetattr(0, TCSANOW, &termios);
 
 #ifndef __APPLE__
+		struct utmp ut_line;
+		struct timeval tv;
+
 		setutent();
 		ut_line.ut_type = LOGIN_PROCESS;
 		ut_line.ut_pid  = getpid();

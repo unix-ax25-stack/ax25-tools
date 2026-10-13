@@ -277,7 +277,7 @@ int main(int argc, char **argv)
 				close(s);
 				break;
 			}
-			if (buffer[2] == 0xF0) {
+			if ((unsigned char) buffer[2] == 0xF0) {
 				buffer[2] = 0;
 				write(s, buffer + 2, n);
 			} else {
