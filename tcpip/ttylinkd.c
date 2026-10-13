@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	if (bind(ctl_skt, &ctl_sin, sizeof(ctl_sin)) != 0)
+	if (bind(ctl_skt, (struct sockaddr *) &ctl_sin, sizeof(ctl_sin)) != 0)
 	{
 		syslog(LOG_DAEMON | LOG_CRIT, "main(): Error when trying to bind() control socket.");
 		close(skt);
@@ -388,8 +388,19 @@ int main(int argc, char *argv[])
 	sprintf(buf, "Paging sysop.\n");
 	write(STDOUT_FILENO, buf, strlen(buf));
 
-	/* Wait for the sysop to connect to us */
-	signal(SIGALRM, alarm_handle);
+	/* Wait for the sysop to connect to us.  Installed with sigaction()
+	* rather than signal(): the latter sets SA_RESTART, so accept() is
+	* restarted after the alarm and the 30 second wait never ends.
+	* Without SA_RESTART accept() returns EINTR and the invitation is
+	* withdrawn below. */
+	{
+		struct sigaction alarmsa;
+
+		memset(&alarmsa, 0, sizeof(alarmsa));
+		alarmsa.sa_handler = alarm_handle;
+		sigemptyset(&alarmsa.sa_mask);
+		sigaction(SIGALRM, &alarmsa, NULL);
+	}
 	alarm(30);
 
 	new_skt = accept(skt, NULL, NULL);
