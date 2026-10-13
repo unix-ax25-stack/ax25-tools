@@ -135,7 +135,8 @@ int main(int argc, char **argv)
 	 * protocol's own timeout.
 	 */
 	if (timeout > 0)
-		connect_timeout(timeout);
+		connect_timeout_handler_init(timeout,
+			"*** Connection timed out - aborting\r");
 
 	/*
 	 * Lets try and connect to the far end.

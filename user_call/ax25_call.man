@@ -56,9 +56,12 @@ default is 256 for ax25_call and rose_call, 236 for netrom_call and
 1024 for tcp_call.
 .TP 12
 .BI "\-T timeout"
-The number of seconds to wait for the connection to be established before
-aborting. The default is 0, which means no internal timeout is used and the
-timeout of the underlying protocol applies.
+The number of seconds to wait for the connection to be established. If it is
+not up when the time is out the program prints a message and exits. The
+default is 0, which means no internal timeout is used and the timeout of the
+underlying protocol applies. The timeout is enforced by the program itself,
+so it applies to NET/ROM, ROSE and TCP, and to AX.25 both on a kernel stack
+and served from userspace (WAMPES, AGWPE).
 .SH FILES
 .br
 @@@AX25_SYSCONFDIR@@@/axports

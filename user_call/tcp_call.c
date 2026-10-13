@@ -112,13 +112,17 @@ int main(int argc, char **argv)
 	 * protocol's own timeout.
 	 */
 	if (timeout > 0)
-		connect_timeout(timeout);
+		connect_timeout_handler_init(timeout,
+			"*** Connection timed out - aborting\n");
 
 	/*
 	 * Lets try and connect to the far end.
 	 */
 	if (connect(s, (struct sockaddr *)&addr, addrlen) != 0) {
-		snprintf(buffer, sizeof(buffer), "ERROR: can't connect: %s\n", strerror(errno));
+		if (errno == EINTR)
+			strcpy(buffer, "*** Connection timed out - aborting\n");
+		else
+			snprintf(buffer, sizeof(buffer), "ERROR: can't connect: %s\n", strerror(errno));
 		err(buffer);
 	}
 
