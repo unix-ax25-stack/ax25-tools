@@ -26,11 +26,12 @@ int main(int argc, char **argv)
 	char buffer[256], *addr;
 	int s, addrlen = sizeof(struct full_sockaddr_ax25);
 	struct full_sockaddr_ax25 nrbind, nrconnect;
+	int timeout = 0;
 
 	paclen_in = 236;
 	paclen_out = 236;
 
-	while ((s = getopt(argc, argv, "ci:o:")) != -1) {
+	while ((s = getopt(argc, argv, "ci:o:T:")) != -1) {
 		switch (s) {
 		case 'c':
 			init_compress();
@@ -42,6 +43,9 @@ int main(int argc, char **argv)
 		case 'o':
 			paclen_out = atoi(optarg);
 			break;
+		case 'T':
+			timeout = atoi(optarg);
+			break;
 		case ':':
 		case '?':
 			err("ERROR: invalid option usage\r");
@@ -51,6 +55,11 @@ int main(int argc, char **argv)
 
 	if (paclen_in < 1 || paclen_out < 1) {
 		err("ERROR: invalid paclen\r");
+		return 1;
+	}
+
+	if (timeout < 0) {
+		err("ERROR: invalid timeout\r");
 		return 1;
 	}
 
@@ -121,9 +130,12 @@ int main(int argc, char **argv)
 	user_write(STDOUT_FILENO, buffer, strlen(buffer));
 
 	/*
-	 * If no response in 30 seconds, go away.
+	 * If -T was given, go away if the connection is not established
+	 * within the given number of seconds, otherwise rely on the
+	 * protocol's own timeout.
 	 */
-	connect_timeout(30);
+	if (timeout > 0)
+		connect_timeout(timeout);
 
 	/*
 	 * Lets try and connect to the far end.

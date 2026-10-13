@@ -22,11 +22,12 @@ int main(int argc, char **argv)
 	struct hostent *hp;
 	struct servent *sp;
 	int verbose = 1;
+	int timeout = 0;
 
 	paclen_in = 1024;
 	paclen_out = 1024;
 
-	while ((s = getopt(argc, argv, "ci:o:q")) != -1) {
+	while ((s = getopt(argc, argv, "ci:o:qT:")) != -1) {
 		switch (s) {
 		case 'c':
 			init_compress();
@@ -37,6 +38,9 @@ int main(int argc, char **argv)
 			break;
 		case 'o':
 			paclen_out = atoi(optarg);
+			break;
+		case 'T':
+			timeout = atoi(optarg);
 			break;
 		case 'q':
 			verbose = 0;
@@ -50,6 +54,11 @@ int main(int argc, char **argv)
 
 	if (paclen_in < 1 || paclen_out < 1) {
 		err("ERROR: invalid paclen\n");
+		return 1;
+	}
+
+	if (timeout < 0) {
+		err("ERROR: invalid timeout\n");
 		return 1;
 	}
 
@@ -98,9 +107,12 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * If no response in 30 seconds, go away.
+	 * If -T was given, go away if the connection is not established
+	 * within the given number of seconds, otherwise rely on the
+	 * protocol's own timeout.
 	 */
-	connect_timeout(30);
+	if (timeout > 0)
+		connect_timeout(timeout);
 
 	/*
 	 * Lets try and connect to the far end.

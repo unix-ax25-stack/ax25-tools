@@ -3,13 +3,13 @@
 ax25_call, netrom_call, rose_call, tcp_call \- make an AX.25, NET/ROM,
 ROSE or TCP connection
 .SH SYNOPSIS
-.B ax25_call [-c] [-i paclen] [-o paclen] port local_call remote_call [digipeaters ...]
+.B ax25_call [-c] [-i paclen] [-o paclen] [-T timeout] port local_call remote_call [digipeaters ...]
 .sp
-.B netrom_call [-c] [-i paclen] [-o paclen] port local_call remote_netrom_addr
+.B netrom_call [-c] [-i paclen] [-o paclen] [-T timeout] port local_call remote_netrom_addr
 .sp
-.B rose_call [-c] [-i paclen] [-o paclen] port local_call remote_call remote_rose_addr
+.B rose_call [-c] [-i paclen] [-o paclen] [-T timeout] port local_call remote_call remote_rose_addr
 .sp
-.B tcp_call [-c] [-i paclen] [-o paclen] remote_addr remote_port
+.B tcp_call [-c] [-i paclen] [-o paclen] [-T timeout] remote_addr remote_port
 .SH DESCRIPTION
 .LP
 .B ax25_call, netrom_call, rose_call and tcp_call
@@ -54,6 +54,11 @@ default is 256 for ax25_call and rose_call, 236 for netrom_call and
 The maximum frame length to be used on the outgoing connection. The
 default is 256 for ax25_call and rose_call, 236 for netrom_call and
 1024 for tcp_call.
+.TP 12
+.BI "\-T timeout"
+The number of seconds to wait for the connection to be established before
+aborting. The default is 0, which means no internal timeout is used and the
+timeout of the underlying protocol applies.
 .SH FILES
 .br
 @@@AX25_SYSCONFDIR@@@/axports
