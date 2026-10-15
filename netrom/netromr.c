@@ -137,6 +137,14 @@ void receive_nodes(unsigned char *buffer, int length, ax25_address *neighbour, i
 	int quality, obs_count, qual, lock;
 	char *callsign, *device;
 
+	/* buffer points at the node mnemonic and is followed by the route
+	 * entries; without the mnemonic there is nothing to announce. */
+	if (length < MNEMONIC_LEN) {
+		if (debug && logging)
+			syslog(LOG_DEBUG, "rejecting frame, NODES broadcast too short (%d bytes)\n", length);
+		return;
+	}
+
 	if (!validcallsign(neighbour)) {
 		if (debug && logging)
 			syslog(LOG_DEBUG, "rejecting frame, invalid neighbour callsign - %s\n", ax25_ntoa(neighbour));
