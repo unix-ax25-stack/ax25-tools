@@ -1185,7 +1185,7 @@ end_mkdirs:
 			sprintf(s_uid, "%d", uid);
 			sprintf(s_gid, "%d", user_gid);
 
-			chargv[chargc++] = "/usr/sbin/useradd";
+			chargv[chargc++] = PROG_USERADD;
 			chargv[chargc++] = "-p";
 			chargv[chargc++] = ((policy_add_empty_password) ? "" : "+");
 			chargv[chargc++] = "-c";

@@ -13,6 +13,8 @@
 #define	DATA_MHEARD_FILE	AX25_LOCALSTATEDIR"mheard/mheard.dat"
 
 #define	PROG_AX25RTCTL		AX25_SBINDIR"ax25rtctl"
+#define	PROG_NRPARMS		AX25_SBINDIR"nrparms"
+#define	PROG_USERADD		AX25_SBINDIR"useradd"
 
 /*
  * /var/lock is a Linux convention; macOS keeps its serial line locks in

@@ -18,7 +18,9 @@
 
 #include <netax25/procutils.h>
 
-static char *Nrparms = "/usr/sbin/nrparms";
+#include "../pathnames.h"
+
+static char *Nrparms = PROG_NRPARMS;
 static char *Usage   = "Usage: nodesave [-p <path>] [-v] [<file>]\n";
 
 int main(int argc, char **argv)
