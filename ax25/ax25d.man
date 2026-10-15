@@ -20,6 +20,20 @@ system log file. By default no logging is done. When
 is running, and a change in the configuration file is made,
 .B ax25d
 can be forced to re-read its configuration file by sending it a SIGHUP.
+.sp 1
+Only one
+.B ax25d
+may run on one configuration file at a time.  It holds an advisory lock
+.RB ( flock (2))
+on the file it reads, and writes nothing: a second
+.B ax25d
+started on the same configuration file reports
+.RI "another ax25d is already running on " file ": not started"
+and exits with status 1.  Two daemons with different configuration
+files, as used when testing with
+.BR \-c ,
+run side by side.  The kernel releases the lock when the daemon exits,
+however it exits.
 .SH OPTIONS
 .TP 15
 .BI "\-c altconffile"

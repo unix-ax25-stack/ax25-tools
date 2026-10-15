@@ -1145,6 +1145,41 @@ static int valid_call(const char *s)
 	return *p == '\0' && ssid <= 15 ? TRUE : FALSE;
 }
 
+/*
+ * Only one ax25d may run on one configuration: a second one listens on
+ * the same callsigns, and the kernel hands the call to either daemon.
+ * The lock is held on the configuration file itself, opened read-only.
+ * A separate pid file would need a writable place, which a machine
+ * with a read-only root does not have to offer, and the file is opened
+ * read-only, so it cannot be mistaken for one we might write.  flock()
+ * is advisory and belongs to the open file description; the descriptor
+ * is close-on-exec, so a long session does not keep the lock.  Returns
+ * the descriptor, or -1 when another ax25d holds the lock (the caller
+ * exits).  When the file cannot be opened at all, ax25d warns and
+ * starts without the protection - it would not find a configuration
+ * there either.
+ */
+static int hold_config_lock(const char *file)
+{
+	int fd;
+
+	fd = open(file, O_RDONLY | O_CLOEXEC);
+	if (fd < 0) {
+		fprintf(stderr, "ax25d: cannot open %s for the single instance lock: %s, starting without it\n",
+			file, strerror(errno));
+		return -2;
+	}
+
+	if (flock(fd, LOCK_EX | LOCK_NB) < 0) {
+		fprintf(stderr, "ax25d: another ax25d is already running on %s: not started\n",
+			file);
+		close(fd);
+		return -1;
+	}
+
+	return fd;
+}
+
 int main(int argc, char *argv[])
 {
 	struct axlist *axltmp, *paxl, *raxl;
@@ -1157,6 +1192,7 @@ int main(int argc, char *argv[])
 	struct timespec ten_sec = { 10, 0 };
 	socklen_t addrlen;
 	int cnt;
+	int lockfd;
 	char buf[1024];
 	char *p;
 	char *mesg;
@@ -1193,6 +1229,14 @@ int main(int argc, char *argv[])
 	nr_config_load_ports();
 
 	rs_config_load_ports();
+
+	/*
+	 * Before daemon_start(), so that a refusal is seen by whoever
+	 * started us rather than lost in the background.
+	 */
+	lockfd = hold_config_lock(ConfigFile);
+	if (lockfd == -1)
+		return 1;
 
 	/*
 	 * -f keeps the process in the foreground, which is what a supervisor
