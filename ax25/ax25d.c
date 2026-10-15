@@ -1507,6 +1507,25 @@ int main(int argc, char *argv[])
 					 */
 					sigprocmask(SIG_SETMASK, &origmask, NULL);
 
+					/*
+					 * The daemon ignores SIGCHLD so
+					 * that finished sessions leave no
+					 * zombies, and the child inherited
+					 * that.  The VC check below runs a
+					 * shell through system(), whose
+					 * waitpid() then finds no child
+					 * report: system() returned -1
+					 * whatever ax25rtctl said, and every
+					 * connection was taken for "not a VC
+					 * user".  SIG_IGN would also survive
+					 * the execve() below, into programs
+					 * that may want to wait for children
+					 * of their own.  The parent keeps
+					 * its SIG_IGN; this child starts
+					 * clean.
+					 */
+					signal(SIGCHLD, SIG_DFL);
+
 					if (raxl->af_type == AF_AX25 && raxl->checkVC) {
 						/* to which of my own addresses has the user connected? */
 						getsockname(new, (struct sockaddr *)&sockaddr, &addrlen);
