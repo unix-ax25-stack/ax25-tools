@@ -1070,7 +1070,11 @@ static void new_user(char *newuser)
 	strcpy(userdir, homedir);
 
 	fd_l = open(LOCK_AXSPAWN_FILE, O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
-	flock(fd_l, LOCK_EX);
+	if (fd_l < 0)
+		syslog(LOG_ERR, "cannot open %s: %s, continuing without the user id allocation lock",
+		       LOCK_AXSPAWN_FILE, strerror(errno));
+	else
+		flock(fd_l, LOCK_EX);
 
 retry:
 	/*
@@ -1287,7 +1291,8 @@ end_mkdirs:
 		chown(USERPROFILE, uid, user_gid);
 	}
 out:
-	flock(fd_l, LOCK_UN);
+	if (fd_l >= 0)
+		flock(fd_l, LOCK_UN);
 }
 
 static void read_config(void)
