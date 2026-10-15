@@ -67,7 +67,10 @@ static char * unix_to_sfbin_date_string(long gmt)
 	unsigned short s_time, s_date;
 
 	date_unix2dos(((gmt == -1) ? time(NULL) : gmt), &s_time, &s_date);
-	sprintf(buf, "%X", ((s_date << 16) + s_time));
+	/* s_date and s_time are unsigned short; shift them as unsigned so
+	 * the result cannot overflow a signed int.  It is at most eight hex
+	 * digits, which is what buf holds. */
+	snprintf(buf, sizeof(buf), "%X", ((unsigned int)s_date << 16) + s_time);
 	return buf;
 }
 
