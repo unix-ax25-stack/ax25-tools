@@ -355,7 +355,7 @@ int bget(void) {
 			close(fddata);
 			return 1;
 		}
-		sprintf(buf, "\r#BIN#%ld#|%d#$%s#%s\r", file_size, crc, unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, file_size, crc, 1));
+		snprintf(buf, sizeof(buf), "\r#BIN#%ld#|%d#$%s#%s\r", file_size, crc, unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, file_size, crc, 1));
 	} else {
 		file_time = time(NULL);
 		if (!is_stream || do_crc_only) {
@@ -372,9 +372,9 @@ int bget(void) {
 				return 1;
 			}
 			*err_msg = 0;
-			sprintf(buf, "\r#BIN#%ld#|%d#$%s#%s\r", file_size, crc, unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, file_size, crc, 1));
+			snprintf(buf, sizeof(buf), "\r#BIN#%ld#|%d#$%s#%s\r", file_size, crc, unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, file_size, crc, 1));
 		} else {
-			sprintf(buf, "\r#BIN###$%s#%s\r", unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, 0, 0, 1));
+			snprintf(buf, sizeof(buf), "\r#BIN###$%s#%s\r", unix_to_sfbin_date_string(file_time), get_fixed_filename(filename, 0, 0, 1));
 		}
 		/*
 		 * hack: check for #ABORT# from fdout (fd 1), because fddata (fd 0) is
