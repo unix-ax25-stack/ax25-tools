@@ -14,8 +14,17 @@
 
 #define	PROG_AX25RTCTL		AX25_SBINDIR"ax25rtctl"
 
+/*
+ * /var/lock is a Linux convention; macOS keeps its serial line locks in
+ * /var/run.  Both are writable by the root that runs axspawn.
+ */
+#ifdef __APPLE__
+#define	LOCK_AXSPAWN_FILE	"/var/run/axspawn"
+#define	LOCK_SERIAL_DIR		"/var/run"
+#else
 #define	LOCK_AXSPAWN_FILE	"/var/lock/axspawn"
 #define	LOCK_SERIAL_DIR		"/var/lock"
+#endif
 
 #define PROC_LOADAVG_FILE	"/proc/loadavg"
 #define PROC_MEMINFO_FILE	"/proc/meminfo"
