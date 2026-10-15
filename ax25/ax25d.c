@@ -1053,6 +1053,8 @@ BadLine:
 BadUID:
 		if (axl_ent->call != NULL)
 			free(axl_ent->call);
+		if (axl_ent->node != NULL)
+			free(axl_ent->node);
 		free(axl_ent);
 		continue;
 
@@ -1062,6 +1064,8 @@ BadArgsFree2:
 BadArgsFree:
 		if (axl_ent->call != NULL)
 			free(axl_ent->call);
+		if (axl_ent->node != NULL)
+			free(axl_ent->node);
 		free(axl_ent);
 
 		/* BadArgs: */
@@ -1275,7 +1279,7 @@ int main(int argc, char *argv[])
 			continue;
 
 		for (paxl = AXL; paxl != NULL; paxl = paxl->next) {
-			if (paxl->fd > 0 && FD_ISSET(paxl->fd, &fdread)) {
+			if (paxl->fd >= 0 && FD_ISSET(paxl->fd, &fdread)) {
 				pid_t pid;
 				gid_t grps[2];
 				char *argv[MAX_ARGS];
