@@ -1433,8 +1433,8 @@ int main(int argc, char *argv[])
 				}
 
 				if (raxl == NULL) {
-					/* No default */
-					if (Logging && !(paxl->flags & FLAG_NOLOGGING)) {
+					/* No default: no entry, hence no "q" flag to honour */
+					if (Logging) {
 						switch (paxl->af_type) {
 						case AF_AX25:
 							syslog(LOG_INFO, "AX.25 %s (%s) rejected - no default", User, Port);
@@ -1453,7 +1453,7 @@ int main(int argc, char *argv[])
 
 				if (raxl->flags & FLAG_LOCKOUT) {
 					/* Not allowed to connect */
-					if (Logging && !(paxl->flags & FLAG_NOLOGGING)) {
+					if (Logging && !(raxl->flags & FLAG_NOLOGGING)) {
 						switch (raxl->af_type) {
 						case AF_AX25:
 							syslog(LOG_INFO, "AX.25 %s (%s) rejected - port locked", User, Port);
@@ -1472,7 +1472,7 @@ int main(int argc, char *argv[])
 
 				if (raxl->af_type == AF_AX25 && (raxl->flags & FLAG_NODIGIS) && sockaddr.ax25.fsa_ax25.sax25_ndigis != 0) {
 					/* Not allowed to uplink via digi's */
-					if (Logging && !(paxl->flags & FLAG_NOLOGGING))
+					if (Logging && !(raxl->flags & FLAG_NOLOGGING))
 						syslog(LOG_INFO, "AX.25 %s (%s) rejected - digipeaters", User, Port);
 					close(new);
 					continue;
@@ -1552,13 +1552,13 @@ int main(int argc, char *argv[])
 						}
 
 						if (raxl->checkVC > 1) {
-							if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC))
+							if (Logging && (!(raxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC))
 								syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO), "AX.25 %s (%s:%s) rejected - AX25.IP-VC entry found", User, Port, myAX25Name);
 							goto close_link;
 						}
 
 						/* checkVC == 1: wait for data */
-						if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC)) {
+						if (Logging && (!(raxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC)) {
 							syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO), "AX.25 %s (%s:%s) AX25.IP-VC host connected. %s",
 								User, Port, myAX25Name,
 								(raxl->VCloginEnable ? "waiting for first PID=text packet for triggered login" : "discarding PID=text packets"));
@@ -1598,7 +1598,7 @@ int main(int argc, char *argv[])
 								goto login;
 						}
 
-						if (Logging && (!(paxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC)) {
+						if (Logging && (!(raxl->flags & FLAG_NOLOGGING) || raxl->LoggingVC)) {
 							syslog((raxl->LoggingVC ? LOG_NOTICE : LOG_INFO),
 									"AX.25 %s (%s:%s) AX25.IP-VC host disconnected%s%s",
 									User,
@@ -1638,7 +1638,7 @@ close_link:
  					SetupOptions(new, raxl);
 					WorkoutArgs(raxl->af_type, raxl->shell, &argc, argv);
 
-					if (Logging && !(paxl->flags & FLAG_NOLOGGING)) {
+					if (Logging && !(raxl->flags & FLAG_NOLOGGING)) {
 						switch (paxl->af_type) {
 						case AF_AX25:
 						syslog(LOG_INFO, "AX.25 %s (%s) %s", User, Port, argv[0]);
