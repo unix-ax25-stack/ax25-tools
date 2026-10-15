@@ -122,6 +122,7 @@
 #include <config.h>
 
 #include <sys/time.h>
+#include <sys/select.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <sys/file.h>
@@ -200,6 +201,10 @@ static int ReadConfig(void);
 static fd_set fdread;
 static int maxfd = -1;
 
+/* Set by the signal handlers, acted upon in the main loop */
+static volatile sig_atomic_t ReloadPending;
+static volatile sig_atomic_t TermPending;
+
 /*--------------------------------------------------------------------------*/
 
 static void update_maxfd(void)
@@ -239,9 +244,18 @@ static void err_config(void)
 
 /*--------------------------------------------------------------------------*/
 
-static void _ReadConfig(int dummy)
+/*
+ * SIGHUP and the retry timer (SIGALRM) only ask for a reload: the
+ * configuration is read again from the main loop.  ReadConfig() calls
+ * malloc(), fopen(), socket() and syslog(), none of which is
+ * async-signal-safe, and ClearList() frees the port list that the main
+ * loop may be walking right after select() handed the connection over.
+ * The handlers run with their signals blocked in every process except
+ * while pselect() waits, so the flags are read by the loop alone.
+ */
+static void SignalReload(int code)
 {
-	ReadConfig();
+	ReloadPending = 1;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -255,24 +269,13 @@ static void reload_timer(int sec)
 	itv.it_interval.tv_sec = 0;
 	itv.it_interval.tv_usec = 0;
 	setitimer(ITIMER_REAL, &itv, NULL);
-	signal(SIGALRM, _ReadConfig);
 }
 
 /*--------------------------------------------------------------------------*/
 
-static void SignalHUP(int code)
-{
-	ReadConfig();
-}
-
 static void SignalTERM(int code)
 {
-	if (Logging) {
-		syslog(LOG_INFO, "terminating on SIGTERM\n");
-		closelog();
-	}
-
-	exit(0);
+	TermPending = 1;
 }
 
 /* One character into the argument being built, and never past its end.  What
@@ -565,7 +568,7 @@ static int ReadConfig(void)
 	int hunt = TRUE, error = FALSE;
 	int parameters = 0;
 
-	signal(SIGALRM, SIG_IGN);
+	reload_timer(0);	/* cancel a pending retry, this is the reload */
 	memset(&axl_defaults, 0, sizeof(axl_defaults));
 
 	fp = fopen(ConfigFile, "r");
@@ -1146,6 +1149,8 @@ int main(int argc, char *argv[])
 		struct sockaddr_rose rose;
 	} sockaddr;
 	struct sigaction act, oact;
+	sigset_t blocked, origmask;
+	struct timespec ten_sec = { 10, 0 };
 	socklen_t addrlen;
 	int cnt;
 	char buf[1024];
@@ -1219,10 +1224,24 @@ int main(int argc, char *argv[])
 		syslog(LOG_INFO, "starting");
 	}
 
-	act.sa_handler = SignalHUP;
+	/*
+	 * The signals are blocked except while pselect() waits, so that a
+	 * SIGHUP arriving just before the wait is not left pending until
+	 * the next connection finally wakes the loop.  The handlers only
+	 * set a flag, and the flag is read by this loop alone.  A child
+	 * takes the original mask back at once after fork().
+	 */
+	sigemptyset(&blocked);
+	sigaddset(&blocked, SIGHUP);
+	sigaddset(&blocked, SIGALRM);
+	sigaddset(&blocked, SIGTERM);
+	sigprocmask(SIG_BLOCK, &blocked, &origmask);
+
+	act.sa_handler = SignalReload;
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = 0;
 	sigaction(SIGHUP, &act, &oact);
+	sigaction(SIGALRM, &act, &oact);
 
 	act.sa_handler = SignalTERM;
 	sigemptyset(&act.sa_mask);
@@ -1233,13 +1252,26 @@ int main(int argc, char *argv[])
 
 	for (;;) {
 
+		if (TermPending) {
+			if (Logging) {
+				syslog(LOG_INFO, "terminating on SIGTERM");
+				closelog();
+			}
+			exit(0);
+		}
+
+		if (ReloadPending) {
+			ReloadPending = 0;
+			ReadConfig();
+		}
+
 		update_maxfd();
 		if (maxfd < 0) {
-			sleep(10);
+			pselect(0, NULL, NULL, NULL, &ten_sec, &origmask);
 			continue;
 		}
 
-		if (select(maxfd + 1, &fdread, NULL, NULL, NULL) <= 0)
+		if (pselect(maxfd + 1, &fdread, NULL, NULL, NULL, &origmask) <= 0)
 			continue;
 
 		for (paxl = AXL; paxl != NULL; paxl = paxl->next) {
@@ -1461,6 +1493,19 @@ int main(int argc, char *argv[])
 					break;			/* Oh well... */
 
 				case 0:
+
+					/*
+					 * The child takes the original mask
+					 * back at once: it does not walk the
+					 * port list, and the AX25.IP VC wait
+					 * below can outlast a reload or a
+					 * shutdown.  The signal handlers stay
+					 * the flag setters - the flags are
+					 * read by the parent's loop only, so
+					 * SIGHUP no longer reads the
+					 * configuration here, as it once did.
+					 */
+					sigprocmask(SIG_SETMASK, &origmask, NULL);
 
 					if (raxl->af_type == AF_AX25 && raxl->checkVC) {
 						/* to which of my own addresses has the user connected? */
