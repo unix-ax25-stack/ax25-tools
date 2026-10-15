@@ -140,7 +140,7 @@ char *get_fixed_filename(char *line, long size, unsigned int msg_crc, int genera
   }
   while (*p && isspace(*p & 0xff))
     p++;
-  for (r = filename, q = p; *q; q++) {
+  for (r = filename, q = p; *q && r < filename + sizeof(filename) - 1; q++) {
     if (*q == '"' || *q == ';') {
       break;
     }
