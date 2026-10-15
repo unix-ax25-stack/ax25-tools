@@ -75,10 +75,12 @@ axspawn_LDADD = $(AX25_LIB) $(UTIL_LIB)
 
 AM_CPPFLAGS = -D_GNU_SOURCE \
 	      -DAX25_SYSCONFDIR=\""$(AX25_SYSCONFDIR)"\" \
-	      -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\"
+	      -DAX25_LOCALSTATEDIR=\""$(AX25_LOCALSTATEDIR)"\" \
+	      -DAX25_SBINDIR=\""$(AX25_SBINDIR)"\"
 
 AX25_SYSCONFDIR=$(sysconfdir)/ax25/
 AX25_LOCALSTATEDIR=$(localstatedir)/ax25/
+AX25_SBINDIR=$(sbindir)/
 
 dist_man_MANS = ax25.4 ax25d.conf.5 axspawn.conf.5 rxecho.conf.5 \
 	   ax25d.8 axctl.8 axkill.8 axparms.8 axspawn.8 axwrapper.8 beacon.8 \

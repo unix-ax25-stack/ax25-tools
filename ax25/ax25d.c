@@ -124,6 +124,7 @@
 #include <sys/time.h>
 #include <sys/select.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/fcntl.h>
 #include <sys/file.h>
 #include <sys/stat.h>
@@ -1180,6 +1181,97 @@ static int hold_config_lock(const char *file)
 	return fd;
 }
 
+/*
+ * Is the caller listed in the AX25.IP table of ax25rtd in "v" (VC)
+ * mode?  This is what the pipeline
+ *	ax25rtctl -l ip | grep -i ' CALL ' | grep 'v '
+ * used to ask through the shell.  We run ax25rtctl with an argument
+ * vector, not with a command line, so the call sign never reaches a
+ * shell, and we read the table here.  ax25rtctl -l ip prints
+ *	IP Address       Port   Callsign  Mode Last update
+ * with the mode a single letter, 'v' for VC and 'd' for datagram (see
+ * ax25rtd/cache_dump.c); grep -i matched the call sign case
+ * insensitively, the mode case sensitively.  Returns TRUE when the
+ * caller is a VC host.  When ax25rtctl cannot be run, we log it and
+ * say FALSE, so that the connection goes on to the login as it did
+ * when system() failed.
+ */
+static int is_vc_host(const char *user)
+{
+	int fd[2], status;
+	pid_t pid;
+	FILE *fp;
+	char line[512];
+	int found = FALSE;
+
+	if (pipe(fd) < 0) {
+		syslog(LOG_ERR, "AX25.IP-VC check: pipe() failed: %s", strerror(errno));
+		return FALSE;
+	}
+	(void)fcntl(fd[0], F_SETFD, FD_CLOEXEC);
+	(void)fcntl(fd[1], F_SETFD, FD_CLOEXEC);
+
+	if ((pid = fork()) < 0) {
+		syslog(LOG_ERR, "AX25.IP-VC check: fork() failed: %s", strerror(errno));
+		close(fd[0]);
+		close(fd[1]);
+		return FALSE;
+	}
+
+	if (pid == 0) {
+		/* the child writes the table into the pipe */
+		char *argv[4];
+
+		close(fd[0]);
+		if (fd[1] != STDOUT_FILENO) {
+			dup2(fd[1], STDOUT_FILENO);
+			close(fd[1]);
+		}
+		argv[0] = PROG_AX25RTCTL;
+		argv[1] = "-l";
+		argv[2] = "ip";
+		argv[3] = NULL;
+		execv(PROG_AX25RTCTL, argv);
+		fprintf(stderr, "ax25d: cannot execute %s: %s\n", PROG_AX25RTCTL, strerror(errno));
+		_exit(127);
+	}
+
+	/* the parent reads the table */
+	close(fd[1]);
+	if ((fp = fdopen(fd[0], "r")) == NULL) {
+		close(fd[0]);
+		while (waitpid(pid, &status, 0) < 0 && errno == EINTR)
+			;
+		syslog(LOG_ERR, "AX25.IP-VC check: fdopen() failed: %s", strerror(errno));
+		return FALSE;
+	}
+
+	while (fgets(line, sizeof(line), fp) != NULL) {
+		char *call, *mode;
+
+		if (strtok(line, " \t") == NULL)	/* IP address */
+			continue;
+		if (strtok(NULL, " \t") == NULL)	/* port */
+			continue;
+		call = strtok(NULL, " \t");
+		mode = strtok(NULL, " \t");
+		if (call != NULL && mode != NULL &&
+		    strcasecmp(call, user) == 0 && mode[0] == 'v') {
+			found = TRUE;
+			break;
+		}
+	}
+	fclose(fp);
+	while (waitpid(pid, &status, 0) < 0 && errno == EINTR)
+		;
+
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 127)
+		syslog(LOG_ERR, "AX25.IP-VC check: cannot execute %s, taking %s for not a VC host",
+		       PROG_AX25RTCTL, user);
+
+	return found;
+}
+
 int main(int argc, char *argv[])
 {
 	struct axlist *axltmp, *paxl, *raxl;
@@ -1579,10 +1671,8 @@ int main(int argc, char *argv[])
 						getsockname(new, (struct sockaddr *)&sockaddr, &addrlen);
 						strcpy(myAX25Name, ax25_ntoa(&sockaddr.ax25.fsa_ax25.sax25_call));
 
-						sprintf(buf, "/usr/sbin/ax25rtctl -l ip | grep -i ' %s ' | /bin/grep 'v ' >/dev/null", User);
-
 						/* he's not a VC user? */
-						if (system(buf) != 0)
+						if (!is_vc_host(User))
 							goto login;
 
 						if (raxl->checkVC > 1) {
