@@ -1098,6 +1098,46 @@ static char *stripssid(const char *call)
 	return newcall;
 }
 
+/*
+ * A callsign as ax25_ntoa() prints it: one to six characters A-Z and
+ * 0-9, optionally '-' and an SSID 0 to 15.  What ax25_ntoa() converts
+ * is what the sender put into the address field, and the kernel does
+ * not check those characters: a short call is space filled on the
+ * channel, so six spaces print as an empty string, and a forged frame
+ * carries anything.  The decision is on the characters alone - a
+ * callsign mangled on the way is refused like a forged one.
+ */
+static int valid_call(const char *s)
+{
+	const char *p = s;
+	int digits = 0, ssid = 0;
+
+	while (*p != '\0' && *p != '-') {
+		if (!isupper(*p & 0xff) && !isdigit(*p & 0xff))
+			return FALSE;
+		p++;
+	}
+
+	if (p == s || p - s > 6)	/* empty, or longer than six */
+		return FALSE;
+
+	if (*p == '\0')			/* no SSID part */
+		return TRUE;
+
+	p++;				/* the '-' */
+	if (*p == '\0')			/* nothing behind the '-' */
+		return FALSE;
+
+	while (isdigit(*p & 0xff)) {
+		ssid = ssid * 10 + (*p - '0');
+		p++;
+		if (++digits > 2)
+			return FALSE;
+	}
+
+	return *p == '\0' && ssid <= 15 ? TRUE : FALSE;
+}
+
 int main(int argc, char *argv[])
 {
 	struct axlist *axltmp, *paxl, *raxl;
@@ -1269,6 +1309,34 @@ int main(int argc, char *argv[])
 					strcpy(User, ax25_ntoa(&sockaddr.rose.srose_call));
 					strcpy(Node, rose_ntoa(&sockaddr.rose.srose_addr));
 					break;
+				}
+
+				/*
+				 * User is not ours to trust: it is checked
+				 * here, where it is read, before it is
+				 * logged, before WorkoutArgs() substitutes
+				 * it into the command lines and before the
+				 * AX25.IP VC check puts it into a shell
+				 * command.  The peer's call is not printed
+				 * in the log message - its characters are
+				 * exactly what is wrong with it.
+				 */
+				if (!valid_call(User)) {
+					if (Logging) {
+						switch (paxl->af_type) {
+						case AF_AX25:
+							syslog(LOG_NOTICE, "AX.25 connection on %s rejected - invalid callsign", paxl->port);
+							break;
+						case AF_NETROM:
+							syslog(LOG_NOTICE, "NET/ROM connection on %s rejected - invalid callsign", paxl->port);
+							break;
+						case AF_ROSE:
+							syslog(LOG_NOTICE, "Rose connection on %s rejected - invalid callsign", paxl->port);
+							break;
+						}
+					}
+					close(new);
+					continue;
 				}
 
 				for (raxl = paxl->ents; raxl != NULL; raxl = raxl->ents) {
