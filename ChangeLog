@@ -1,3 +1,8 @@
+ax25-tools (git)
+	* Maintained at https://github.com/unix-ax25-stack/ax25-tools
+	  since August 2026.  All packages of the project:
+	  https://github.com/unix-ax25-stack/
+
 ax25-tools (0.0.10)
 	* Version number 0.0.10 was used for several years in CVS.  To avoid
 	  confusion we decieded to not make a 0.0.9 tarball release.

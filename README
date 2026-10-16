@@ -1,6 +1,9 @@
 AX25 Tools
 ==========
 
+Maintained at https://github.com/unix-ax25-stack/ax25-tools since August 2026.
+All packages of the project: https://github.com/unix-ax25-stack/
+
 Note that kissattach has changed its command line format slight.  While the
 old format will work, the -i option is now, err, not optional.  This was
 done to stop the million or so emails we get on linux-hams email list
