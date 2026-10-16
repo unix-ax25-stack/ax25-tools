@@ -8,7 +8,7 @@
  * prevents this). see:
  *   http://x-berg.in-berlin.de/cgi-bin/viewcvs.cgi/ampr/patches/linux-ax25/
  *
- * (c) 2002 Thomas Osterried  DL9SAU <thomas@x-berg.in-berlin.de>
+ * (c) 2002 Thomas Osterried  DL9SAU <dl9sau@darc.de>
  * License: GPL. See http://www.fsf.org/
  * Sources: http://x-berg.in-berlin.de/cgi-bin/viewcvs.cgi/ampr/axgetput/
  *
@@ -154,7 +154,7 @@ static void signal_handler(int sig)
 static void do_version(void)
 {
         fprintf(stderr, MYNAME " " FULL_VER "\n");
-	fprintf(stderr, "  (c) 2002 Thomas Osterried <thomas@x-berg.in-berlin.de>\n");
+	fprintf(stderr, "  (c) 2002 Thomas Osterried <dl9sau@darc.de>\n");
 	fprintf(stderr, "  License: GPL. See http://www.fsf.org/\n");
 	fprintf(stderr, "  Sources: http://x-berg.in-berlin.de/cgi-bin/viewcvs.cgi/ampr/axgetput/\n");
 }

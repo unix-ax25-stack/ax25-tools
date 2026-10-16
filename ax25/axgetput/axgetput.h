@@ -1,5 +1,5 @@
 /*
- * (c) 2002 Thomas Osterried  DL9SAU <thomas@x-berg.in-berlin.de>
+ * (c) 2002 Thomas Osterried  DL9SAU <dl9sau@darc.de>
  *   License: GPL. See http://www.fsf.org/
  *   Sources: http://x-berg.in-berlin.de/cgi-bin/viewcvs.cgi/ampr/axgetput/
  */
