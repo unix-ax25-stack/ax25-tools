@@ -25,8 +25,12 @@
 
 static void put_mnemonic(char *dst, const char *alias)
 {
+	size_t n = strlen(alias);
+
+	if (n > MNEMONIC_LEN)
+		n = MNEMONIC_LEN;
 	memset(dst, ' ', MNEMONIC_LEN);
-	strncpy(dst, alias, MNEMONIC_LEN);
+	memcpy(dst, alias, n);
 }
 
 static int build_header(char *message)
