@@ -126,5 +126,5 @@ The same on channel 2, written as one argument.
 .BR axparms (8).
 .SH AUTHORS
 .nf
-Jorg Reuter DL1BKE <jreuter@poboxes.com>
+Thomas Osterried <dl9sau@darc.de>
 .fi
