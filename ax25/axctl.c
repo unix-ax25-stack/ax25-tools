@@ -153,9 +153,13 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	/* AX.25 control parameters (window, t1, t2, t3, n2, idle, paclen)
-	 * only apply to kernel AX.25 stack ports. */
+	/* AX.25 control parameters (window, t1, t2, t3, n2, idle, paclen, kill)
+	 * are kernel AX.25 stack parameters.  For WAMPES/AGWPE backends, only
+	 * 'kill' (disconnect) is universally applicable; other parameters
+	 * would need backend-specific protocol mappings (TODO). */
 	if (pinfo.backend != AX25_PORT_KERNEL) {
+		/* TODO: Implement backend-specific parameter control for WAMPES/AGWPE.
+		 * For now, only 'kill' (disconnect) could be universally supported. */
 		fprintf(stderr, "axctl: control parameters only supported on kernel ports\n");
 		return 1;
 	}
