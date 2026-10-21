@@ -28,6 +28,8 @@
 #include <netrose/rose.h>
 
 #include <netax25/axconfig.h>
+#include <netax25/wampes_client.h>
+#include <netax25/agwpe_client.h>
 
 #define	PARAM_TXDELAY	1
 #define	PARAM_PERSIST	2
@@ -39,6 +41,159 @@
 #define	PARAM_RETURN	255
 
 #define USAGE "usage: kissparms [-c crc-type] -p <port> [-f y|n] [-h hw] [-l txtail]\n                 [-r pers ] [-s slot] [-t txd] [-e feclevel] [-v] [-x] [-X raw]\n"
+
+static int kissparms_kernel(const char *port, struct ax25_port_info *pinfo,
+			    int proto, unsigned char *buffer, int *buflen,
+			    int crcmode, int txdelay, int txtail, int persist,
+			    int slottime, int fulldup, int hardware, int feclevel,
+			    int kissoff, int X)
+{
+	struct sockaddr sa;
+	int s;
+
+	s = socket(PF_PACKET, SOCK_PACKET, htons(proto));
+	if (s < 0) {
+		perror("kissparms: socket");
+		return 1;
+	}
+
+	strcpy(sa.sa_data, pinfo->dev);
+
+	if (X && *buflen)
+		goto rawsend;
+	if (kissoff) {
+		buffer[0] = PARAM_RETURN;
+		*buflen    = 1;
+rawsend:
+		if (sendto(s, buffer, *buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+			perror("kissparms: sendto");
+			close(s);
+			return 1;
+		}
+	} else {
+		if (crcmode != -1) {
+			buffer[0] = 0x85;
+			buffer[1] = crcmode;
+			*buflen    = 2;
+			if (sendto(s, buffer, *buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				close(s);
+				return 1;
+			}
+		}
+		if (crcmode != -1) {
+			buffer[0] = 0x85;
+			buffer[1] = crcmode;
+			*buflen    = 2;
+			if (sendto(s, buffer, *buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				close(s);
+				return 1;
+			}
+		}
+		if (txdelay != -1) {
+			buffer[0] = PARAM_TXDELAY;
+			buffer[1] = txdelay;
+			*buflen    = 2;
+			if (sendto(s, buffer, *buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				close(s);
+				return 1;
+			}
+		}
+		if (txtail != -1) {
+			buffer[0] = PARAM_TXTAIL;
+			buffer[1] = txtail;
+			*buflen    = 2;
+			if (sendto(s, buffer, *buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				close(s);
+				return 1;
+			}
+		}
+		if (persist != -1) {
+			buffer[0] = PARAM_PERSIST;
+			buffer[1] = persist;
+			*buflen    = 2;
+			if (sendto(s, buffer, *buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				close(s);
+				return 1;
+			}
+		}
+		if (slottime != -1) {
+			buffer[0] = PARAM_SLOTTIME;
+			buffer[1] = slottime;
+			*buflen    = 2;
+			if (sendto(s, buffer, *buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				close(s);
+				return 1;
+			}
+		}
+		if (fulldup != -1) {
+			buffer[0] = PARAM_FULLDUP;
+			buffer[1] = fulldup;
+			*buflen    = 2;
+			if (sendto(s, buffer, *buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				close(s);
+				return 1;
+			}
+		}
+		if (hardware != -1) {
+			buffer[0] = PARAM_HARDWARE;
+			buffer[1] = hardware;
+			*buflen    = 2;
+			if (sendto(s, buffer, *buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				close(s);
+				return 1;
+			}
+		}
+		if (feclevel != -1) {
+			buffer[0] = PARAM_FECLEVEL;
+			buffer[1] = feclevel;
+			*buflen    = 2;
+			if (sendto(s, buffer, *buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
+				perror("kissparms: sendto");
+				close(s);
+				return 1;
+			}
+		}
+	}
+
+	close(s);
+	return 0;
+}
+
+/*
+ * Send KISS parameter commands via WAMPES node.
+ * Uses WAMPES client API to send "kiss" commands to the node.
+ */
+static int kissparms_wampes(const char *port, struct ax25_port_info *pinfo,
+			    int crcmode, int txdelay, int txtail, int persist,
+			    int slottime, int fulldup, int hardware, int feclevel,
+			    int kissoff, int X)
+{
+	/* TODO: Implement WAMPES kissparms via WAMPES service socket */
+	fprintf(stderr, "kissparms: WAMPES backend not yet implemented\n");
+	return 1;
+}
+
+/*
+ * Send KISS parameter commands via AGWPE server.
+ * Uses AGWPE 'X' (raw KISS) frames to send raw KISS commands to the TNC.
+ */
+static int kissparms_agwpe(const char *port, struct ax25_port_info *pinfo,
+			    int crcmode, int txdelay, int txtail, int persist,
+			    int slottime, int fulldup, int hardware, int feclevel,
+			    int kissoff, int X)
+{
+	/* TODO: Implement AGWPE kissparms via AGWPE 'X' frames */
+	fprintf(stderr, "kissparms: AGWPE backend not yet implemented\n");
+	return 1;
+}
 
 int main(int argc, char *argv[])
 {
@@ -171,116 +326,22 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	/* KISS parameters only apply to kernel ports with real TNCs */
-	if (pinfo.backend != AX25_PORT_KERNEL) {
-		fprintf(stderr, "kissparms: KISS parameters only supported on kernel ports\n");
-		return 1;
-	}
-
-	s = socket(PF_PACKET, SOCK_PACKET, htons(proto));
-	if (s < 0) {
-		perror("kissparms: socket");
-		return 1;
-	}
-
-	strcpy(sa.sa_data, pinfo.dev);
-
-	if (X && buflen)
-		goto rawsend;
-	if (kissoff) {
-		buffer[0] = PARAM_RETURN;
-		buflen    = 1;
-rawsend:
-		if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
-			perror("kissparms: sendto");
-			return 1;
-		}
+	/* KISS parameters are supported on all backends with real TNCs.
+	 * Dispatch based on backend type. */
+	if (pinfo.backend == AX25_PORT_KERNEL) {
+		return kissparms_kernel(port, &pinfo, proto, buffer, &buflen, crcmode,
+					txdelay, txtail, persist, slottime, fulldup,
+					hardware, feclevel, kissoff, X);
+	} else if (pinfo.backend == AX25_PORT_WAMPES) {
+		return kissparms_wampes(port, &pinfo,
+					crcmode, txdelay, txtail, persist, slottime, fulldup,
+					hardware, feclevel, kissoff, X);
+	} else if (pinfo.backend == AX25_PORT_AGWPE) {
+		return kissparms_agwpe(port, &pinfo,
+					crcmode, txdelay, txtail, persist, slottime, fulldup,
+					hardware, feclevel, kissoff, X);
 	} else {
-		if (crcmode != -1) {
-			buffer[0] = 0x85;
-			buffer[1] = crcmode;
-			buflen    = 2;
-			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
-				perror("kissparms: sendto");
-				return 1;
-			}
-		}
-		if (crcmode != -1) {
-			buffer[0] = 0x85;
-			buffer[1] = crcmode;
-			buflen    = 2;
-			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
-				perror("kissparms: sendto");
-				return 1;
-			}
-		}
-		if (txdelay != -1) {
-			buffer[0] = PARAM_TXDELAY;
-			buffer[1] = txdelay;
-			buflen    = 2;
-			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
-				perror("kissparms: sendto");
-				return 1;
-			}
-		}
-		if (txtail != -1) {
-			buffer[0] = PARAM_TXTAIL;
-			buffer[1] = txtail;
-			buflen    = 2;
-			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
-				perror("kissparms: sendto");
-				return 1;
-			}
-		}
-		if (persist != -1) {
-			buffer[0] = PARAM_PERSIST;
-			buffer[1] = persist;
-			buflen    = 2;
-			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
-				perror("kissparms: sendto");
-				return 1;
-			}
-		}
-		if (slottime != -1) {
-			buffer[0] = PARAM_SLOTTIME;
-			buffer[1] = slottime;
-			buflen    = 2;
-			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
-				perror("kissparms: sendto");
-				return 1;
-			}
-		}
-		if (fulldup != -1) {
-			buffer[0] = PARAM_FULLDUP;
-			buffer[1] = fulldup;
-			buflen    = 2;
-			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
-				perror("kissparms: sendto");
-				return 1;
-			}
-		}
-		if (hardware != -1) {
-			buffer[0] = PARAM_HARDWARE;
-			buffer[1] = hardware;
-			buflen    = 2;
-			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
-				perror("kissparms: sendto");
-				return 1;
-			}
-		}
-		if (feclevel != -1) {
-			buffer[0] = PARAM_FECLEVEL;
-			buffer[1] = feclevel;
-
-			buflen    = 2;
-			if (sendto(s, buffer, buflen, 0, &sa, sizeof(struct sockaddr)) == -1) {
-				perror("kissparms: sendto");
-				return 1;
-			}
-		}
+		fprintf(stderr, "kissparms: unsupported backend for port '%s'\n", port);
+		return 1;
 	}
-
-	close(s);
-
-	return 0;
 }
