@@ -13,6 +13,17 @@
 
 #include <net/ethernet.h>
 
+/* For non-Linux systems */
+#ifndef PF_PACKET
+#define PF_PACKET 17
+#endif
+#ifndef SOCK_PACKET
+#define SOCK_PACKET 10
+#endif
+#ifndef ETH_P_AX25
+#define ETH_P_AX25 0x0002
+#endif
+
 #include <netax25/ax25.h>
 #include <netrose/rose.h>
 
@@ -153,13 +164,26 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	/* Determine port backend via ax25_port_info() */
+	struct ax25_port_info pinfo;
+	if (ax25_port_info(port, &pinfo) != 0 || pinfo.backend == AX25_PORT_NONE) {
+		fprintf(stderr, "kissparms: unknown port '%s'\n", port);
+		return 1;
+	}
+
+	/* KISS parameters only apply to kernel ports with real TNCs */
+	if (pinfo.backend != AX25_PORT_KERNEL) {
+		fprintf(stderr, "kissparms: KISS parameters only supported on kernel ports\n");
+		return 1;
+	}
+
 	s = socket(PF_PACKET, SOCK_PACKET, htons(proto));
 	if (s < 0) {
 		perror("kissparms: socket");
 		return 1;
 	}
 
-	strcpy(sa.sa_data, ax25_config_get_dev(port));
+	strcpy(sa.sa_data, pinfo.dev);
 
 	if (X && buflen)
 		goto rawsend;
