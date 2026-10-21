@@ -452,7 +452,11 @@ int main(int argc, char **argv)
 
 			memcpy(&mheard->entry.from_call, data + AXLEN, sizeof(ax25_address));
 			memcpy(&mheard->entry.to_call,   data + 0,     sizeof(ax25_address));
-			strcpy(mheard->entry.portname,   port);
+			/* Store full "node:iface" if it fits, else base port name */
+			if (strchr(sa.sa_data, ':') != NULL && strlen(sa.sa_data) < sizeof(mheard->entry.portname))
+				strcpy(mheard->entry.portname, sa.sa_data);
+			else
+				strcpy(mheard->entry.portname, port);
 			mheard->entry.ndigis = 0;
 
 			extseq = ((data[AXLEN + ALEN] & SSSID_SPARE) != SSSID_SPARE);
