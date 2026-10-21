@@ -379,15 +379,34 @@ int main(int argc, char **argv)
 			}
 
 			/* The monitor reports either a device name (kernel PF_PACKET)
-		 * or a port name (WAMPES/AGWPE monitor).  First try to use the
-		 * name directly as a port name by scanning the port list; if that
-		 * fails, fall back to mapping a device name via ax25_config_get_name(). */
+		 * or a port name (WAMPES/AGWPE monitor).  WAMPES monitor names
+		 * are "<node>:<iface>" (e.g. "wampes:xnet").  First try exact
+		 * match against the port list; if that fails and the name
+		 * contains a colon, try the base name before the colon; finally
+		 * fall back to mapping a device name via ax25_config_get_name(). */
 	port = NULL;
 	for (char *p = ax25_config_get_next(NULL); p != NULL; p = ax25_config_get_next(p))
 		if (strcmp(p, sa.sa_data) == 0) {
 			port = p;
 			break;
 		}
+	if (port == NULL) {
+		char *colon = strchr(sa.sa_data, ':');
+		if (colon != NULL) {
+			/* Try base name before colon (e.g. "wampes" from "wampes:xnet") */
+			size_t baselen = colon - sa.sa_data;
+			char base[20];
+			if (baselen < sizeof(base)) {
+				memcpy(base, sa.sa_data, baselen);
+				base[baselen] = '\0';
+				for (char *p = ax25_config_get_next(NULL); p != NULL; p = ax25_config_get_next(p))
+					if (strcmp(p, base) == 0) {
+						port = p;
+						break;
+					}
+			}
+		}
+	}
 	if (port == NULL)
 		port = ax25_config_get_name(sa.sa_data);
 			if (port == NULL) {
