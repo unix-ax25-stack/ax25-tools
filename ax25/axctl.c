@@ -146,6 +146,20 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	/* Determine port backend via ax25_port_info() */
+	struct ax25_port_info pinfo;
+	if (ax25_port_info(portarg, &pinfo) != 0 || pinfo.backend == AX25_PORT_NONE) {
+		fprintf(stderr, "axctl: unknown port '%s'\n", portarg);
+		return 1;
+	}
+
+	/* AX.25 control parameters (window, t1, t2, t3, n2, idle, paclen)
+	 * only apply to kernel AX.25 stack ports. */
+	if (pinfo.backend != AX25_PORT_KERNEL) {
+		fprintf(stderr, "axctl: control parameters only supported on kernel ports\n");
+		return 1;
+	}
+
 	addr = ax25_config_get_addr(portarg);
 	if (addr == NULL) {
 		fprintf(stderr, "axctl: invalid port name - %s\n", portarg);
