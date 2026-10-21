@@ -378,7 +378,18 @@ int main(int argc, char **argv)
 				continue;
 			}
 
-			port = ax25_config_get_name(sa.sa_data);
+			/* The monitor reports either a device name (kernel PF_PACKET)
+		 * or a port name (WAMPES/AGWPE monitor).  First try to use the
+		 * name directly as a port name by scanning the port list; if that
+		 * fails, fall back to mapping a device name via ax25_config_get_name(). */
+	port = NULL;
+	for (char *p = ax25_config_get_next(NULL); p != NULL; p = ax25_config_get_next(p))
+		if (strcmp(p, sa.sa_data) == 0) {
+			port = p;
+			break;
+		}
+	if (port == NULL)
+		port = ax25_config_get_name(sa.sa_data);
 			if (port == NULL) {
 				if (logging)
 					syslog(LOG_WARNING, "unknown port '%s'\n", sa.sa_data);
