@@ -415,16 +415,32 @@ int main(int argc, char **argv)
 				continue;
 			}
 			if (*ports) {
+				int match = 0;
 				char testport[sizeof(sa.sa_data)+2];
 				sprintf(testport, "|%s|", sa.sa_data);
+				if (strstr(ports, testport))
+					match = 1;
+				if (!match && strchr(sa.sa_data, ':')) {
+					char *colon = strchr(sa.sa_data, ':');
+					size_t baselen = colon - sa.sa_data;
+					size_t suflen = strlen(colon + 1);
+					if (baselen < sizeof(testport)-2) {
+						sprintf(testport, "|%.*s|", (int)baselen, sa.sa_data);
+						if (strstr(ports, testport))
+							match = 1;
+					}
+					if (!match && suflen < sizeof(testport)-2) {
+						sprintf(testport, "|%s|", colon + 1);
+						if (strstr(ports, testport))
+							match = 1;
+					}
+				}
 				if (ports_excl) {
-					if (strstr(ports, testport)) {
+					if (match)
 						continue;
-					}
 				} else {
-					if (!strstr(ports, testport)) {
+					if (!match)
 						continue;
-					}
 				}
 			}
 
