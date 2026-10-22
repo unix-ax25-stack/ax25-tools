@@ -98,7 +98,7 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MEMCMP
 AC_FUNC_STRFTIME
 AC_FUNC_WAIT3
-AC_CHECK_FUNCS(gethostname gettimeofday mkdir select socket strdup strerror strspn strstr strtol strtoul uname)
+AC_CHECK_FUNCS(gethostname gettimeofday mkdir select socket strdup strerror strspn strstr strtol strtoul uname openpty)
 
 dnl Only use -Wall if we have gcc
 if test "x$GCC" = "xyes"; then

@@ -88,6 +88,46 @@ static char *namepts;			/* name of the unix98 pts slave, which
 
 /* --------------------------------------------------------------------- */
 
+/* Portable pty allocation - works on Linux, macOS, and other POSIX systems */
+static int ax25_openpty(int *amaster, int *aslave, char *name, size_t namesz)
+{
+#if defined(HAVE_OPENPTY)
+	return openpty(amaster, aslave, name, NULL, NULL);
+#else
+	int master = posix_openpt(O_RDWR | O_NOCTTY);
+	if (master < 0)
+		return -1;
+
+	if (grantpt(master) < 0 || unlockpt(master) < 0) {
+		close(master);
+		return -1;
+	}
+
+	char *slave_name = ptsname(master);
+	if (!slave_name) {
+		close(master);
+		return -1;
+	}
+
+	if (name && namesz > 0) {
+		strncpy(name, slave_name, namesz - 1);
+		name[namesz - 1] = '\0';
+	}
+
+	int slave = open(slave_name, O_RDWR | O_NOCTTY);
+	if (slave < 0) {
+		close(master);
+		return -1;
+	}
+
+	*amaster = master;
+	*aslave = slave;
+	return 0;
+#endif
+}
+
+/* --------------------------------------------------------------------- */
+
 static void die(char *func)
 {
 	fprintf(stderr, "%s: %s (%i)%s%s\n", progname, strerror(errno),
@@ -571,7 +611,7 @@ int main(int argc, char *argv[])
 	if (symlnk) {
 		int fdtty;
 
-		if (openpty(&fdpty, &fdtty, slavename, NULL, NULL)) {
+		if (ax25_openpty(&fdpty, &fdtty, slavename, sizeof(slavename))) {
 			fprintf(stderr, "%s: out of pseudoterminals\n",
 				progname);
 			exit(1);
