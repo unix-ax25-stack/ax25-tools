@@ -468,11 +468,11 @@ int main(int argc, char **argv)
 
 			memcpy(&mheard->entry.from_call, data + AXLEN, sizeof(ax25_address));
 			memcpy(&mheard->entry.to_call,   data + 0,     sizeof(ax25_address));
-			/* Store full "node:iface" if it fits, else base port name */
-			if (strchr(sa.sa_data, ':') != NULL && strlen(sa.sa_data) < sizeof(mheard->entry.portname))
-				strcpy(mheard->entry.portname, sa.sa_data);
-			else
-				strcpy(mheard->entry.portname, port);
+			/* Always store the resolved port name, not raw sa_data
+			 * which may be truncated for WAMPES/AGWPE monitor sources
+			 * (sa_data[14]). */
+			strncpy(mheard->entry.portname, port, sizeof(mheard->entry.portname) - 1);
+			mheard->entry.portname[sizeof(mheard->entry.portname) - 1] = '\0';
 			mheard->entry.ndigis = 0;
 
 			extseq = ((data[AXLEN + ALEN] & SSSID_SPARE) != SSSID_SPARE);
@@ -610,6 +610,8 @@ int main(int argc, char **argv)
 			time(&mheard->entry.last_heard);
 
 			fp = fopen(DATA_MHEARD_FILE, "r+");
+			if (fp == NULL)
+				fp = fopen(DATA_MHEARD_FILE, "w+");
 			if (fp == NULL) {
 				if (logging)
 					syslog(LOG_ERR, "cannot open mheard data file\n");

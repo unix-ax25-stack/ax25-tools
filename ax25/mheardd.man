@@ -57,6 +57,17 @@ be deleted has to ask for
 as well \-\- mheardd started with
 .B \-f
 alone keeps the old list and stays in the foreground on top of it.
+.PP
+The same
+.I mheard.dat
+file is also maintained by
+.BR ax25netd (8)
+when not started with
+.B \-\-no-mheard.
+Only one of them should maintain the file to avoid duplicate counting; both
+serialize writes with
+.BR flock (2)
+but neither deduplicates frames received from multiple monitor sources.
 .TP 10
 .BI \-F
 Deletes the existing mheard logging file at program startup, this is not the
