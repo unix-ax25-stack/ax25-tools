@@ -1318,9 +1318,18 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	nr_config_load_ports();
+	/*
+	 * NET/ROM and ROSE are optional.  A userspace-only host has neither
+	 * and usually no nrports/rsports file; loading them anyway made
+	 * ax25d print "nrconfig: unable to open nrports file ..." and the
+	 * same for rsports at every start.  If the file is there, load it
+	 * and report what it says; if not, there is nothing to configure.
+	 */
+	if (access(CONF_NRPORTS_FILE, F_OK) == 0)
+		nr_config_load_ports();
 
-	rs_config_load_ports();
+	if (access(CONF_RSPORTS_FILE, F_OK) == 0)
+		rs_config_load_ports();
 
 	/*
 	 * Before daemon_start(), so that a refusal is seen by whoever
