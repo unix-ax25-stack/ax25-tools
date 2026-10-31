@@ -1063,6 +1063,7 @@ static void new_user(char *newuser)
 	FILE *fp;
 	char username[80];
 	char homedir[256], userdir[256];
+	char profile[sizeof(userdir) + sizeof(USERPROFILE) + 1];
 	char buf[4096];
 	char subdir[4];
 	int cnt;
@@ -1219,15 +1220,31 @@ end_mkdirs:
 			
 			/* signal SIGCHLD: see description above */
 			signal(SIGCHLD, signal_handler_sigchild);
-                	execve(chargv[0], chargv, envp);
+			execve(chargv[0], chargv, envp);
+			/* Failed execve returns.  Without this _exit the
+			 * child would fall out of this block and continue
+			 * new_user() - as root, and after the parent has
+			 * already decided what happened.  The parent sees
+			 * 127 and gives up below. */
+			_exit(127);
 		} else {
 			int status;
 			pid_t wpid = -1;
 			wpid = waitpid(-1, &status, 0);
 			if (wpid == -1)
 				goto out;
-			if (!WIFEXITED(status))
+			if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+				syslog(LOG_ERR, "useradd failed for %s (status 0x%x)",
+				       newuser, status);
 				goto out;
+			}
+			/* useradd -m made the home with HOME_MODE from
+			 * login.defs (0755 on Debian), not with the mode the
+			 * path below applies.  Bring both paths together so
+			 * secure_home means the same thing either way. */
+			if (chmod(userdir, homedir_mode) < 0)
+				syslog(LOG_WARNING, "cannot chmod %s: %s",
+				       userdir, strerror(errno));
 		}
 
 	} else {
@@ -1267,14 +1284,22 @@ end_mkdirs:
 
 	/*
 	 * copy ax25.profile
+	 *
+	 * By full path, not relative to the current directory.  The
+	 * useradd path stops one component short of the home (so that
+	 * "useradd -m" can make it) and used to open ".profile" in the
+	 * parent directory: /home/ax25/zz9.../.profile for a user whose
+	 * home is /home/ax25/zz9.../zz9tst/, shared by everyone with that
+	 * three-letter prefix.
 	 */
+	snprintf(profile, sizeof(profile), "%s/%s", userdir, USERPROFILE);
 
 	fd_a = open(CONF_AXSPAWN_PROF_FILE, O_RDONLY);
 
 	if (fd_a > 0)
 	{
 		int first = 1;
-		fd_b = open(USERPROFILE, O_CREAT|O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR);
+		fd_b = open(profile, O_CREAT|O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR);
 
 		if (fd_b < 0)
 			goto out;
@@ -1301,7 +1326,7 @@ end_mkdirs:
 		}
 		close(fd_b);
 		close(fd_a);
-		chown(USERPROFILE, uid, user_gid);
+		chown(profile, uid, user_gid);
 	}
 out:
 	if (fd_l >= 0)
