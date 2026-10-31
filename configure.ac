@@ -45,6 +45,13 @@ AC_SUBST(UTIL_LIB)
 AC_SUBST(FLTK_LIB)
 AC_CHECK_LIB(z, zlibVersion,Z_LIB="-lz",Z_LIB=)
 AC_CHECK_LIB(ax25, ax25_config_load_ports, AX25_LIB="-lax25", AC_MSG_ERROR([Could not find the libax25 libraries; aborting]))
+dnl The raw monitor interface and the AGWPE shim header are recent libax25
+dnl additions.  axmon.h includes agwpe.h, so asking for axmon.h checks both;
+dnl naming axmon.h here says what the programs use, rather than naming the
+dnl backend-specific header ax25d happens to need underneath.  Fail here
+dnl instead of in the middle of the build with a missing header.
+AC_CHECK_HEADERS([netax25/axmon.h], [],
+	[AC_MSG_ERROR([libax25 is too old: netax25/axmon.h is missing; install a current libax25])])
 dnl openpty is in libutil on Linux but in libc on other systems.
 AC_CHECK_FUNC(openpty, UTIL_LIB=, AC_CHECK_LIB(util, openpty, UTIL_LIB="-lutil", AC_MSG_ERROR([Could not find libutil; aborting])))
 AC_CHECK_LIB([fltk], [main], [FLTK_LIB=`fltk-config --ldflags`], FLTK_LIB=)
