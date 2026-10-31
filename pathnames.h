@@ -14,7 +14,22 @@
 
 #define	PROG_AX25RTCTL		AX25_SBINDIR"ax25rtctl"
 #define	PROG_NRPARMS		AX25_SBINDIR"nrparms"
+
+/*
+ * useradd(8) is part of the system (passwd/shadow-utils), not of this
+ * package.  AX25_SBINDIR is the directory axspawn is installed into, which
+ * is only the same place with the default --prefix=/usr; with
+ * --prefix=/opt/uax25 the old definition looked for
+ * /opt/uax25/sbin/useradd and account creation failed with ENOENT.
+ * On Linux the system path is fixed.  Elsewhere there is no useradd at all
+ * in the usual case (macOS, BSD), and create_with_useradd is off by default;
+ * keep the old path for a user-supplied wrapper.
+ */
+#ifdef __linux__
+#define	PROG_USERADD		"/usr/sbin/useradd"
+#else
 #define	PROG_USERADD		AX25_SBINDIR"useradd"
+#endif
 
 /*
  * /var/lock is a Linux convention; macOS keeps its serial line locks in
