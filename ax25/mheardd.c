@@ -104,17 +104,86 @@ static int    logging = FALSE;
 static int    foreground = FALSE;	/* -f: no fork, for a supervisor */
 
 static int ftype(char *, int *, int);
-static struct mheard_list_struct *findentry(ax25_address *, char *);
-
-static void terminate(int sig)
+static struct mheard_list_struct *findentry(ax25_address *callsign, char *port)
 {
-	if (logging) {
-		syslog(LOG_INFO, "terminating on SIGTERM\n");
-		closelog();
+	struct mheard_list_struct *oldest = NULL;
+	int i;
+	char *portcolon = NULL;
+
+	if (port != NULL)
+		portcolon = strchr(port, ':');
+
+	for (i = 0; i < mheard_list_size; i++)
+		if (mheard_list[i].in_use &&
+		    ax25_cmp(&mheard_list[i].entry.from_call, callsign) == 0 &&
+		    strcmp(mheard_list[i].entry.portname, port) == 0)
+			return mheard_list + i;
+
+	/* Try to merge variants like "wampes" vs "wampes:xnet" */
+	for (i = 0; i < mheard_list_size; i++) {
+		if (!mheard_list[i].in_use)
+			continue;
+		if (ax25_cmp(&mheard_list[i].entry.from_call, callsign) != 0)
+			continue;
+		char *ecolon = strchr(mheard_list[i].entry.portname, ':');
+		if (portcolon != NULL && ecolon != NULL) {
+			size_t pbase = portcolon - port;
+			size_t ebase = ecolon - mheard_list[i].entry.portname;
+			if (pbase == ebase && strncmp(port, mheard_list[i].entry.portname, pbase) == 0) {
+				/* Same base; prefer full form */
+				if (portcolon - port >= 0) { /* keep current port form */
+					strncpy(mheard_list[i].entry.portname, port, sizeof(mheard_list[i].entry.portname) - 1);
+					mheard_list[i].entry.portname[sizeof(mheard_list[i].entry.portname) - 1] = '\0';
+				}
+				return mheard_list + i;
+			}
+		} else if (portcolon != NULL && ecolon == NULL) {
+			/* port is base:suffix, entry is base - merge to suffix form */
+			if (strlen(mheard_list[i].entry.portname) == (size_t)(portcolon - port) &&
+			    strncmp(mheard_list[i].entry.portname, port, portcolon - port) == 0) {
+				strncpy(mheard_list[i].entry.portname, port, sizeof(mheard_list[i].entry.portname) - 1);
+				mheard_list[i].entry.portname[sizeof(mheard_list[i].entry.portname) - 1] = '\0';
+				return mheard_list + i;
+			}
+		} else if (portcolon == NULL && ecolon != NULL) {
+			/* port is base, entry has suffix - merge to keep existing or normalize */
+			if (strlen(port) == (size_t)(ecolon - mheard_list[i].entry.portname) &&
+			    strncmp(mheard_list[i].entry.portname, port, ecolon - mheard_list[i].entry.portname) == 0) {
+				return mheard_list + i;
+			}
+		}
 	}
 
-	exit(0);
+	for (i = 0; i < mheard_list_size; i++) {
+		if (!mheard_list[i].in_use) {
+			mheard_list[i].in_use   = TRUE;
+			mheard_list[i].position = 0xFFFFFF;
+			return mheard_list + i;
+		}
+	}
+
+	for (i = 0; i < mheard_list_size; i++) {
+		if (mheard_list[i].in_use) {
+			if (oldest == NULL) {
+				oldest = mheard_list + i;
+			} else {
+				if (mheard_list[i].entry.last_heard < oldest->entry.last_heard)
+					oldest = mheard_list + i;
+			}
+		}
+	}
+
+	memset(&oldest->entry, 0x00, sizeof(struct mheard_struct));
+
+	return oldest;
 }
+
+
+
+
+
+
+
 
 int main(int argc, char **argv)
 {
@@ -179,7 +248,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	signal(SIGTERM, terminate);
+	signal(SIGTERM, SIG_DFL);
 
 	if (ax25_config_load_ports() == 0) {
 		fprintf(stderr, "mheardd: no AX.25 port data configured\n");
@@ -458,20 +527,33 @@ int main(int argc, char **argv)
 				continue;
 			}
 
-			mheard = findentry((ax25_address *)(data + AXLEN), port);
+			char mheard_portname[sizeof(mheard_list[0].entry.portname)];
+			mheard_portname[0] = '\0';
+			if (strchr(sa.sa_data, ':') != NULL && port != NULL && strchr(port, ':') == NULL) {
+				char *c2 = strchr(sa.sa_data, ':');
+				snprintf(mheard_portname, sizeof(mheard_portname), "%s%s", port, c2);
+			} else if (strchr(sa.sa_data, ':') != NULL) {
+				strncpy(mheard_portname, sa.sa_data, sizeof(mheard_portname) - 1);
+				mheard_portname[sizeof(mheard_portname) - 1] = '\0';
+			} else if (port != NULL) {
+				strncpy(mheard_portname, port, sizeof(mheard_portname) - 1);
+				mheard_portname[sizeof(mheard_portname) - 1] = '\0';
+			} else {
+				strncpy(mheard_portname, sa.sa_data, sizeof(mheard_portname) - 1);
+				mheard_portname[sizeof(mheard_portname) - 1] = '\0';
+			}
+
+			mheard = findentry((ax25_address *)(data + AXLEN), mheard_portname);
 
 			if (!ax25_validate(data + 0) || !ax25_validate(data + AXLEN)) {
 				if (logging)
-					syslog(LOG_WARNING, "invalid callsign on port %s\n", port);
+					syslog(LOG_WARNING, "invalid callsign on port %s\n", mheard_portname);
 				continue;
 			}
 
 			memcpy(&mheard->entry.from_call, data + AXLEN, sizeof(ax25_address));
 			memcpy(&mheard->entry.to_call,   data + 0,     sizeof(ax25_address));
-			/* Always store the resolved port name, not raw sa_data
-			 * which may be truncated for WAMPES/AGWPE monitor sources
-			 * (sa_data[14]). */
-			strncpy(mheard->entry.portname, port, sizeof(mheard->entry.portname) - 1);
+			strncpy(mheard->entry.portname, mheard_portname, sizeof(mheard->entry.portname) - 1);
 			mheard->entry.portname[sizeof(mheard->entry.portname) - 1] = '\0';
 			mheard->entry.ndigis = 0;
 
@@ -669,37 +751,3 @@ static int ftype(char *data, int *type, int extseq)
 	}
 }
 
-static struct mheard_list_struct *findentry(ax25_address *callsign, char *port)
-{
-	struct mheard_list_struct *oldest = NULL;
-	int i;
-
-	for (i = 0; i < mheard_list_size; i++)
-		if (mheard_list[i].in_use &&
-		    ax25_cmp(&mheard_list[i].entry.from_call, callsign) == 0 &&
-		    strcmp(mheard_list[i].entry.portname, port) == 0)
-			return mheard_list + i;
-
-	for (i = 0; i < mheard_list_size; i++) {
-		if (!mheard_list[i].in_use) {
-			mheard_list[i].in_use   = TRUE;
-			mheard_list[i].position = 0xFFFFFF;
-			return mheard_list + i;
-		}
-	}
-
-	for (i = 0; i < mheard_list_size; i++) {
-		if (mheard_list[i].in_use) {
-			if (oldest == NULL) {
-				oldest = mheard_list + i;
-			} else {
-				if (mheard_list[i].entry.last_heard < oldest->entry.last_heard)
-					oldest = mheard_list + i;
-			}
-		}
-	}
-
-	memset(&oldest->entry, 0x00, sizeof(struct mheard_struct));
-
-	return oldest;
-}
