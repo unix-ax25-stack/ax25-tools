@@ -162,6 +162,12 @@ matches the criteria of both the
 .B "interface control"
 and the
 .B "callsign entry".
+The program to execute must be a real binary; shell scripts are not executed
+directly. If you need to run a shell script, use
+.B /bin/sh -c /path/to/script
+or
+.B /bin/bash -c /path/to/script
+as the executable with the appropriate arguments.
 .TP 10
 .B args...
 These are the optional arguments that are passed to the executable. All of
@@ -210,6 +216,9 @@ This is only valid under NET/ROM and Rose, under AX.25 a % is substituted instea
 .B %r
 The nodename of the remote station in lower case with the SSID.
 This is only valid under NET/ROM and Rose, under AX.25 a % is substituted instead.
+.TP 5
+.B %%
+A literal % sign.
 .RE
 .PP
 A trailing
@@ -261,14 +270,9 @@ as the caller, on the local call it arrived for, is then
 default  * * * * * *  \-  root  /usr/sbin/ax25_call  ax25_call %d %S %L
 .fi
 .RE
-.TP 5
-.B %%
-A %.
-.RE
-.RE
 .sp 1
 The
-.B peer
+.B peer 
 argument is dependent upon whether AX.25, NET/ROM or Rose is being used. There are
 five formats of this argument:
 .sp 1
