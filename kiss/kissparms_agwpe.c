@@ -13,7 +13,16 @@
 #include <netax25/axconfig.h>
 #include <netax25/agwpe_client.h>
 #include <netax25/agwpe.h>
-#include "kissparms.h"
+
+/* KISS parameter numbers */
+#define PARAM_TXDELAY     1
+#define PARAM_PERSIST     2
+#define PARAM_SLOTTIME    3
+#define PARAM_TXTAIL      4
+#define PARAM_FULLDUP     5
+#define PARAM_HARDWARE    6
+#define PARAM_FECLEVEL    8
+#define PARAM_RETURN      0xFF
 
 /* Build a KISS command frame */
 static int build_kiss_cmd(unsigned char *frame, int param, int value)
@@ -80,7 +89,7 @@ int kissparms_agwpe(const char *port, struct ax25_port_info *pinfo,
     unsigned char port_num = pinfo->port;
     unsigned char channel = pinfo->channel;
 
-    /* unused */
+    int rc_final = 0;
 
     /* Send KISS commands via AGWPE 'X' frames */
     if (crcmode != -1) {
@@ -114,7 +123,7 @@ int kissparms_agwpe(const char *port, struct ax25_port_info *pinfo,
             rc = 1;
     }
     if (feclevel != -1) {
-        //if (send_agwpe_kiss_cmd(cl, port_num, channel, PARAM_FECLEVEL, feclevel) != 0)
+        if (send_agwpe_kiss_cmd(cl, port_num, channel, PARAM_FECLEVEL, feclevel) != 0)
             rc = 1;
     }
 

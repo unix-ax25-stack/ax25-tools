@@ -30,7 +30,15 @@
 #include <netax25/axconfig.h>
 #include <netax25/wampes_client.h>
 #include <netax25/agwpe_client.h>
-#include "kissparms.h"
+
+#define	PARAM_TXDELAY	1
+#define	PARAM_PERSIST	2
+#define	PARAM_SLOTTIME	3
+#define	PARAM_TXTAIL	4
+#define	PARAM_FULLDUP	5
+#define	PARAM_HARDWARE	6
+#define	PARAM_FECLEVEL	8
+#define	PARAM_RETURN	255
 
 #define USAGE "usage: kissparms [-c crc-type] -p <port> [-f y|n] [-h hw] [-l txtail]\n                 [-r pers ] [-s slot] [-t txd] [-e feclevel] [-v] [-x] [-X raw]\n"
 
@@ -159,21 +167,38 @@ rawsend:
 	return 0;
 }
 
-/* Forward declarations for backend implementations */
-extern int kissparms_wampes(const char *port, struct ax25_port_info *pinfo,
+/*
+ * Send KISS parameter commands via WAMPES node.
+ * Uses WAMPES client API to send "kiss" commands to the node.
+ */
+static int kissparms_wampes(const char *port, struct ax25_port_info *pinfo,
 			    int crcmode, int txdelay, int txtail, int persist,
 			    int slottime, int fulldup, int hardware, int feclevel,
-			    int kissoff, int X);
+			    int kissoff, int X)
+{
+	/* TODO: Implement WAMPES kissparms via WAMPES service socket */
+	fprintf(stderr, "kissparms: WAMPES backend not yet implemented\n");
+	return 1;
+}
 
-extern int kissparms_agwpe(const char *port, struct ax25_port_info *pinfo,
+/*
+ * Send KISS parameter commands via AGWPE server.
+ * Uses AGWPE 'X' (raw KISS) frames to send raw KISS commands to the TNC.
+ */
+static int kissparms_agwpe(const char *port, struct ax25_port_info *pinfo,
 			    int crcmode, int txdelay, int txtail, int persist,
 			    int slottime, int fulldup, int hardware, int feclevel,
-			    int kissoff, int X);
+			    int kissoff, int X)
+{
+	/* TODO: Implement AGWPE kissparms via AGWPE 'X' frames */
+	fprintf(stderr, "kissparms: AGWPE backend not yet implemented\n");
+	return 1;
+}
 
 int main(int argc, char *argv[])
 {
 	unsigned char buffer[256];
-	int option_e_set = 0;
+	struct sockaddr sa;
 	int proto = ETH_P_AX25;
 	int txdelay  = -1;
 	int txtail  = -1;
@@ -201,7 +226,6 @@ int main(int argc, char *argv[])
 			break;
 		case 'e':
 			feclevel = atoi(optarg);
-			option_e_set = 1;
 			if (feclevel < 0 || feclevel > 3) {
 				fprintf(stderr, "kissparms: invalid FEC level value\n");
 				return 1;
@@ -309,10 +333,6 @@ int main(int argc, char *argv[])
 					txdelay, txtail, persist, slottime, fulldup,
 					hardware, feclevel, kissoff, X);
 	} else if (pinfo.backend == AX25_PORT_WAMPES) {
-		if (option_e_set) {
-			fprintf(stderr, "kissparms: feclevel not supported at '%s'\n", port);
-			return 1;
-		}
 		return kissparms_wampes(port, &pinfo,
 					crcmode, txdelay, txtail, persist, slottime, fulldup,
 					hardware, feclevel, kissoff, X);

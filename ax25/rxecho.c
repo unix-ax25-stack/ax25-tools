@@ -61,33 +61,17 @@
 #include <syslog.h>
 #include <signal.h>
 #include <sys/types.h>
-#include <errno.h>
 
 #include <config.h>
 #include <scm-version.h>
 
 #include <sys/socket.h>
 
-#if defined(__GLIBC__)
 #include <features.h>    /* for the glibc version number */
-#endif
 #include <sys/ioctl.h>
 #include <net/if.h>
-#if defined(__linux__)
 #include <netpacket/packet.h>
-#endif
-#ifndef AF_PACKET
-#define AF_PACKET PF_PACKET
-#endif
-#ifndef PF_PACKET
-#define PF_PACKET 17
-#endif
-#ifndef SOCK_PACKET
-#define SOCK_PACKET 10
-#endif
-#ifndef ETH_P_AX25
-#define ETH_P_AX25 0x0002
-#endif
+#include <net/ethernet.h>
 
 #include <netinet/in.h>
 
@@ -97,22 +81,16 @@
 #include <netax25/axlib.h>
 #include <netax25/axconfig.h>
 #include <netax25/daemon.h>
-#include <netax25/axmon.h>
 
 #include "../pathnames.h"
 
 #define MAXCALLS	8
 
-#ifndef AX25_PORT_NAME_LEN
-#define AX25_PORT_NAME_LEN	64
-#endif
-
 struct config {
-	char		from[AX25_PORT_NAME_LEN];
-	enum ax25_port_backend from_backend;
-	char		to[AX25_PORT_NAME_LEN];
-	enum ax25_port_backend to_backend;
-	int		to_fd;
+	char		from[IFNAMSIZ];
+	int		from_idx;
+	char		to[IFNAMSIZ];
+	int		to_idx;
 	ax25_address	calls[MAXCALLS];/* list of calls to echo	*/
 	int		ncalls;		/* number of calls to echo	*/
 
@@ -171,9 +149,8 @@ static int read_calls(struct config *p, char *s)
 static struct config *readconfig(void)
 {
 	FILE *fp;
-	char line[80], *cp;
+	char line[80], *cp, *dev;
 	struct config *p, *list = NULL;
-	struct ax25_port_info info;
 
 	fp = fopen(CONF_RXECHO_FILE, "r");
 	if (fp == NULL) {
@@ -193,37 +170,32 @@ static struct config *readconfig(void)
 			return NULL;
 		}
 
-		if (ax25_port_info(cp, &info) != 0 || info.backend == AX25_PORT_NONE) {
+		dev = ax25_config_get_dev(cp);
+		if (dev == NULL) {
 			fprintf(stderr, "rxecho: invalid port name - %s\n", cp);
-			free(p);
 			return NULL;
 		}
 
-		strncpy(p->from, cp, AX25_PORT_NAME_LEN - 1);
-		p->from[AX25_PORT_NAME_LEN - 1] = 0;
-		p->from_backend = info.backend;
+		strcpy(p->from, dev);
+		p->from_idx = -1;
 
 		cp = strtok(NULL, " \t\r\n");
 		if (cp == NULL) {
 			fprintf(stderr, "rxecho: config file error.\n");
-			free(p);
 			return NULL;
 		}
 
-		if (ax25_port_info(cp, &info) != 0 || info.backend == AX25_PORT_NONE) {
+		dev = ax25_config_get_dev(cp);
+		if (dev == NULL) {
 			fprintf(stderr, "rxecho: invalid port name - %s\n", cp);
-			free(p);
 			return NULL;
 		}
 
-		strncpy(p->to, cp, AX25_PORT_NAME_LEN - 1);
-		p->to[AX25_PORT_NAME_LEN - 1] = 0;
-		p->to_fd = -1;
-		p->to_backend = info.backend;
+		strcpy(p->to, dev);
+		p->to_idx = -1;
 
 		if (read_calls(p, strtok(NULL, " \t\r\n")) == -1) {
 			fprintf(stderr, "rxecho: config file error.\n");
-			free(p);
 			return NULL;
 		}
 
@@ -358,42 +330,19 @@ static int check_calls(struct config *cfg, unsigned char *buf, int len)
 	return -1;
 }
 
-static int open_tx_sock(const char *port)
-{
-	int fd;
-	struct sockaddr sa;
-
-	fd = socket(AF_PACKET, SOCK_PACKET, htons(ETH_P_AX25));
-	if (fd < 0) {
-		perror("rxecho: socket");
-		return -1;
-	}
-
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_family = AF_PACKET;
-	memset(sa.sa_data, 0, sizeof(sa.sa_data));
-	strncpy(sa.sa_data, port, sizeof(sa.sa_data) - 1);
-
-	if (bind(fd, &sa, sizeof(sa)) < 0) {
-		perror("rxecho: bind");
-		close(fd);
-		return -1;
-	}
-
-	return fd;
-}
-
 int main(int argc, char **argv)
 {
-	struct config *p, *list;
-	struct axmon mon;
+	struct sockaddr_ll sll;
+	struct sockaddr *psa = (struct sockaddr *)&sll;
+	const socklen_t sa_len = sizeof(struct sockaddr_ll);
+	int from_idx;
+	int s, size;
+	socklen_t alen;
 	unsigned char buf[1500];
-	char *port = NULL;
-	int opt, i;
-	unsigned int ready;
+	struct config *p, *list;
 
-	while ((opt = getopt(argc, argv, "lv")) != -1) {
-		switch (opt) {
+	while ((s = getopt(argc, argv, "lv")) != -1) {
+		switch (s) {
 		case 'l':
 			logging = TRUE;
 			break;
@@ -417,14 +366,43 @@ int main(int argc, char **argv)
 	if (list == NULL)
 		return 1;
 
+	s = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_AX25));
+	if (s == -1) {
+		perror("rxecho: socket:");
+		return 1;
+	}
+
 	for (p = list; p != NULL; p = p->next) {
-		p->to_fd = open_tx_sock(p->to);
-		if (p->to_fd < 0)
-			return 1;
+		int i;
+
+		for (i = 0; i < 2; i++) {
+			struct config *q;
+			struct ifreq ifr;
+			char *p_name = (i ? p->to : p->from);
+			int *p_idx = (i ? &p->to_idx : &p->from_idx);
+
+			/* already set?  */
+			if (*p_idx >= 0)
+				continue;
+			strncpy(ifr.ifr_name, p_name, sizeof(ifr.ifr_name)-1);
+			ifr.ifr_name[sizeof(ifr.ifr_name)-1] = 0;
+			if (ioctl(s, SIOCGIFINDEX, &ifr) < 0) {
+				perror("SIOCGIFINDEX");
+				return 1;
+			}
+			*p_idx = ifr.ifr_ifindex;
+			for (q = p->next; q != NULL; q = q->next) {
+				if (q->from_idx < 0 && !strcmp(q->from, p_name))
+					q->from_idx = *p_idx;
+				if (q->to_idx < 0 && !strcmp(q->to, p_name))
+					q->to_idx = *p_idx;
+			}
+		}
 	}
 
 	if (!daemon_start(FALSE)) {
 		fprintf(stderr, "rxecho: cannot become a daemon\n");
+		close(s);
 		return 1;
 	}
 
@@ -433,49 +411,43 @@ int main(int argc, char **argv)
 		syslog(LOG_INFO, "starting");
 	}
 
-	if (axmon_open(htons(ETH_P_AX25), port, &mon) < 0) {
-		if (logging) {
-			syslog(LOG_ERR, "axmon_open: %s", strerror(errno));
-			closelog();
-		}
-		return 1;
-	}
+	for (;;) {
+		alen = sa_len;
 
-	while (axmon_alive(&mon) > 0) {
-		if (axmon_poll(&mon, -1, &ready) < 0)
-			break;
-		for (i = 0; i < mon.nfd; i++) {
-			if (!(ready & (1 << i)))
-				continue;
-			ssize_t size;
-			struct sockaddr sa;
-			socklen_t asize = sizeof(sa);
-			char from[AX25_PORT_NAME_LEN] = "";
-
-			size = axmon_read(mon.fd[i], mon.framed[i], buf, sizeof(buf), &sa, &asize);
-			if (size <= 0) {
-				if (size < 0 && logging)
-					syslog(LOG_ERR, "axmon_read: %s", strerror(errno));
-				break;
+		size = recvfrom(s, buf, 1500, 0, psa, &alen);
+		if (size == -1) {
+			if (logging) {
+				syslog(LOG_ERR, "recvfrom: %m");
+				closelog();
 			}
+			return 1;
+		}
 
-			const char *src = axmon_source_name(&mon, i);
-			if (src)
-				strncpy(from, src, AX25_PORT_NAME_LEN - 1);
-			else if (sa.sa_family == AF_PACKET || sa.sa_family == PF_PACKET)
-				strncpy(from, sa.sa_data, AX25_PORT_NAME_LEN - 1);
+		from_idx = sll.sll_ifindex;
 
-			for (p = list; p != NULL; p = p->next) {
-				if (!strcmp(p->from, from) && check_calls(p, buf, size) == 0) {
-					if (send(p->to_fd, buf, size, 0) < 0) {
-						if (logging)
-							syslog(LOG_ERR, "send: %s", strerror(errno));
+		for (p = list; p != NULL; p = p->next)
+			if (p->from_idx == from_idx && (check_calls(p, buf, size) == 0)) {
+				sll.sll_ifindex = p->to_idx;
+				/*
+				 * cave: alen (set by recvfrom()) may > salen
+				 *   which means it may point beyound of the
+				 *   end of the struct. thats why we use the
+				 *   correct len (sa_len). this fixes a bug
+				 *   where skpt->protocol on sockaddr structs
+				 *   pointed behind the struct, leading to
+				 *   funny protocol IDs.
+				 *   btw, the linux kernel internaly always
+				 *   maps to sockaddr to sockaddr_pkt
+				 *   on sockets of type SOCK_PACKET on family
+				 *   AF_INET. sockaddr_pkt is len 18, sockaddr
+				 *   is 16.
+				 */
+				if (sendto(s, buf, size, 0, psa, sa_len) == -1) {
+					if (logging) {
+						syslog(LOG_ERR, "sendto: %m");
+						closelog();
 					}
 				}
 			}
-		}
 	}
-
-	axmon_close(&mon);
-	return 0;
 }

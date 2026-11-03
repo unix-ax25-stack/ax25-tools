@@ -29,6 +29,3 @@ dist_man_MANS = kissattach.8 spattach.8 kissnetd.8 kissparms.8 mkiss.8 \
 		net2kiss.8
 
 EXTRA_DIST = kissparms_wampes.c kissparms_agwpe.c
-
-mostlyclean-local:
-	-rm -rf .deps
